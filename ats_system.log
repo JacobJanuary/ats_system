@@ -1,0 +1,1812 @@
+2025-08-20 18:37:07,236 - __main__ - INFO - ============================================================
+2025-08-20 18:37:07,238 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-20 18:37:07,238 - __main__ - INFO - ============================================================
+2025-08-20 18:37:07,238 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 10.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "fixed",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-20 18:37:07,238 - __main__ - INFO - Initializing database connection...
+2025-08-20 18:37:07,895 - database.connection - INFO - Database connection pool initialized
+2025-08-20 18:37:07,895 - database.connection - INFO - Database manager initialized
+2025-08-20 18:37:08,028 - __main__ - INFO - Database connection established
+2025-08-20 18:37:08,028 - __main__ - INFO - Initializing binance exchange...
+2025-08-20 18:37:09,263 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-20 18:37:10,515 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-20 18:37:10,516 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-20 18:37:11,293 - __main__ - INFO - Balance: USDT = 14969.76162780
+2025-08-20 18:37:11,293 - __main__ - INFO - Initializing signal processor...
+2025-08-20 18:37:11,294 - __main__ - INFO - Signal processor initialized
+2025-08-20 18:37:11,294 - __main__ - INFO - System initialization complete
+2025-08-20 18:37:11,294 - __main__ - INFO - ============================================================
+2025-08-20 18:37:11,294 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-20 18:37:11,294 - __main__ - INFO - ============================================================
+2025-08-20 18:37:11,294 - __main__ - INFO - Starting signal monitor...
+2025-08-20 18:37:11,295 - __main__ - INFO - Starting position monitor...
+2025-08-20 18:37:11,295 - __main__ - INFO - Starting prediction listener...
+2025-08-20 18:37:11,296 - __main__ - INFO - Starting cleanup task...
+2025-08-20 18:37:11,435 - __main__ - INFO - Found 1 new signals
+2025-08-20 18:37:11,684 - trading.signal_processor - ERROR - Error processing signal 316: invalid input for query argument $5: {'prediction_id': 316, 'signal_id': 6049... (expected str, got dict)
+2025-08-20 18:37:11,717 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-20 18:37:11,855 - trading.signal_processor - ERROR - Error processing signal 316: invalid input for query argument $5: {'signal_id': 1, 'symbol': 'BANANAS31USD... (expected str, got dict)
+2025-08-20 18:37:11,855 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 0, 'skipped': 0, 'errors': 1}
+2025-08-20 18:37:11,864 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 18:42:12,295 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 18:43:01,778 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-20 18:43:02,124 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-20 18:43:02,128 - exchanges.binance - INFO - Binance connection closed
+2025-08-20 18:43:02,218 - database.connection - INFO - Database connections closed
+2025-08-20 18:43:02,220 - __main__ - INFO - Shutdown complete
+2025-08-20 18:47:53,767 - __main__ - INFO - ============================================================
+2025-08-20 18:47:53,767 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-20 18:47:53,767 - __main__ - INFO - ============================================================
+2025-08-20 18:47:53,767 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 10.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "fixed",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-20 18:47:53,767 - __main__ - INFO - Initializing database connection...
+2025-08-20 18:47:54,408 - database.connection - INFO - Database connection pool initialized
+2025-08-20 18:47:54,409 - database.connection - INFO - Database manager initialized
+2025-08-20 18:47:54,537 - __main__ - INFO - Database connection established
+2025-08-20 18:47:54,537 - __main__ - INFO - Initializing binance exchange...
+2025-08-20 18:47:55,336 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-20 18:47:56,539 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-20 18:47:56,540 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-20 18:47:57,312 - __main__ - INFO - Balance: USDT = 14969.75939544
+2025-08-20 18:47:57,313 - __main__ - INFO - Initializing signal processor...
+2025-08-20 18:47:57,313 - __main__ - INFO - Signal processor initialized
+2025-08-20 18:47:57,313 - __main__ - INFO - System initialization complete
+2025-08-20 18:47:57,313 - __main__ - INFO - ============================================================
+2025-08-20 18:47:57,313 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-20 18:47:57,313 - __main__ - INFO - ============================================================
+2025-08-20 18:47:57,313 - __main__ - INFO - Starting signal monitor...
+2025-08-20 18:47:57,314 - __main__ - INFO - Starting position monitor...
+2025-08-20 18:47:57,314 - __main__ - INFO - Starting prediction listener...
+2025-08-20 18:47:57,315 - __main__ - INFO - Starting cleanup task...
+2025-08-20 18:47:57,741 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-20 18:47:57,872 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 18:49:18,923 - __main__ - INFO - Found 10 new signals
+2025-08-20 18:49:23,405 - exchanges.base - INFO - Opened SHORT position for ADAUSDT: qty=0, price=0.00
+2025-08-20 18:49:23,623 - trading.signal_processor - ERROR - Error opening position: name 'OrderStatus' is not defined
+2025-08-20 18:49:23,796 - trading.signal_processor - ERROR - Error processing signal 334: Failed to open position
+2025-08-20 18:49:25,686 - trading.signal_processor - INFO - Skipped signal 333: Not tradeable: Low volume: $513,648
+2025-08-20 18:49:27,107 - trading.signal_processor - INFO - Skipped signal 332: Not tradeable: Spread too high: 15.51%
+2025-08-20 18:49:28,543 - trading.signal_processor - INFO - Skipped signal 331: Not tradeable: Low volume: $792,891
+2025-08-20 18:49:30,250 - __main__ - ERROR - Error monitoring position ADAUSDT: record "new" has no field "updated_at"
+2025-08-20 18:49:30,421 - trading.signal_processor - INFO - Skipped signal 330: Not tradeable: Low volume: $709,044
+2025-08-20 18:49:33,439 - trading.signal_processor - ERROR - Failed to open position: Order value $0.00 below minimum $5
+2025-08-20 18:49:33,703 - trading.signal_processor - ERROR - Error processing signal 329: Failed to open position
+2025-08-20 18:49:34,640 - trading.signal_processor - INFO - Skipped signal 328: Not tradeable: Spread too high: 2.23%
+2025-08-20 18:49:38,743 - exchanges.binance - ERROR - Binance API error placing market order: APIError(code=-4131): The counterparty's best price does not meet the PERCENT_PRICE filter limit.
+2025-08-20 18:49:38,743 - trading.signal_processor - ERROR - Failed to open position: APIError(code=-4131): The counterparty's best price does not meet the PERCENT_PRICE filter limit.
+2025-08-20 18:49:39,033 - trading.signal_processor - ERROR - Error processing signal 327: Failed to open position
+2025-08-20 18:49:41,651 - __main__ - ERROR - Error monitoring position ADAUSDT: record "new" has no field "updated_at"
+2025-08-20 18:49:41,822 - exchanges.base - INFO - Opened SHORT position for FUNUSDT: qty=0, price=0.00
+2025-08-20 18:49:42,081 - trading.signal_processor - ERROR - Error opening position: name 'OrderStatus' is not defined
+2025-08-20 18:49:42,251 - trading.signal_processor - ERROR - Error processing signal 326: Failed to open position
+2025-08-20 18:49:42,637 - trading.signal_processor - INFO - Skipped signal 325: Bybit not yet implemented
+2025-08-20 18:49:42,637 - trading.signal_processor - WARNING - Skipped Bybit signal for XRPUSDT - not implemented
+2025-08-20 18:49:42,637 - __main__ - INFO - Processed signals: {'total': 10, 'executed': 0, 'skipped': 10, 'errors': 0}
+2025-08-20 18:49:47,820 - __main__ - INFO - Found 10 new signals
+2025-08-20 18:49:48,171 - trading.signal_processor - INFO - Skipped signal 346: Bybit not yet implemented
+2025-08-20 18:49:48,171 - trading.signal_processor - WARNING - Skipped Bybit signal for LINKUSDT - not implemented
+2025-08-20 18:49:50,045 - trading.signal_processor - INFO - Skipped signal 345: Not tradeable: Low volume: $709,064
+2025-08-20 18:49:51,457 - trading.signal_processor - INFO - Skipped signal 344: Not tradeable: Low volume: $562,489
+2025-08-20 18:49:52,396 - trading.signal_processor - INFO - Skipped signal 343: Not tradeable: Spread too high: 1182.11%
+2025-08-20 18:49:52,974 - __main__ - ERROR - Error monitoring position FUNUSDT: record "new" has no field "updated_at"
+2025-08-20 18:49:54,227 - __main__ - ERROR - Error monitoring position ADAUSDT: record "new" has no field "updated_at"
+2025-08-20 18:49:55,549 - exchanges.base - INFO - Opened LONG position for 1000BONKUSDT: qty=0, price=0.00
+2025-08-20 18:49:55,717 - trading.signal_processor - ERROR - Error opening position: name 'OrderStatus' is not defined
+2025-08-20 18:49:55,890 - trading.signal_processor - ERROR - Error processing signal 342: Failed to open position
+2025-08-20 18:49:58,563 - exchanges.base - INFO - Opened SHORT position for SEIUSDT: qty=0, price=0.00
+2025-08-20 18:49:58,731 - trading.signal_processor - ERROR - Error opening position: name 'OrderStatus' is not defined
+2025-08-20 18:49:58,910 - trading.signal_processor - ERROR - Error processing signal 341: Failed to open position
+2025-08-20 18:50:00,311 - trading.signal_processor - INFO - Skipped signal 340: Not tradeable: Low volume: $244,116
+2025-08-20 18:50:00,663 - trading.signal_processor - INFO - Skipped signal 339: Bybit not yet implemented
+2025-08-20 18:50:00,663 - trading.signal_processor - WARNING - Skipped Bybit signal for AVAXUSDT - not implemented
+2025-08-20 18:50:02,057 - trading.signal_processor - INFO - Skipped signal 338: Not tradeable: Low volume: $814,395
+2025-08-20 18:50:02,408 - trading.signal_processor - INFO - Skipped signal 337: Bybit not yet implemented
+2025-08-20 18:50:02,408 - trading.signal_processor - WARNING - Skipped Bybit signal for MATICUSDT - not implemented
+2025-08-20 18:50:02,409 - __main__ - INFO - Processed signals: {'total': 10, 'executed': 0, 'skipped': 10, 'errors': 0}
+2025-08-20 18:50:05,568 - __main__ - ERROR - Error monitoring position SEIUSDT: record "new" has no field "updated_at"
+2025-08-20 18:50:07,282 - __main__ - ERROR - Error monitoring position 1000BONKUSDT: record "new" has no field "updated_at"
+2025-08-20 18:50:07,593 - __main__ - INFO - Found 10 new signals
+2025-08-20 18:50:07,961 - trading.signal_processor - INFO - Skipped signal 336: Bybit not yet implemented
+2025-08-20 18:50:07,961 - trading.signal_processor - WARNING - Skipped Bybit signal for WLDUSDT - not implemented
+2025-08-20 18:50:08,516 - __main__ - ERROR - Error monitoring position FUNUSDT: record "new" has no field "updated_at"
+2025-08-20 18:50:09,751 - __main__ - ERROR - Error monitoring position ADAUSDT: record "new" has no field "updated_at"
+2025-08-20 18:50:11,445 - trading.signal_processor - ERROR - Failed to open position: Order value $0.00 below minimum $100
+2025-08-20 18:50:11,700 - trading.signal_processor - ERROR - Error processing signal 335: Failed to open position
+2025-08-20 18:50:15,347 - exchanges.base - INFO - Opened SHORT position for OPUSDT: qty=0.0, price=0.00
+2025-08-20 18:50:15,521 - trading.signal_processor - ERROR - Error opening position: name 'OrderStatus' is not defined
+2025-08-20 18:50:15,689 - trading.signal_processor - ERROR - Error processing signal 324: Failed to open position
+2025-08-20 18:50:16,041 - trading.signal_processor - INFO - Skipped signal 323: Bybit not yet implemented
+2025-08-20 18:50:16,041 - trading.signal_processor - WARNING - Skipped Bybit signal for ARBUSDT - not implemented
+2025-08-20 18:50:16,392 - trading.signal_processor - INFO - Skipped signal 322: Signal too old: 60s
+2025-08-20 18:50:16,732 - trading.signal_processor - INFO - Skipped signal 321: Signal too old: 61s
+2025-08-20 18:50:17,074 - trading.signal_processor - INFO - Skipped signal 320: Signal too old: 61s
+2025-08-20 18:50:17,415 - trading.signal_processor - INFO - Skipped signal 319: Signal too old: 62s
+2025-08-20 18:50:17,770 - trading.signal_processor - INFO - Skipped signal 318: Signal too old: 62s
+2025-08-20 18:50:18,112 - trading.signal_processor - INFO - Skipped signal 317: Bybit not yet implemented
+2025-08-20 18:50:18,113 - trading.signal_processor - WARNING - Skipped Bybit signal for INJUSDT - not implemented
+2025-08-20 18:50:18,113 - __main__ - INFO - Processed signals: {'total': 10, 'executed': 0, 'skipped': 10, 'errors': 0}
+2025-08-20 18:50:21,557 - __main__ - ERROR - Error monitoring position OPUSDT: record "new" has no field "updated_at"
+2025-08-20 18:50:23,264 - __main__ - ERROR - Error monitoring position SEIUSDT: record "new" has no field "updated_at"
+2025-08-20 18:50:24,500 - __main__ - ERROR - Error monitoring position 1000BONKUSDT: record "new" has no field "updated_at"
+2025-08-20 18:50:25,733 - __main__ - ERROR - Error monitoring position FUNUSDT: record "new" has no field "updated_at"
+2025-08-20 18:50:26,963 - __main__ - ERROR - Error monitoring position ADAUSDT: record "new" has no field "updated_at"
+2025-08-20 18:50:38,753 - __main__ - ERROR - Error monitoring position OPUSDT: record "new" has no field "updated_at"
+2025-08-20 18:50:40,468 - __main__ - ERROR - Error monitoring position SEIUSDT: record "new" has no field "updated_at"
+2025-08-20 18:50:41,692 - __main__ - ERROR - Error monitoring position 1000BONKUSDT: record "new" has no field "updated_at"
+2025-08-20 18:50:42,932 - __main__ - ERROR - Error monitoring position FUNUSDT: record "new" has no field "updated_at"
+2025-08-20 18:50:44,156 - __main__ - ERROR - Error monitoring position ADAUSDT: record "new" has no field "updated_at"
+2025-08-20 18:50:55,477 - __main__ - ERROR - Error monitoring position OPUSDT: record "new" has no field "updated_at"
+2025-08-20 18:50:57,177 - __main__ - ERROR - Error monitoring position SEIUSDT: record "new" has no field "updated_at"
+2025-08-20 18:50:58,408 - __main__ - ERROR - Error monitoring position 1000BONKUSDT: record "new" has no field "updated_at"
+2025-08-20 18:50:59,649 - __main__ - ERROR - Error monitoring position FUNUSDT: record "new" has no field "updated_at"
+2025-08-20 18:51:00,414 - __main__ - ERROR - Error monitoring position ADAUSDT: record "new" has no field "updated_at"
+2025-08-20 18:51:12,230 - __main__ - ERROR - Error monitoring position OPUSDT: record "new" has no field "updated_at"
+2025-08-20 18:51:13,929 - __main__ - ERROR - Error monitoring position SEIUSDT: record "new" has no field "updated_at"
+2025-08-20 18:51:15,164 - __main__ - ERROR - Error monitoring position 1000BONKUSDT: record "new" has no field "updated_at"
+2025-08-20 18:51:16,403 - __main__ - ERROR - Error monitoring position FUNUSDT: record "new" has no field "updated_at"
+2025-08-20 18:51:17,162 - __main__ - ERROR - Error monitoring position ADAUSDT: record "new" has no field "updated_at"
+2025-08-20 18:51:22,852 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-20 18:51:22,972 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-20 18:51:22,975 - exchanges.binance - INFO - Binance connection closed
+2025-08-20 18:51:23,064 - database.connection - INFO - Database connections closed
+2025-08-20 18:51:23,064 - __main__ - INFO - Shutdown complete
+2025-08-20 19:57:02,093 - __main__ - INFO - ============================================================
+2025-08-20 19:57:02,093 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-20 19:57:02,093 - __main__ - INFO - ============================================================
+2025-08-20 19:57:02,093 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 10.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "fixed",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-20 19:57:02,094 - __main__ - INFO - Initializing database connection...
+2025-08-20 19:57:02,764 - database.connection - INFO - Database connection pool initialized
+2025-08-20 19:57:02,764 - database.connection - INFO - Database manager initialized
+2025-08-20 19:57:02,895 - __main__ - INFO - Database connection established
+2025-08-20 19:57:02,895 - __main__ - INFO - Initializing binance exchange...
+2025-08-20 19:57:04,159 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-20 19:57:05,390 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-20 19:57:05,391 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-20 19:57:06,177 - __main__ - INFO - Balance: USDT = 14968.27051473
+2025-08-20 19:57:06,177 - __main__ - INFO - Initializing signal processor...
+2025-08-20 19:57:06,177 - __main__ - INFO - Signal processor initialized
+2025-08-20 19:57:06,177 - __main__ - INFO - System initialization complete
+2025-08-20 19:57:06,177 - __main__ - INFO - ============================================================
+2025-08-20 19:57:06,177 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-20 19:57:06,177 - __main__ - INFO - ============================================================
+2025-08-20 19:57:06,177 - __main__ - INFO - Starting signal monitor...
+2025-08-20 19:57:06,178 - __main__ - INFO - Starting position monitor...
+2025-08-20 19:57:06,178 - __main__ - INFO - Starting prediction listener...
+2025-08-20 19:57:06,179 - __main__ - INFO - Starting cleanup task...
+2025-08-20 19:57:06,589 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-20 19:57:06,737 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 19:57:57,242 - __main__ - INFO - Found 1 new signals
+2025-08-20 19:58:02,629 - exchanges.base - INFO - Opened LONG position for BTCUSDT: qty=0.000, price=0.00
+2025-08-20 19:58:03,284 - exchanges.binance - ERROR - Error placing stop market order: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:58:03,284 - trading.signal_processor - ERROR - Failed to set stop loss: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:58:04,044 - exchanges.binance - ERROR - Error placing take profit order: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:58:04,044 - trading.signal_processor - ERROR - Failed to set take profit: Failed to set take profit orders
+2025-08-20 19:58:04,045 - trading.signal_processor - INFO - Opened LONG position for BTCUSDT: qty=0.000, price=0.00
+2025-08-20 19:58:04,129 - trading.signal_processor - INFO - Signal 347 executed in 6.88s
+2025-08-20 19:58:04,130 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-20 19:58:14,394 - __main__ - INFO - Found 1 new signals
+2025-08-20 19:58:14,739 - trading.signal_processor - INFO - Skipped signal 348: Cooldown active, 13s remaining
+2025-08-20 19:58:14,739 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 0, 'skipped': 1, 'errors': 0}
+2025-08-20 19:58:25,010 - __main__ - INFO - Found 10 new signals
+2025-08-20 19:58:25,494 - trading.signal_processor - INFO - Skipped signal 359: Bybit not yet implemented
+2025-08-20 19:58:25,494 - trading.signal_processor - WARNING - Skipped Bybit signal for UNIUSDT - not implemented
+2025-08-20 19:58:30,165 - exchanges.base - INFO - Opened LONG position for BNBUSDT: qty=0.00, price=0.00
+2025-08-20 19:58:31,401 - exchanges.binance - ERROR - Error placing stop market order: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:58:31,402 - trading.signal_processor - ERROR - Failed to set stop loss: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:58:32,164 - exchanges.binance - ERROR - Error placing take profit order: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:58:32,164 - trading.signal_processor - ERROR - Failed to set take profit: Failed to set take profit orders
+2025-08-20 19:58:32,164 - trading.signal_processor - INFO - Opened LONG position for BNBUSDT: qty=0.00, price=0.00
+2025-08-20 19:58:32,250 - trading.signal_processor - INFO - Signal 358 executed in 6.76s
+2025-08-20 19:58:33,196 - trading.signal_processor - INFO - Skipped signal 357: Not tradeable: Low volume: $577,966
+2025-08-20 19:58:35,417 - exchanges.base - INFO - Opened LONG position for 1000BONKUSDT: qty=0, price=0.00
+2025-08-20 19:58:36,450 - exchanges.binance - ERROR - Error placing stop market order: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:58:36,451 - trading.signal_processor - ERROR - Failed to set stop loss: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:58:36,746 - exchanges.binance - ERROR - Error placing take profit order: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:58:36,747 - trading.signal_processor - ERROR - Failed to set take profit: Failed to set take profit orders
+2025-08-20 19:58:36,747 - trading.signal_processor - INFO - Opened LONG position for 1000BONKUSDT: qty=0, price=0.00
+2025-08-20 19:58:36,834 - trading.signal_processor - INFO - Signal 356 executed in 3.64s
+2025-08-20 19:58:40,465 - exchanges.base - INFO - Opened SHORT position for ETHUSDT: qty=0.000, price=0.00
+2025-08-20 19:58:41,488 - exchanges.binance - ERROR - Error placing stop market order: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:58:41,488 - trading.signal_processor - ERROR - Failed to set stop loss: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:58:42,256 - exchanges.binance - ERROR - Error placing take profit order: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:58:42,256 - trading.signal_processor - ERROR - Failed to set take profit: Failed to set take profit orders
+2025-08-20 19:58:42,256 - trading.signal_processor - INFO - Opened SHORT position for ETHUSDT: qty=0.000, price=0.00
+2025-08-20 19:58:42,341 - trading.signal_processor - INFO - Signal 355 executed in 5.50s
+2025-08-20 19:58:43,286 - trading.signal_processor - INFO - Skipped signal 354: Not tradeable: Low volume: $903,638
+2025-08-20 19:58:43,645 - trading.signal_processor - INFO - Skipped signal 353: Bybit not yet implemented
+2025-08-20 19:58:43,645 - trading.signal_processor - WARNING - Skipped Bybit signal for WLDUSDT - not implemented
+2025-08-20 19:58:45,060 - trading.signal_processor - INFO - Skipped signal 352: Not tradeable: Low volume: $654,088
+2025-08-20 19:58:48,236 - exchanges.base - INFO - Opened SHORT position for ADAUSDT: qty=0, price=0.00
+2025-08-20 19:58:49,261 - exchanges.binance - ERROR - Error placing stop market order: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:58:49,262 - trading.signal_processor - ERROR - Failed to set stop loss: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:58:49,558 - exchanges.binance - ERROR - Error placing take profit order: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:58:49,558 - trading.signal_processor - ERROR - Failed to set take profit: Failed to set take profit orders
+2025-08-20 19:58:49,558 - trading.signal_processor - INFO - Opened SHORT position for ADAUSDT: qty=0, price=0.00
+2025-08-20 19:58:49,657 - trading.signal_processor - INFO - Signal 351 executed in 4.60s
+2025-08-20 19:58:51,073 - trading.signal_processor - INFO - Skipped signal 350: Not tradeable: Spread too high: 9.92%
+2025-08-20 19:58:51,074 - __main__ - INFO - Processed signals: {'total': 10, 'executed': 4, 'skipped': 6, 'errors': 0}
+2025-08-20 19:58:56,257 - __main__ - INFO - Found 10 new signals
+2025-08-20 19:58:58,152 - trading.signal_processor - INFO - Skipped signal 378: Not tradeable: Low volume: $543,825
+2025-08-20 19:59:00,031 - trading.signal_processor - INFO - Skipped signal 377: Not tradeable: Spread too high: 5.92%
+2025-08-20 19:59:01,448 - trading.signal_processor - INFO - Skipped signal 376: Not tradeable: Low volume: $738,328
+2025-08-20 19:59:01,788 - trading.signal_processor - INFO - Skipped signal 375: Bybit not yet implemented
+2025-08-20 19:59:01,788 - trading.signal_processor - WARNING - Skipped Bybit signal for TIAUSDT - not implemented
+2025-08-20 19:59:04,463 - exchanges.base - INFO - Opened LONG position for INJUSDT: qty=0.0, price=0.00
+2025-08-20 19:59:05,023 - exchanges.binance - ERROR - Error placing stop market order: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:59:05,023 - trading.signal_processor - ERROR - Failed to set stop loss: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:59:05,315 - exchanges.binance - ERROR - Error placing take profit order: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:59:05,316 - trading.signal_processor - ERROR - Failed to set take profit: Failed to set take profit orders
+2025-08-20 19:59:05,316 - trading.signal_processor - INFO - Opened LONG position for INJUSDT: qty=0.0, price=0.00
+2025-08-20 19:59:05,403 - trading.signal_processor - INFO - Signal 374 executed in 3.61s
+2025-08-20 19:59:09,501 - exchanges.base - INFO - Opened LONG position for DOGEUSDT: qty=0, price=0.00
+2025-08-20 19:59:10,525 - exchanges.binance - ERROR - Error placing stop market order: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:59:10,525 - trading.signal_processor - ERROR - Failed to set stop loss: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:59:10,821 - exchanges.binance - ERROR - Error placing take profit order: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:59:10,821 - trading.signal_processor - ERROR - Failed to set take profit: Failed to set take profit orders
+2025-08-20 19:59:10,822 - trading.signal_processor - INFO - Opened LONG position for DOGEUSDT: qty=0, price=0.00
+2025-08-20 19:59:10,907 - trading.signal_processor - INFO - Signal 373 executed in 5.50s
+2025-08-20 19:59:14,056 - exchanges.base - INFO - Opened LONG position for SUIUSDT: qty=0.0, price=0.00
+2025-08-20 19:59:14,610 - exchanges.binance - ERROR - Error placing stop market order: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:59:14,610 - trading.signal_processor - ERROR - Failed to set stop loss: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:59:14,902 - exchanges.binance - ERROR - Error placing take profit order: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:59:14,902 - trading.signal_processor - ERROR - Failed to set take profit: Failed to set take profit orders
+2025-08-20 19:59:14,903 - trading.signal_processor - INFO - Opened LONG position for SUIUSDT: qty=0.0, price=0.00
+2025-08-20 19:59:14,988 - trading.signal_processor - INFO - Signal 372 executed in 4.08s
+2025-08-20 19:59:15,333 - trading.signal_processor - INFO - Skipped signal 371: Bybit not yet implemented
+2025-08-20 19:59:15,334 - trading.signal_processor - WARNING - Skipped Bybit signal for XMRUSDT - not implemented
+2025-08-20 19:59:15,678 - trading.signal_processor - INFO - Skipped signal 370: Bybit not yet implemented
+2025-08-20 19:59:15,678 - trading.signal_processor - WARNING - Skipped Bybit signal for SEIUSDT - not implemented
+2025-08-20 19:59:16,017 - trading.signal_processor - INFO - Skipped signal 369: Bybit not yet implemented
+2025-08-20 19:59:16,018 - trading.signal_processor - WARNING - Skipped Bybit signal for MATICUSDT - not implemented
+2025-08-20 19:59:16,018 - __main__ - INFO - Processed signals: {'total': 10, 'executed': 3, 'skipped': 7, 'errors': 0}
+2025-08-20 19:59:21,203 - __main__ - INFO - Found 10 new signals
+2025-08-20 19:59:21,556 - trading.signal_processor - INFO - Skipped signal 368: Bybit not yet implemented
+2025-08-20 19:59:21,557 - trading.signal_processor - WARNING - Skipped Bybit signal for FUNUSDT - not implemented
+2025-08-20 19:59:21,906 - trading.signal_processor - INFO - Skipped signal 367: Bybit not yet implemented
+2025-08-20 19:59:21,906 - trading.signal_processor - WARNING - Skipped Bybit signal for TONUSDT - not implemented
+2025-08-20 19:59:25,515 - exchanges.base - INFO - Opened SHORT position for 1000FLOKIUSDT: qty=0, price=0.00
+2025-08-20 19:59:26,065 - exchanges.binance - ERROR - Error placing stop market order: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:59:26,065 - trading.signal_processor - ERROR - Failed to set stop loss: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:59:26,827 - exchanges.binance - ERROR - Error placing take profit order: APIError(code=-4006): Stop price less than zero.
+2025-08-20 19:59:26,828 - trading.signal_processor - ERROR - Failed to set take profit: Failed to set take profit orders
+2025-08-20 19:59:26,828 - trading.signal_processor - INFO - Opened SHORT position for 1000FLOKIUSDT: qty=0, price=0.00
+2025-08-20 19:59:26,914 - trading.signal_processor - INFO - Signal 366 executed in 5.01s
+2025-08-20 19:59:27,270 - trading.signal_processor - INFO - Skipped signal 365: Signal too old: 61s
+2025-08-20 19:59:27,615 - trading.signal_processor - INFO - Skipped signal 364: Signal too old: 62s
+2025-08-20 19:59:27,960 - trading.signal_processor - INFO - Skipped signal 363: Signal too old: 62s
+2025-08-20 19:59:28,311 - trading.signal_processor - INFO - Skipped signal 362: Signal too old: 63s
+2025-08-20 19:59:28,660 - trading.signal_processor - INFO - Skipped signal 361: Signal too old: 63s
+2025-08-20 19:59:29,004 - trading.signal_processor - INFO - Skipped signal 360: Signal too old: 64s
+2025-08-20 19:59:29,346 - trading.signal_processor - INFO - Skipped signal 349: Signal too old: 67s
+2025-08-20 19:59:29,346 - __main__ - INFO - Processed signals: {'total': 10, 'executed': 1, 'skipped': 9, 'errors': 0}
+2025-08-20 20:02:07,038 - __main__ - INFO - Today's metrics: Signals: 9, Positions: 9, PNL: $0.00
+2025-08-20 20:07:07,260 - __main__ - INFO - Today's metrics: Signals: 9, Positions: 9, PNL: $0.00
+2025-08-20 20:12:07,488 - __main__ - INFO - Today's metrics: Signals: 9, Positions: 9, PNL: $0.00
+2025-08-20 20:17:07,755 - __main__ - INFO - Today's metrics: Signals: 9, Positions: 9, PNL: $0.00
+2025-08-20 20:22:07,994 - __main__ - INFO - Today's metrics: Signals: 9, Positions: 9, PNL: $0.00
+2025-08-20 20:27:08,213 - __main__ - INFO - Today's metrics: Signals: 9, Positions: 9, PNL: $0.00
+2025-08-20 20:29:56,241 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-20 20:29:56,761 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-20 20:29:56,766 - exchanges.binance - INFO - Binance connection closed
+2025-08-20 20:29:56,852 - database.connection - INFO - Database connections closed
+2025-08-20 20:29:56,852 - __main__ - INFO - Shutdown complete
+2025-08-20 20:31:35,721 - __main__ - INFO - ============================================================
+2025-08-20 20:31:35,721 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-20 20:31:35,721 - __main__ - INFO - ============================================================
+2025-08-20 20:31:35,721 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 20.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "fixed",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-20 20:31:35,721 - __main__ - INFO - Initializing database connection...
+2025-08-20 20:31:36,363 - database.connection - INFO - Database connection pool initialized
+2025-08-20 20:31:36,363 - database.connection - INFO - Database manager initialized
+2025-08-20 20:31:36,496 - __main__ - INFO - Database connection established
+2025-08-20 20:31:36,496 - __main__ - INFO - Initializing binance exchange...
+2025-08-20 20:31:37,287 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-20 20:31:38,579 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-20 20:31:38,580 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-20 20:31:39,367 - __main__ - INFO - Balance: USDT = 14968.12453132
+2025-08-20 20:31:39,367 - __main__ - INFO - Initializing signal processor...
+2025-08-20 20:31:39,367 - __main__ - INFO - Signal processor initialized
+2025-08-20 20:31:39,367 - __main__ - INFO - System initialization complete
+2025-08-20 20:31:39,367 - __main__ - INFO - ============================================================
+2025-08-20 20:31:39,367 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-20 20:31:39,367 - __main__ - INFO - ============================================================
+2025-08-20 20:31:39,367 - __main__ - INFO - Starting signal monitor...
+2025-08-20 20:31:39,368 - __main__ - INFO - Starting position monitor...
+2025-08-20 20:31:39,368 - __main__ - INFO - Starting prediction listener...
+2025-08-20 20:31:39,370 - __main__ - INFO - Starting cleanup task...
+2025-08-20 20:31:39,799 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-20 20:31:39,939 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 9, PNL: $0.00
+2025-08-20 20:32:10,116 - __main__ - INFO - Found 1 new signals
+2025-08-20 20:32:14,572 - exchanges.base - WARNING - Using requested quantity 0.001 as executed quantity was 0.000
+2025-08-20 20:32:14,572 - exchanges.base - WARNING - Using market price 114003.00 as avg price was 0.00
+2025-08-20 20:32:14,572 - exchanges.base - INFO - Opened LONG position for BTCUSDT: qty=0.001, price=114003.00
+2025-08-20 20:32:15,705 - exchanges.base - INFO - Set fixed stop loss for BTCUSDT: order_id=5599807154
+2025-08-20 20:32:15,798 - trading.signal_processor - INFO - Set fixed stop loss for BTCUSDT
+2025-08-20 20:32:16,101 - exchanges.base - INFO - Set take profit for BTCUSDT: price=118563.1
+2025-08-20 20:32:16,187 - trading.signal_processor - INFO - Set take profit for BTCUSDT: 1 orders
+2025-08-20 20:32:16,187 - trading.signal_processor - INFO - Opened LONG position for BTCUSDT: qty=0.001, price=114003.00
+2025-08-20 20:32:16,284 - trading.signal_processor - INFO - Signal 379 executed in 6.17s
+2025-08-20 20:32:16,284 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-20 20:34:13,384 - __main__ - INFO - Found 1 new signals
+2025-08-20 20:34:17,956 - exchanges.base - WARNING - Using requested quantity 0.023 as executed quantity was 0.000
+2025-08-20 20:34:17,957 - exchanges.base - WARNING - Using market price 4309.99 as avg price was 0.00
+2025-08-20 20:34:17,957 - exchanges.base - INFO - Opened SHORT position for ETHUSDT: qty=0.023, price=4309.99
+2025-08-20 20:34:18,988 - exchanges.base - INFO - Set fixed stop loss for ETHUSDT: order_id=4977377955
+2025-08-20 20:34:19,072 - trading.signal_processor - INFO - Set fixed stop loss for ETHUSDT
+2025-08-20 20:34:19,364 - exchanges.base - INFO - Set take profit for ETHUSDT: price=4137.59
+2025-08-20 20:34:19,452 - trading.signal_processor - INFO - Set take profit for ETHUSDT: 1 orders
+2025-08-20 20:34:19,453 - trading.signal_processor - INFO - Opened SHORT position for ETHUSDT: qty=0.023, price=4309.99
+2025-08-20 20:34:19,535 - trading.signal_processor - INFO - Signal 380 executed in 6.15s
+2025-08-20 20:34:19,535 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-20 20:34:50,171 - __main__ - INFO - Found 10 new signals
+2025-08-20 20:34:52,064 - trading.signal_processor - INFO - Skipped signal 401: Not tradeable: Low volume: $727,239
+2025-08-20 20:34:56,468 - exchanges.binance - WARNING - Testnet order simulation for DOGEUSDT: qty=458, price=0.218290
+2025-08-20 20:34:56,468 - exchanges.base - INFO - Opened LONG position for DOGEUSDT: qty=458, price=0.218290
+2025-08-20 20:34:57,023 - exchanges.base - INFO - Set fixed stop loss for DOGEUSDT: order_id=166715267
+2025-08-20 20:34:57,107 - trading.signal_processor - INFO - Set fixed stop loss for DOGEUSDT
+2025-08-20 20:34:57,870 - exchanges.base - INFO - Set take profit for DOGEUSDT: price=0.22702
+2025-08-20 20:34:57,999 - trading.signal_processor - INFO - Set take profit for DOGEUSDT: 1 orders
+2025-08-20 20:34:57,999 - trading.signal_processor - INFO - Opened LONG position for DOGEUSDT: qty=458, price=0.218290
+2025-08-20 20:34:58,127 - trading.signal_processor - INFO - Signal 400 executed in 6.06s
+2025-08-20 20:34:58,552 - trading.signal_processor - INFO - Skipped signal 399: Bybit not yet implemented
+2025-08-20 20:34:58,553 - trading.signal_processor - WARNING - Skipped Bybit signal for ATOMUSDT - not implemented
+2025-08-20 20:35:02,098 - exchanges.binance - WARNING - Testnet order simulation for WLDUSDT: qty=106, price=0.9478000
+2025-08-20 20:35:02,098 - exchanges.base - INFO - Opened SHORT position for WLDUSDT: qty=106, price=0.9478000
+2025-08-20 20:35:03,167 - exchanges.base - INFO - Set fixed stop loss for WLDUSDT: order_id=19726394
+2025-08-20 20:35:03,256 - trading.signal_processor - INFO - Set fixed stop loss for WLDUSDT
+2025-08-20 20:35:03,554 - exchanges.base - INFO - Set take profit for WLDUSDT: price=0.9099
+2025-08-20 20:35:03,647 - trading.signal_processor - INFO - Set take profit for WLDUSDT: 1 orders
+2025-08-20 20:35:03,647 - trading.signal_processor - INFO - Opened SHORT position for WLDUSDT: qty=106, price=0.9478000
+2025-08-20 20:35:03,731 - trading.signal_processor - INFO - Signal 398 executed in 5.18s
+2025-08-20 20:35:05,225 - trading.signal_processor - INFO - Skipped signal 397: Risk check failed: Position already exists for ETHUSDT
+2025-08-20 20:35:06,172 - trading.signal_processor - INFO - Skipped signal 396: Not tradeable: Low volume: $622,777
+2025-08-20 20:35:07,584 - trading.signal_processor - INFO - Skipped signal 395: Not tradeable: Low volume: $862,487
+2025-08-20 20:35:09,475 - trading.signal_processor - INFO - Skipped signal 394: Not tradeable: Low volume: $914,897
+2025-08-20 20:35:13,105 - exchanges.base - WARNING - Using requested quantity 34.2 as executed quantity was 0.0
+2025-08-20 20:35:13,106 - exchanges.base - WARNING - Using market price 2.9277 as avg price was 0.00
+2025-08-20 20:35:13,106 - exchanges.base - INFO - Opened SHORT position for XRPUSDT: qty=34.2, price=2.9277
+2025-08-20 20:35:14,128 - exchanges.base - INFO - Set fixed stop loss for XRPUSDT: order_id=447712655
+2025-08-20 20:35:14,217 - trading.signal_processor - INFO - Set fixed stop loss for XRPUSDT
+2025-08-20 20:35:14,987 - exchanges.base - INFO - Set take profit for XRPUSDT: price=2.8106
+2025-08-20 20:35:15,077 - trading.signal_processor - INFO - Set take profit for XRPUSDT: 1 orders
+2025-08-20 20:35:15,077 - trading.signal_processor - INFO - Opened SHORT position for XRPUSDT: qty=34.2, price=2.9277
+2025-08-20 20:35:15,167 - trading.signal_processor - INFO - Signal 393 executed in 5.69s
+2025-08-20 20:35:17,388 - exchanges.base - WARNING - Using requested quantity 28.3 as executed quantity was 0.0
+2025-08-20 20:35:17,389 - exchanges.base - WARNING - Using market price 3.531700 as avg price was 0.00
+2025-08-20 20:35:17,389 - exchanges.base - INFO - Opened LONG position for SUIUSDT: qty=28.3, price=3.531700
+2025-08-20 20:35:18,421 - exchanges.base - INFO - Set fixed stop loss for SUIUSDT: order_id=289495135
+2025-08-20 20:35:18,505 - trading.signal_processor - INFO - Set fixed stop loss for SUIUSDT
+2025-08-20 20:35:19,266 - exchanges.base - INFO - Set take profit for SUIUSDT: price=3.6730
+2025-08-20 20:35:19,353 - trading.signal_processor - INFO - Set take profit for SUIUSDT: 1 orders
+2025-08-20 20:35:19,353 - trading.signal_processor - INFO - Opened LONG position for SUIUSDT: qty=28.3, price=3.531700
+2025-08-20 20:35:19,439 - trading.signal_processor - INFO - Signal 392 executed in 4.27s
+2025-08-20 20:35:19,439 - __main__ - INFO - Processed signals: {'total': 10, 'executed': 4, 'skipped': 6, 'errors': 0}
+2025-08-20 20:35:24,621 - __main__ - INFO - Found 10 new signals
+2025-08-20 20:35:26,021 - trading.signal_processor - INFO - Skipped signal 410: Not tradeable: Low volume: $928,806
+2025-08-20 20:35:27,435 - trading.signal_processor - INFO - Skipped signal 409: Not tradeable: Spread too high: 193.26%
+2025-08-20 20:35:27,800 - trading.signal_processor - INFO - Skipped signal 408: Bybit not yet implemented
+2025-08-20 20:35:27,801 - trading.signal_processor - WARNING - Skipped Bybit signal for ADAUSDT - not implemented
+2025-08-20 20:35:31,465 - exchanges.base - WARNING - Using requested quantity 0.12 as executed quantity was 0.00
+2025-08-20 20:35:31,466 - exchanges.base - WARNING - Using market price 850.000 as avg price was 0.00
+2025-08-20 20:35:31,466 - exchanges.base - INFO - Opened LONG position for BNBUSDT: qty=0.12, price=850.000
+2025-08-20 20:35:32,524 - exchanges.base - INFO - Set fixed stop loss for BNBUSDT: order_id=566346512
+2025-08-20 20:35:32,639 - trading.signal_processor - INFO - Set fixed stop loss for BNBUSDT
+2025-08-20 20:35:33,416 - exchanges.base - INFO - Set take profit for BNBUSDT: price=884.000
+2025-08-20 20:35:33,499 - trading.signal_processor - INFO - Set take profit for BNBUSDT: 1 orders
+2025-08-20 20:35:33,499 - trading.signal_processor - INFO - Opened LONG position for BNBUSDT: qty=0.12, price=850.000
+2025-08-20 20:35:33,585 - trading.signal_processor - INFO - Signal 407 executed in 5.78s
+2025-08-20 20:35:33,944 - trading.signal_processor - INFO - Skipped signal 406: Bybit not yet implemented
+2025-08-20 20:35:33,944 - trading.signal_processor - WARNING - Skipped Bybit signal for TONUSDT - not implemented
+2025-08-20 20:35:38,855 - exchanges.binance - WARNING - Testnet order simulation for 1000FLOKIUSDT: qty=972, price=0.1025600
+2025-08-20 20:35:38,855 - exchanges.base - INFO - Opened SHORT position for 1000FLOKIUSDT: qty=972, price=0.1025600
+2025-08-20 20:35:39,424 - exchanges.base - INFO - Set fixed stop loss for 1000FLOKIUSDT: order_id=21875275
+2025-08-20 20:35:39,512 - trading.signal_processor - INFO - Set fixed stop loss for 1000FLOKIUSDT
+2025-08-20 20:35:39,807 - exchanges.base - INFO - Set take profit for 1000FLOKIUSDT: price=0.09846
+2025-08-20 20:35:39,898 - trading.signal_processor - INFO - Set take profit for 1000FLOKIUSDT: 1 orders
+2025-08-20 20:35:39,898 - trading.signal_processor - INFO - Opened SHORT position for 1000FLOKIUSDT: qty=972, price=0.1025600
+2025-08-20 20:35:39,992 - trading.signal_processor - INFO - Signal 405 executed in 6.05s
+2025-08-20 20:35:41,937 - trading.signal_processor - INFO - Skipped signal 404: Not tradeable: Low volume: $577,966
+2025-08-20 20:35:46,882 - exchanges.binance - WARNING - Testnet order simulation for 1000BONKUSDT: qty=4557, price=0.0219690
+2025-08-20 20:35:46,883 - exchanges.base - INFO - Opened LONG position for 1000BONKUSDT: qty=4557, price=0.0219690
+2025-08-20 20:35:47,458 - exchanges.base - INFO - Set fixed stop loss for 1000BONKUSDT: order_id=19906166
+2025-08-20 20:35:47,553 - trading.signal_processor - INFO - Set fixed stop loss for 1000BONKUSDT
+2025-08-20 20:35:47,850 - exchanges.base - INFO - Set take profit for 1000BONKUSDT: price=0.022848
+2025-08-20 20:35:47,950 - trading.signal_processor - INFO - Set take profit for 1000BONKUSDT: 1 orders
+2025-08-20 20:35:47,950 - trading.signal_processor - INFO - Opened LONG position for 1000BONKUSDT: qty=4557, price=0.0219690
+2025-08-20 20:35:48,043 - trading.signal_processor - INFO - Signal 403 executed in 6.10s
+2025-08-20 20:35:48,451 - trading.signal_processor - INFO - Skipped signal 402: Bybit not yet implemented
+2025-08-20 20:35:48,451 - trading.signal_processor - WARNING - Skipped Bybit signal for BTCUSDT - not implemented
+2025-08-20 20:35:48,853 - trading.signal_processor - INFO - Skipped signal 391: Signal too old: 61s
+2025-08-20 20:35:48,854 - __main__ - INFO - Processed signals: {'total': 10, 'executed': 3, 'skipped': 7, 'errors': 0}
+2025-08-20 20:35:54,055 - __main__ - INFO - Found 10 new signals
+2025-08-20 20:35:54,449 - trading.signal_processor - INFO - Skipped signal 390: Signal too old: 67s
+2025-08-20 20:35:54,841 - trading.signal_processor - INFO - Skipped signal 389: Signal too old: 67s
+2025-08-20 20:35:55,205 - trading.signal_processor - INFO - Skipped signal 388: Signal too old: 68s
+2025-08-20 20:35:55,607 - trading.signal_processor - INFO - Skipped signal 387: Bybit not yet implemented
+2025-08-20 20:35:55,607 - trading.signal_processor - WARNING - Skipped Bybit signal for SEIUSDT - not implemented
+2025-08-20 20:35:56,003 - trading.signal_processor - INFO - Skipped signal 386: Signal too old: 69s
+2025-08-20 20:35:56,398 - trading.signal_processor - INFO - Skipped signal 385: Signal too old: 70s
+2025-08-20 20:35:56,767 - trading.signal_processor - INFO - Skipped signal 384: Signal too old: 70s
+2025-08-20 20:35:57,160 - trading.signal_processor - INFO - Skipped signal 383: Signal too old: 71s
+2025-08-20 20:35:57,538 - trading.signal_processor - INFO - Skipped signal 382: Signal too old: 72s
+2025-08-20 20:35:57,926 - trading.signal_processor - INFO - Skipped signal 381: Signal too old: 72s
+2025-08-20 20:35:57,926 - __main__ - INFO - Processed signals: {'total': 10, 'executed': 0, 'skipped': 10, 'errors': 0}
+2025-08-20 20:36:11,646 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-20 20:36:11,658 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-20 20:36:11,700 - exchanges.binance - INFO - Binance connection closed
+2025-08-20 20:36:11,785 - database.connection - INFO - Database connections closed
+2025-08-20 20:36:11,785 - __main__ - INFO - Shutdown complete
+2025-08-20 21:09:36,790 - __main__ - INFO - ============================================================
+2025-08-20 21:09:36,791 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-20 21:09:36,791 - __main__ - INFO - ============================================================
+2025-08-20 21:09:36,791 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 100.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "fixed",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-20 21:09:36,791 - __main__ - INFO - Initializing database connection...
+2025-08-20 21:09:37,452 - database.connection - INFO - Database connection pool initialized
+2025-08-20 21:09:37,452 - database.connection - INFO - Database manager initialized
+2025-08-20 21:09:37,586 - __main__ - INFO - Database connection established
+2025-08-20 21:09:37,587 - __main__ - INFO - Initializing binance exchange...
+2025-08-20 21:09:38,300 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-20 21:09:38,787 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-20 21:09:38,788 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-20 21:09:39,097 - __main__ - INFO - Balance: USDT = 14959.66460907
+2025-08-20 21:09:39,097 - __main__ - INFO - Initializing signal processor...
+2025-08-20 21:09:39,097 - __main__ - INFO - Signal processor initialized
+2025-08-20 21:09:39,097 - __main__ - INFO - System initialization complete
+2025-08-20 21:09:39,097 - __main__ - INFO - ============================================================
+2025-08-20 21:09:39,097 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-20 21:09:39,097 - __main__ - INFO - ============================================================
+2025-08-20 21:09:39,098 - __main__ - INFO - Starting signal monitor...
+2025-08-20 21:09:39,098 - __main__ - INFO - Starting position monitor...
+2025-08-20 21:09:39,098 - __main__ - INFO - Starting prediction listener...
+2025-08-20 21:09:39,100 - __main__ - INFO - Starting cleanup task...
+2025-08-20 21:09:39,515 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-20 21:09:39,641 - __main__ - INFO - Today's metrics: Signals: 9, Positions: 18, PNL: $0.00
+2025-08-20 21:11:09,026 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-20 21:11:09,611 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-20 21:11:09,613 - exchanges.binance - INFO - Binance connection closed
+2025-08-20 21:11:09,701 - database.connection - INFO - Database connections closed
+2025-08-20 21:11:09,701 - __main__ - INFO - Shutdown complete
+2025-08-20 21:12:03,918 - __main__ - INFO - ============================================================
+2025-08-20 21:12:03,919 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-20 21:12:03,919 - __main__ - INFO - ============================================================
+2025-08-20 21:12:03,920 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 100.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "fixed",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-20 21:12:03,920 - __main__ - INFO - Initializing database connection...
+2025-08-20 21:12:04,564 - database.connection - INFO - Database connection pool initialized
+2025-08-20 21:12:04,565 - database.connection - INFO - Database manager initialized
+2025-08-20 21:12:04,711 - __main__ - INFO - Database connection established
+2025-08-20 21:12:04,711 - __main__ - INFO - Initializing binance exchange...
+2025-08-20 21:12:05,429 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-20 21:12:05,900 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-20 21:12:05,901 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-20 21:12:06,192 - __main__ - INFO - Balance: USDT = 14958.40235047
+2025-08-20 21:12:06,192 - __main__ - INFO - Initializing signal processor...
+2025-08-20 21:12:06,192 - __main__ - INFO - Signal processor initialized
+2025-08-20 21:12:06,193 - __main__ - INFO - System initialization complete
+2025-08-20 21:12:06,193 - __main__ - INFO - ============================================================
+2025-08-20 21:12:06,193 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-20 21:12:06,193 - __main__ - INFO - ============================================================
+2025-08-20 21:12:06,193 - __main__ - INFO - Starting signal monitor...
+2025-08-20 21:12:06,193 - __main__ - INFO - Starting position monitor...
+2025-08-20 21:12:06,194 - __main__ - INFO - Starting prediction listener...
+2025-08-20 21:12:06,195 - __main__ - INFO - Starting cleanup task...
+2025-08-20 21:12:06,615 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-20 21:12:06,738 - __main__ - INFO - Today's metrics: Signals: 9, Positions: 18, PNL: $0.00
+2025-08-20 21:13:22,753 - __main__ - INFO - Found 1 new signals
+2025-08-20 21:13:24,079 - trading.signal_processor - INFO - Skipped signal 424: Risk check failed: Position already exists for ETHUSDT
+2025-08-20 21:13:24,080 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 0, 'skipped': 1, 'errors': 0}
+2025-08-20 21:13:59,796 - __main__ - INFO - Found 4 new signals
+2025-08-20 21:14:00,152 - trading.signal_processor - INFO - Skipped signal 428: Bybit not yet implemented
+2025-08-20 21:14:00,153 - trading.signal_processor - WARNING - Skipped Bybit signal for AVAXUSDT - not implemented
+2025-08-20 21:14:01,137 - trading.signal_processor - INFO - Skipped signal 427: Not tradeable: Spread too high: 47.28%
+2025-08-20 21:14:02,224 - trading.signal_processor - INFO - Skipped signal 426: Risk check failed: Position already exists for BNBUSDT
+2025-08-20 21:14:04,674 - exchanges.binance - WARNING - Testnet order simulation for UNIUSDT: qty=48, price=10.5130
+2025-08-20 21:14:04,675 - exchanges.base - INFO - Opened SHORT position for UNIUSDT: qty=48, price=10.5130
+2025-08-20 21:14:05,300 - exchanges.base - INFO - Set fixed stop loss for UNIUSDT: order_id=72037594
+2025-08-20 21:14:05,391 - trading.signal_processor - INFO - Set fixed stop loss for UNIUSDT
+2025-08-20 21:14:05,675 - exchanges.base - INFO - Set take profit for UNIUSDT: price=10.092
+2025-08-20 21:14:05,762 - trading.signal_processor - INFO - Set take profit for UNIUSDT: 1 orders
+2025-08-20 21:14:05,762 - trading.signal_processor - INFO - Opened SHORT position for UNIUSDT: qty=48, price=10.5130
+2025-08-20 21:14:05,846 - trading.signal_processor - INFO - Signal 425 executed in 3.62s
+2025-08-20 21:14:05,847 - __main__ - INFO - Processed signals: {'total': 4, 'executed': 1, 'skipped': 3, 'errors': 0}
+2025-08-20 21:14:11,026 - __main__ - INFO - Found 10 new signals
+2025-08-20 21:14:11,376 - trading.signal_processor - INFO - Skipped signal 454: Bybit not yet implemented
+2025-08-20 21:14:11,377 - trading.signal_processor - WARNING - Skipped Bybit signal for SOLUSDT - not implemented
+2025-08-20 21:14:14,218 - exchanges.binance - WARNING - Testnet order simulation for NEARUSDT: qty=199, price=2.5210
+2025-08-20 21:14:14,218 - exchanges.base - INFO - Opened LONG position for NEARUSDT: qty=199, price=2.5210
+2025-08-20 21:14:14,754 - exchanges.base - INFO - Set fixed stop loss for NEARUSDT: order_id=55873598
+2025-08-20 21:14:14,886 - trading.signal_processor - INFO - Set fixed stop loss for NEARUSDT
+2025-08-20 21:14:15,162 - exchanges.base - INFO - Set take profit for NEARUSDT: price=2.622
+2025-08-20 21:14:15,246 - trading.signal_processor - INFO - Set take profit for NEARUSDT: 1 orders
+2025-08-20 21:14:15,246 - trading.signal_processor - INFO - Opened LONG position for NEARUSDT: qty=199, price=2.5210
+2025-08-20 21:14:15,333 - trading.signal_processor - INFO - Signal 453 executed in 3.96s
+2025-08-20 21:14:15,672 - trading.signal_processor - INFO - Skipped signal 452: Bybit not yet implemented
+2025-08-20 21:14:15,673 - trading.signal_processor - WARNING - Skipped Bybit signal for TONUSDT - not implemented
+2025-08-20 21:14:16,661 - trading.signal_processor - INFO - Skipped signal 451: Risk check failed: Position already exists for 1000FLOKIUSDT
+2025-08-20 21:14:17,648 - trading.signal_processor - INFO - Skipped signal 450: Risk check failed: Position already exists for WLDUSDT
+2025-08-20 21:14:19,090 - trading.signal_processor - INFO - Skipped signal 449: Risk check failed: Position already exists for BTCUSDT
+2025-08-20 21:14:20,085 - trading.signal_processor - INFO - Skipped signal 448: Risk check failed: Position already exists for 1000BONKUSDT
+2025-08-20 21:14:21,080 - trading.signal_processor - INFO - Skipped signal 447: Risk check failed: Position already exists for ETHUSDT
+2025-08-20 21:14:23,175 - exchanges.base - WARNING - Using requested quantity 982.5 as executed quantity was 0.0
+2025-08-20 21:14:23,175 - exchanges.base - WARNING - Using market price 0.508900 as avg price was 0.00
+2025-08-20 21:14:23,175 - exchanges.base - INFO - Opened LONG position for ARBUSDT: qty=982.5, price=0.508900
+2025-08-20 21:14:23,717 - exchanges.base - INFO - Set fixed stop loss for ARBUSDT: order_id=12521921
+2025-08-20 21:14:23,801 - trading.signal_processor - INFO - Set fixed stop loss for ARBUSDT
+2025-08-20 21:14:24,523 - exchanges.base - INFO - Set take profit for ARBUSDT: price=0.5293
+2025-08-20 21:14:24,606 - trading.signal_processor - INFO - Set take profit for ARBUSDT: 1 orders
+2025-08-20 21:14:24,606 - trading.signal_processor - INFO - Opened LONG position for ARBUSDT: qty=982.5, price=0.508900
+2025-08-20 21:14:24,696 - trading.signal_processor - INFO - Signal 446 executed in 3.62s
+2025-08-20 21:14:27,970 - exchanges.binance - WARNING - Testnet order simulation for TIAUSDT: qty=294, price=1.7109000
+2025-08-20 21:14:27,971 - exchanges.base - INFO - Opened SHORT position for TIAUSDT: qty=294, price=1.7109000
+2025-08-20 21:14:28,508 - exchanges.base - INFO - Set fixed stop loss for TIAUSDT: order_id=22782607
+2025-08-20 21:14:28,591 - trading.signal_processor - INFO - Set fixed stop loss for TIAUSDT
+2025-08-20 21:14:29,327 - exchanges.base - INFO - Set take profit for TIAUSDT: price=1.6425
+2025-08-20 21:14:29,410 - trading.signal_processor - INFO - Set take profit for TIAUSDT: 1 orders
+2025-08-20 21:14:29,410 - trading.signal_processor - INFO - Opened SHORT position for TIAUSDT: qty=294, price=1.7109000
+2025-08-20 21:14:29,496 - trading.signal_processor - INFO - Signal 445 executed in 4.80s
+2025-08-20 21:14:29,496 - __main__ - INFO - Processed signals: {'total': 10, 'executed': 3, 'skipped': 7, 'errors': 0}
+2025-08-20 21:14:34,680 - __main__ - INFO - Found 10 new signals
+2025-08-20 21:14:37,725 - exchanges.base - WARNING - Using requested quantity 112.79 as executed quantity was 0.00
+2025-08-20 21:14:37,725 - exchanges.base - WARNING - Using market price 4.433 as avg price was 0.00
+2025-08-20 21:14:37,725 - exchanges.base - INFO - Opened LONG position for ATOMUSDT: qty=112.79, price=4.433
+2025-08-20 21:14:38,265 - exchanges.base - INFO - Set fixed stop loss for ATOMUSDT: order_id=99060262
+2025-08-20 21:14:38,352 - trading.signal_processor - INFO - Set fixed stop loss for ATOMUSDT
+2025-08-20 21:14:38,626 - exchanges.base - INFO - Set take profit for ATOMUSDT: price=4.610
+2025-08-20 21:14:38,708 - trading.signal_processor - INFO - Set take profit for ATOMUSDT: 1 orders
+2025-08-20 21:14:38,708 - trading.signal_processor - INFO - Opened LONG position for ATOMUSDT: qty=112.79, price=4.433
+2025-08-20 21:14:38,795 - trading.signal_processor - INFO - Signal 444 executed in 4.11s
+2025-08-20 21:14:40,249 - trading.signal_processor - INFO - Skipped signal 443: Risk check failed: Position already exists for XRPUSDT
+2025-08-20 21:14:41,593 - trading.signal_processor - INFO - Skipped signal 442: Not tradeable: Spread too high: 23.20%
+2025-08-20 21:14:44,418 - exchanges.binance - WARNING - Testnet order simulation for SEIUSDT: qty=1647, price=0.3045000
+2025-08-20 21:14:44,418 - exchanges.base - INFO - Opened SHORT position for SEIUSDT: qty=1647, price=0.3045000
+2025-08-20 21:14:45,439 - exchanges.base - INFO - Set fixed stop loss for SEIUSDT: order_id=4747853
+2025-08-20 21:14:45,525 - trading.signal_processor - INFO - Set fixed stop loss for SEIUSDT
+2025-08-20 21:14:45,805 - exchanges.base - INFO - Set take profit for SEIUSDT: price=0.2923
+2025-08-20 21:14:45,889 - trading.signal_processor - INFO - Set take profit for SEIUSDT: 1 orders
+2025-08-20 21:14:45,889 - trading.signal_processor - INFO - Opened SHORT position for SEIUSDT: qty=1647, price=0.3045000
+2025-08-20 21:14:45,975 - trading.signal_processor - INFO - Signal 441 executed in 4.38s
+2025-08-20 21:14:48,804 - exchanges.binance - WARNING - Testnet order simulation for ADAUSDT: qty=545, price=0.89570
+2025-08-20 21:14:48,804 - exchanges.base - INFO - Opened SHORT position for ADAUSDT: qty=545, price=0.89570
+2025-08-20 21:14:49,348 - exchanges.base - INFO - Set fixed stop loss for ADAUSDT: order_id=179130808
+2025-08-20 21:14:49,435 - trading.signal_processor - INFO - Set fixed stop loss for ADAUSDT
+2025-08-20 21:14:49,719 - exchanges.base - INFO - Set take profit for ADAUSDT: price=0.8599
+2025-08-20 21:14:49,811 - trading.signal_processor - INFO - Set take profit for ADAUSDT: 1 orders
+2025-08-20 21:14:49,813 - trading.signal_processor - INFO - Opened SHORT position for ADAUSDT: qty=545, price=0.89570
+2025-08-20 21:14:49,911 - trading.signal_processor - INFO - Signal 440 executed in 3.94s
+2025-08-20 21:14:50,251 - trading.signal_processor - INFO - Skipped signal 439: Bybit not yet implemented
+2025-08-20 21:14:50,259 - trading.signal_processor - WARNING - Skipped Bybit signal for LINKUSDT - not implemented
+2025-08-20 21:14:51,717 - trading.signal_processor - INFO - Skipped signal 438: Risk check failed: Position already exists for DOGEUSDT
+2025-08-20 21:14:52,059 - trading.signal_processor - INFO - Skipped signal 437: Bybit not yet implemented
+2025-08-20 21:14:52,060 - trading.signal_processor - WARNING - Skipped Bybit signal for OPUSDT - not implemented
+2025-08-20 21:14:53,060 - trading.signal_processor - INFO - Skipped signal 436: Risk check failed: Position already exists for SUIUSDT
+2025-08-20 21:14:53,407 - trading.signal_processor - INFO - Skipped signal 435: Bybit not yet implemented
+2025-08-20 21:14:53,407 - trading.signal_processor - WARNING - Skipped Bybit signal for FUNUSDT - not implemented
+2025-08-20 21:14:53,407 - __main__ - INFO - Processed signals: {'total': 10, 'executed': 3, 'skipped': 7, 'errors': 0}
+2025-08-20 21:14:58,583 - __main__ - INFO - Found 6 new signals
+2025-08-20 21:15:01,604 - exchanges.base - WARNING - Using requested quantity 1.991 as executed quantity was 0.000
+2025-08-20 21:15:01,605 - exchanges.base - WARNING - Using market price 251.080 as avg price was 0.00
+2025-08-20 21:15:01,605 - exchanges.base - INFO - Opened SHORT position for XMRUSDT: qty=1.991, price=251.080
+2025-08-20 21:15:02,182 - exchanges.base - INFO - Set fixed stop loss for XMRUSDT: order_id=176673168
+2025-08-20 21:15:02,270 - trading.signal_processor - INFO - Set fixed stop loss for XMRUSDT
+2025-08-20 21:15:02,567 - exchanges.base - INFO - Set take profit for XMRUSDT: price=241.037
+2025-08-20 21:15:02,660 - trading.signal_processor - INFO - Set take profit for XMRUSDT: 1 orders
+2025-08-20 21:15:02,660 - trading.signal_processor - INFO - Opened SHORT position for XMRUSDT: qty=1.991, price=251.080
+2025-08-20 21:15:02,744 - trading.signal_processor - INFO - Signal 434 executed in 4.16s
+2025-08-20 21:15:03,098 - trading.signal_processor - INFO - Skipped signal 433: Signal too old: 62s
+2025-08-20 21:15:03,442 - trading.signal_processor - INFO - Skipped signal 432: Bybit not yet implemented
+2025-08-20 21:15:03,442 - trading.signal_processor - WARNING - Skipped Bybit signal for MATICUSDT - not implemented
+2025-08-20 21:15:03,788 - trading.signal_processor - INFO - Skipped signal 431: Signal too old: 63s
+2025-08-20 21:15:04,131 - trading.signal_processor - INFO - Skipped signal 430: Signal too old: 64s
+2025-08-20 21:15:04,473 - trading.signal_processor - INFO - Skipped signal 429: Bybit not yet implemented
+2025-08-20 21:15:04,474 - trading.signal_processor - WARNING - Skipped Bybit signal for DOTUSDT - not implemented
+2025-08-20 21:15:04,474 - __main__ - INFO - Processed signals: {'total': 6, 'executed': 1, 'skipped': 5, 'errors': 0}
+2025-08-20 21:17:07,003 - __main__ - INFO - Today's metrics: Signals: 17, Positions: 26, PNL: $0.00
+2025-08-20 21:18:07,899 - __main__ - INFO - Found 3 new signals
+2025-08-20 21:18:09,996 - exchanges.base - WARNING - Using requested quantity 112.5 as executed quantity was 0.0
+2025-08-20 21:18:09,997 - exchanges.base - WARNING - Using market price 4.44400 as avg price was 0.00
+2025-08-20 21:18:09,997 - exchanges.base - INFO - Opened LONG position for APTUSDT: qty=112.5, price=4.44400
+2025-08-20 21:18:10,557 - exchanges.base - INFO - Set fixed stop loss for APTUSDT: order_id=33457651
+2025-08-20 21:18:10,640 - trading.signal_processor - INFO - Set fixed stop loss for APTUSDT
+2025-08-20 21:18:10,918 - exchanges.base - INFO - Set take profit for APTUSDT: price=4.622
+2025-08-20 21:18:11,006 - trading.signal_processor - INFO - Set take profit for APTUSDT: 1 orders
+2025-08-20 21:18:11,007 - trading.signal_processor - INFO - Opened LONG position for APTUSDT: qty=112.5, price=4.44400
+2025-08-20 21:18:11,093 - trading.signal_processor - INFO - Signal 455 executed in 3.19s
+2025-08-20 21:18:12,084 - trading.signal_processor - INFO - Skipped signal 457: Risk check failed: Position already exists for TIAUSDT
+2025-08-20 21:18:14,195 - exchanges.base - WARNING - Using requested quantity 150.5 as executed quantity was 0.0
+2025-08-20 21:18:14,195 - exchanges.base - WARNING - Using market price 3.323000 as avg price was 0.00
+2025-08-20 21:18:14,195 - exchanges.base - INFO - Opened SHORT position for GASUSDT: qty=150.5, price=3.323000
+2025-08-20 21:18:14,741 - exchanges.base - INFO - Set fixed stop loss for GASUSDT: order_id=9801686
+2025-08-20 21:18:14,835 - trading.signal_processor - INFO - Set fixed stop loss for GASUSDT
+2025-08-20 21:18:15,116 - exchanges.base - INFO - Set take profit for GASUSDT: price=3.190
+2025-08-20 21:18:15,202 - trading.signal_processor - INFO - Set take profit for GASUSDT: 1 orders
+2025-08-20 21:18:15,203 - trading.signal_processor - INFO - Opened SHORT position for GASUSDT: qty=150.5, price=3.323000
+2025-08-20 21:18:15,293 - trading.signal_processor - INFO - Signal 459 executed in 3.21s
+2025-08-20 21:18:15,293 - __main__ - INFO - Processed signals: {'total': 3, 'executed': 2, 'skipped': 1, 'errors': 0}
+2025-08-20 21:22:07,262 - __main__ - INFO - Today's metrics: Signals: 19, Positions: 28, PNL: $0.00
+2025-08-20 21:25:25,954 - __main__ - INFO - ============================================================
+2025-08-20 21:25:25,954 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-20 21:25:25,954 - __main__ - INFO - ============================================================
+2025-08-20 21:25:25,954 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 100.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "fixed",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-20 21:25:25,954 - __main__ - INFO - Initializing database connection...
+2025-08-20 21:25:26,593 - database.connection - INFO - Database connection pool initialized
+2025-08-20 21:25:26,593 - database.connection - INFO - Database manager initialized
+2025-08-20 21:25:26,720 - __main__ - INFO - Database connection established
+2025-08-20 21:25:26,720 - __main__ - INFO - Initializing binance exchange...
+2025-08-20 21:25:27,442 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-20 21:25:27,917 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-20 21:25:27,918 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-20 21:25:28,208 - __main__ - INFO - Balance: USDT = 14957.91570429
+2025-08-20 21:25:28,208 - __main__ - INFO - Initializing signal processor...
+2025-08-20 21:25:28,209 - __main__ - INFO - Signal processor initialized
+2025-08-20 21:25:28,209 - __main__ - INFO - System initialization complete
+2025-08-20 21:25:28,209 - __main__ - INFO - ============================================================
+2025-08-20 21:25:28,209 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-20 21:25:28,209 - __main__ - INFO - ============================================================
+2025-08-20 21:25:28,209 - __main__ - INFO - Starting signal monitor...
+2025-08-20 21:25:28,209 - __main__ - INFO - Starting position monitor...
+2025-08-20 21:25:28,209 - __main__ - INFO - Starting prediction listener...
+2025-08-20 21:25:28,210 - __main__ - INFO - Starting cleanup task...
+2025-08-20 21:25:28,639 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-20 21:25:28,759 - __main__ - INFO - Today's metrics: Signals: 19, Positions: 28, PNL: $0.00
+2025-08-20 21:26:39,758 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-20 21:26:39,779 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-20 21:26:39,790 - exchanges.binance - INFO - Binance connection closed
+2025-08-20 21:26:39,878 - database.connection - INFO - Database connections closed
+2025-08-20 21:26:39,878 - __main__ - INFO - Shutdown complete
+2025-08-20 21:26:44,376 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-20 21:26:44,621 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-20 21:26:44,625 - exchanges.binance - INFO - Binance connection closed
+2025-08-20 21:26:44,716 - database.connection - INFO - Database connections closed
+2025-08-20 21:26:44,717 - __main__ - INFO - Shutdown complete
+2025-08-20 21:26:49,492 - __main__ - INFO - ============================================================
+2025-08-20 21:26:49,492 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-20 21:26:49,492 - __main__ - INFO - ============================================================
+2025-08-20 21:26:49,492 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 100.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "fixed",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-20 21:26:49,492 - __main__ - INFO - Initializing database connection...
+2025-08-20 21:26:50,148 - database.connection - INFO - Database connection pool initialized
+2025-08-20 21:26:50,148 - database.connection - INFO - Database manager initialized
+2025-08-20 21:26:50,287 - __main__ - INFO - Database connection established
+2025-08-20 21:26:50,287 - __main__ - INFO - Initializing binance exchange...
+2025-08-20 21:26:52,012 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-20 21:26:52,859 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-20 21:26:52,860 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-20 21:26:53,154 - __main__ - INFO - Balance: USDT = 14957.92478997
+2025-08-20 21:26:53,154 - __main__ - INFO - Initializing signal processor...
+2025-08-20 21:26:53,155 - __main__ - INFO - Signal processor initialized
+2025-08-20 21:26:53,155 - __main__ - INFO - System initialization complete
+2025-08-20 21:26:53,155 - __main__ - INFO - ============================================================
+2025-08-20 21:26:53,155 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-20 21:26:53,155 - __main__ - INFO - ============================================================
+2025-08-20 21:26:53,155 - __main__ - INFO - Starting signal monitor...
+2025-08-20 21:26:53,156 - __main__ - INFO - Starting position monitor...
+2025-08-20 21:26:53,156 - __main__ - INFO - Starting prediction listener...
+2025-08-20 21:26:53,157 - __main__ - INFO - Starting cleanup task...
+2025-08-20 21:26:53,564 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-20 21:26:53,712 - __main__ - INFO - Today's metrics: Signals: 19, Positions: 28, PNL: $0.00
+2025-08-20 21:28:19,875 - __main__ - INFO - Found 1 new signals
+2025-08-20 21:28:21,485 - trading.signal_processor - INFO - Skipped signal 460: Risk check failed: Position already exists for BTCUSDT
+2025-08-20 21:28:21,486 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 0, 'skipped': 1, 'errors': 0}
+2025-08-20 21:29:00,570 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-20 21:29:00,710 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-20 21:29:00,713 - exchanges.binance - INFO - Binance connection closed
+2025-08-20 21:29:00,801 - database.connection - INFO - Database connections closed
+2025-08-20 21:29:00,801 - __main__ - INFO - Shutdown complete
+2025-08-20 21:29:16,595 - __main__ - INFO - ============================================================
+2025-08-20 21:29:16,595 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-20 21:29:16,595 - __main__ - INFO - ============================================================
+2025-08-20 21:29:16,595 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 100.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "fixed",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-20 21:29:16,595 - __main__ - INFO - Initializing database connection...
+2025-08-20 21:29:17,237 - database.connection - INFO - Database connection pool initialized
+2025-08-20 21:29:17,238 - database.connection - INFO - Database manager initialized
+2025-08-20 21:29:17,373 - __main__ - INFO - Database connection established
+2025-08-20 21:29:17,373 - __main__ - INFO - Initializing binance exchange...
+2025-08-20 21:29:17,373 - __main__ - ERROR - Fatal error: 'PositionConfig' object has no attribute 'min_volume_24h_usd_testnet'
+2025-08-20 21:29:17,373 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-20 21:29:17,416 - database.connection - INFO - Database connections closed
+2025-08-20 21:29:17,417 - __main__ - INFO - Shutdown complete
+2025-08-20 21:29:17,417 - __main__ - ERROR - System error: 'PositionConfig' object has no attribute 'min_volume_24h_usd_testnet'
+2025-08-20 21:40:00,400 - __main__ - INFO - ============================================================
+2025-08-20 21:40:00,400 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-20 21:40:00,400 - __main__ - INFO - ============================================================
+2025-08-20 21:40:00,400 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 100.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "fixed",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-20 21:40:00,400 - __main__ - INFO - Initializing database connection...
+2025-08-20 21:40:01,048 - database.connection - INFO - Database connection pool initialized
+2025-08-20 21:40:01,048 - database.connection - INFO - Database manager initialized
+2025-08-20 21:40:01,181 - __main__ - INFO - Database connection established
+2025-08-20 21:40:01,181 - __main__ - INFO - Initializing binance exchange...
+2025-08-20 21:40:01,181 - __main__ - INFO - Using testnet thresholds: volume=$1,000, spread=20.0%
+2025-08-20 21:40:01,959 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-20 21:40:03,178 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-20 21:40:03,180 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-20 21:40:03,965 - __main__ - INFO - Balance: USDT = 14958.41503671
+2025-08-20 21:40:03,966 - __main__ - INFO - Initializing signal processor...
+2025-08-20 21:40:03,966 - __main__ - INFO - Signal processor initialized
+2025-08-20 21:40:03,966 - __main__ - INFO - System initialization complete
+2025-08-20 21:40:03,966 - __main__ - INFO - ============================================================
+2025-08-20 21:40:03,966 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-20 21:40:03,966 - __main__ - INFO - ============================================================
+2025-08-20 21:40:03,966 - __main__ - INFO - Starting signal monitor...
+2025-08-20 21:40:03,966 - __main__ - INFO - Starting position monitor...
+2025-08-20 21:40:03,967 - __main__ - INFO - Starting prediction listener...
+2025-08-20 21:40:03,968 - __main__ - INFO - Starting cleanup task...
+2025-08-20 21:40:04,098 - __main__ - INFO - Found 1 new signals
+2025-08-20 21:40:04,394 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-20 21:40:04,514 - __main__ - INFO - Today's metrics: Signals: 19, Positions: 28, PNL: $0.00
+2025-08-20 21:40:05,972 - trading.signal_processor - INFO - Skipped signal 467: Risk check failed: Position already exists for BTCUSDT
+2025-08-20 21:40:05,972 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 0, 'skipped': 1, 'errors': 0}
+2025-08-20 21:41:27,520 - __main__ - INFO - Found 1 new signals
+2025-08-20 21:41:28,591 - trading.signal_processor - INFO - Skipped signal 468: Risk check failed: Position already exists for BTCUSDT
+2025-08-20 21:41:28,592 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 0, 'skipped': 1, 'errors': 0}
+2025-08-20 21:45:04,797 - __main__ - INFO - Today's metrics: Signals: 19, Positions: 28, PNL: $0.00
+2025-08-20 21:50:05,021 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 21:55:05,633 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 21:57:14,186 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-20 21:57:14,607 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-20 21:57:14,610 - exchanges.binance - INFO - Binance connection closed
+2025-08-20 21:57:14,700 - database.connection - INFO - Database connections closed
+2025-08-20 21:57:14,700 - __main__ - INFO - Shutdown complete
+2025-08-20 21:57:18,602 - __main__ - INFO - ============================================================
+2025-08-20 21:57:18,602 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-20 21:57:18,602 - __main__ - INFO - ============================================================
+2025-08-20 21:57:18,602 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 100.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "fixed",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-20 21:57:18,602 - __main__ - INFO - Initializing database connection...
+2025-08-20 21:57:19,243 - database.connection - INFO - Database connection pool initialized
+2025-08-20 21:57:19,243 - database.connection - INFO - Database manager initialized
+2025-08-20 21:57:19,373 - __main__ - INFO - Database connection established
+2025-08-20 21:57:19,373 - __main__ - INFO - Initializing binance exchange...
+2025-08-20 21:57:19,373 - __main__ - INFO - Using testnet thresholds: volume=$1,000, spread=20.0%
+2025-08-20 21:57:20,149 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-20 21:57:21,354 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-20 21:57:21,354 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-20 21:57:22,129 - __main__ - INFO - Balance: USDT = 14957.58283470
+2025-08-20 21:57:22,129 - __main__ - INFO - Initializing signal processor...
+2025-08-20 21:57:22,129 - __main__ - INFO - Signal processor initialized
+2025-08-20 21:57:22,129 - __main__ - INFO - System initialization complete
+2025-08-20 21:57:22,129 - __main__ - INFO - ============================================================
+2025-08-20 21:57:22,129 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-20 21:57:22,129 - __main__ - INFO - ============================================================
+2025-08-20 21:57:22,130 - __main__ - INFO - Starting signal monitor...
+2025-08-20 21:57:22,130 - __main__ - INFO - Starting position monitor...
+2025-08-20 21:57:22,130 - __main__ - INFO - Starting prediction listener...
+2025-08-20 21:57:22,131 - __main__ - INFO - Starting cleanup task...
+2025-08-20 21:57:22,529 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-20 21:57:22,663 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 21:58:38,640 - __main__ - INFO - Found 1 new signals
+2025-08-20 21:58:44,105 - exchanges.base - WARNING - Using requested quantity 0.004 as executed quantity was 0.000
+2025-08-20 21:58:44,106 - exchanges.base - WARNING - Using market price 113600.20 as avg price was 0.00
+2025-08-20 21:58:44,106 - exchanges.base - INFO - Opened LONG position for BTCUSDT: qty=0.004, price=113600.20
+2025-08-20 21:58:44,748 - exchanges.base - INFO - Set fixed stop loss for BTCUSDT: order_id=5599918499
+2025-08-20 21:58:44,833 - trading.signal_processor - INFO - Set fixed stop loss for BTCUSDT
+2025-08-20 21:58:45,601 - exchanges.base - INFO - Set take profit for BTCUSDT: price=118144.2
+2025-08-20 21:58:45,688 - trading.signal_processor - INFO - Set take profit for BTCUSDT: 1 orders
+2025-08-20 21:58:45,688 - trading.signal_processor - INFO - Opened LONG position for BTCUSDT: qty=0.004, price=113600.20
+2025-08-20 21:58:45,774 - trading.signal_processor - INFO - Signal 471 executed in 7.13s
+2025-08-20 21:58:45,774 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-20 21:59:57,139 - __main__ - INFO - Found 1 new signals
+2025-08-20 22:00:01,743 - exchanges.base - WARNING - Using requested quantity 133.1 as executed quantity was 0.0
+2025-08-20 22:00:01,744 - exchanges.base - WARNING - Using market price 3.757500 as avg price was 0.00
+2025-08-20 22:00:01,744 - exchanges.base - INFO - Opened LONG position for SUIUSDT: qty=133.1, price=3.757500
+2025-08-20 22:00:02,778 - exchanges.base - INFO - Set fixed stop loss for SUIUSDT: order_id=289524705
+2025-08-20 22:00:02,866 - trading.signal_processor - INFO - Set fixed stop loss for SUIUSDT
+2025-08-20 22:00:03,163 - exchanges.base - INFO - Set take profit for SUIUSDT: price=3.9078
+2025-08-20 22:00:03,247 - trading.signal_processor - INFO - Set take profit for SUIUSDT: 1 orders
+2025-08-20 22:00:03,248 - trading.signal_processor - INFO - Opened LONG position for SUIUSDT: qty=133.1, price=3.757500
+2025-08-20 22:00:03,335 - trading.signal_processor - INFO - Signal 472 executed in 6.19s
+2025-08-20 22:00:03,335 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-20 22:00:54,310 - __main__ - INFO - Found 1 new signals
+2025-08-20 22:00:54,747 - trading.signal_processor - INFO - Skipped signal 473: Bybit not yet implemented
+2025-08-20 22:00:54,748 - trading.signal_processor - WARNING - Skipped Bybit signal for SEIUSDT - not implemented
+2025-08-20 22:00:54,748 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 0, 'skipped': 1, 'errors': 0}
+2025-08-20 22:01:30,501 - __main__ - INFO - Found 1 new signals
+2025-08-20 22:01:35,216 - exchanges.base - WARNING - Using requested quantity 6195.8 as executed quantity was 0.0
+2025-08-20 22:01:35,216 - exchanges.base - WARNING - Using market price 0.0807000 as avg price was 0.00
+2025-08-20 22:01:35,217 - exchanges.base - INFO - Opened LONG position for WUSDT: qty=6195.8, price=0.0807000
+2025-08-20 22:01:35,859 - exchanges.base - INFO - Set fixed stop loss for WUSDT: order_id=7564206
+2025-08-20 22:01:35,945 - trading.signal_processor - INFO - Set fixed stop loss for WUSDT
+2025-08-20 22:01:36,246 - exchanges.base - INFO - Set take profit for WUSDT: price=0.0839
+2025-08-20 22:01:36,334 - trading.signal_processor - INFO - Set take profit for WUSDT: 1 orders
+2025-08-20 22:01:36,334 - trading.signal_processor - INFO - Opened LONG position for WUSDT: qty=6195.8, price=0.0807000
+2025-08-20 22:01:36,420 - trading.signal_processor - INFO - Signal 474 executed in 5.92s
+2025-08-20 22:01:36,421 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-20 22:02:22,926 - __main__ - INFO - Today's metrics: Signals: 3, Positions: 3, PNL: $0.00
+2025-08-20 22:03:08,486 - __main__ - INFO - Found 2 new signals
+2025-08-20 22:03:08,829 - trading.signal_processor - INFO - Skipped signal 476: Not tradeable: Symbol not found
+2025-08-20 22:03:13,693 - exchanges.binance - WARNING - Testnet order simulation for XCNUSDT: qty=39557, price=0.0126400
+2025-08-20 22:03:13,694 - exchanges.base - INFO - Opened SHORT position for XCNUSDT: qty=39557, price=0.0126400
+2025-08-20 22:03:14,252 - exchanges.base - INFO - Set fixed stop loss for XCNUSDT: order_id=460850
+2025-08-20 22:03:14,336 - trading.signal_processor - INFO - Set fixed stop loss for XCNUSDT
+2025-08-20 22:03:15,108 - exchanges.base - INFO - Set take profit for XCNUSDT: price=0.01213
+2025-08-20 22:03:15,192 - trading.signal_processor - INFO - Set take profit for XCNUSDT: 1 orders
+2025-08-20 22:03:15,193 - trading.signal_processor - INFO - Opened SHORT position for XCNUSDT: qty=39557, price=0.0126400
+2025-08-20 22:03:15,278 - trading.signal_processor - INFO - Signal 477 executed in 6.45s
+2025-08-20 22:03:15,278 - __main__ - INFO - Processed signals: {'total': 2, 'executed': 1, 'skipped': 1, 'errors': 0}
+2025-08-20 22:04:48,936 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-20 22:04:49,084 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-20 22:04:49,087 - exchanges.binance - INFO - Binance connection closed
+2025-08-20 22:04:49,177 - database.connection - INFO - Database connections closed
+2025-08-20 22:04:49,177 - __main__ - INFO - Shutdown complete
+2025-08-20 22:07:18,909 - __main__ - INFO - ============================================================
+2025-08-20 22:07:18,909 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-20 22:07:18,909 - __main__ - INFO - ============================================================
+2025-08-20 22:07:18,909 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 100.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "fixed",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-20 22:07:18,909 - __main__ - INFO - Initializing database connection...
+2025-08-20 22:07:19,559 - database.connection - INFO - Database connection pool initialized
+2025-08-20 22:07:19,559 - database.connection - INFO - Database manager initialized
+2025-08-20 22:07:19,696 - __main__ - INFO - Database connection established
+2025-08-20 22:07:19,696 - __main__ - INFO - Initializing binance exchange...
+2025-08-20 22:07:19,697 - __main__ - INFO - Using testnet thresholds: volume=$1,000, spread=20.0%
+2025-08-20 22:07:20,476 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-20 22:07:21,695 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-20 22:07:21,696 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-20 22:07:22,481 - __main__ - INFO - Balance: USDT = 14938.75253123
+2025-08-20 22:07:22,481 - __main__ - INFO - Initializing signal processor...
+2025-08-20 22:07:22,481 - __main__ - INFO - Signal processor initialized
+2025-08-20 22:07:22,481 - __main__ - INFO - System initialization complete
+2025-08-20 22:07:22,482 - __main__ - INFO - ============================================================
+2025-08-20 22:07:22,482 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-20 22:07:22,482 - __main__ - INFO - ============================================================
+2025-08-20 22:07:22,482 - __main__ - INFO - Starting signal monitor...
+2025-08-20 22:07:22,482 - __main__ - INFO - Starting position monitor...
+2025-08-20 22:07:22,483 - __main__ - INFO - Starting prediction listener...
+2025-08-20 22:07:22,485 - __main__ - INFO - Starting cleanup task...
+2025-08-20 22:07:22,621 - __main__ - INFO - Found 2 new signals
+2025-08-20 22:07:22,910 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-20 22:07:23,040 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 22:07:23,126 - trading.signal_processor - INFO - Skipped signal 476: Signal too old: 257s
+2025-08-20 22:07:23,467 - trading.signal_processor - INFO - Skipped signal 477: Signal too old: 258s
+2025-08-20 22:07:23,467 - __main__ - INFO - Processed signals: {'total': 2, 'executed': 0, 'skipped': 2, 'errors': 0}
+2025-08-20 22:11:02,356 - __main__ - INFO - Found 1 new signals
+2025-08-20 22:11:07,222 - exchanges.base - WARNING - Using requested quantity 0.004 as executed quantity was 0.000
+2025-08-20 22:11:07,222 - exchanges.base - WARNING - Using market price 113923.40 as avg price was 0.00
+2025-08-20 22:11:07,222 - exchanges.base - INFO - Opened LONG position for BTCUSDT: qty=0.004, price=113923.40
+2025-08-20 22:11:07,920 - exchanges.base - INFO - Set fixed stop loss for BTCUSDT: order_id=5599934732
+2025-08-20 22:11:08,012 - trading.signal_processor - INFO - Set fixed stop loss for BTCUSDT
+2025-08-20 22:11:08,313 - exchanges.base - INFO - Set take profit for BTCUSDT: price=118480.3
+2025-08-20 22:11:08,397 - trading.signal_processor - INFO - Set take profit for BTCUSDT: 1 orders
+2025-08-20 22:11:08,397 - trading.signal_processor - INFO - Opened LONG position for BTCUSDT: qty=0.004, price=113923.40
+2025-08-20 22:11:08,527 - trading.signal_processor - INFO - Signal 478 executed in 6.17s
+2025-08-20 22:11:08,528 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-20 22:12:23,300 - __main__ - INFO - Today's metrics: Signals: 1, Positions: 1, PNL: $0.00
+2025-08-20 22:12:45,351 - __main__ - INFO - Found 1 new signals
+2025-08-20 22:12:50,052 - exchanges.base - WARNING - Using requested quantity 133.0 as executed quantity was 0.0
+2025-08-20 22:12:50,052 - exchanges.base - WARNING - Using market price 3.759900 as avg price was 0.00
+2025-08-20 22:12:50,052 - exchanges.base - INFO - Opened LONG position for SUIUSDT: qty=133.0, price=3.759900
+2025-08-20 22:12:51,073 - exchanges.base - INFO - Set fixed stop loss for SUIUSDT: order_id=289528771
+2025-08-20 22:12:51,157 - trading.signal_processor - INFO - Set fixed stop loss for SUIUSDT
+2025-08-20 22:12:51,454 - exchanges.base - INFO - Set take profit for SUIUSDT: price=3.9103
+2025-08-20 22:12:51,544 - trading.signal_processor - INFO - Set take profit for SUIUSDT: 1 orders
+2025-08-20 22:12:51,544 - trading.signal_processor - INFO - Opened LONG position for SUIUSDT: qty=133.0, price=3.759900
+2025-08-20 22:12:51,635 - trading.signal_processor - INFO - Signal 479 executed in 6.28s
+2025-08-20 22:12:51,635 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-20 22:17:23,660 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 22:22:23,865 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 22:27:24,125 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 22:32:24,391 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 22:37:24,646 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 22:42:24,874 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 22:47:25,102 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 22:52:25,413 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 22:57:25,704 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 23:02:25,935 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 23:03:07,110 - __main__ - INFO - Found 3 new signals
+2025-08-20 23:03:09,283 - trading.signal_processor - INFO - Skipped signal 481: Not tradeable: Spread too high: 254.01%
+2025-08-20 23:03:09,624 - trading.signal_processor - INFO - Skipped signal 482: Not tradeable: Symbol not found
+2025-08-20 23:03:09,977 - trading.signal_processor - INFO - Skipped signal 483: Bybit not yet implemented
+2025-08-20 23:03:09,979 - trading.signal_processor - WARNING - Skipped Bybit signal for COREUSDT - not implemented
+2025-08-20 23:03:09,979 - __main__ - INFO - Processed signals: {'total': 3, 'executed': 0, 'skipped': 3, 'errors': 0}
+2025-08-20 23:07:26,162 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 23:12:26,446 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 23:17:26,720 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 23:22:26,996 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 23:23:06,421 - __main__ - INFO - Found 1 new signals
+2025-08-20 23:23:06,907 - trading.signal_processor - INFO - Skipped signal 484: Not tradeable: Symbol not found
+2025-08-20 23:23:06,907 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 0, 'skipped': 1, 'errors': 0}
+2025-08-20 23:27:27,234 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 23:32:27,501 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-20 23:33:07,601 - __main__ - INFO - Found 2 new signals
+2025-08-20 23:33:13,400 - exchanges.binance - WARNING - Testnet order simulation for ARKUSDT: qty=1112, price=0.4460000
+2025-08-20 23:33:13,400 - exchanges.base - INFO - Opened SHORT position for ARKUSDT: qty=1112, price=0.4460000
+2025-08-20 23:33:14,514 - exchanges.base - INFO - Set fixed stop loss for ARKUSDT: order_id=8675073
+2025-08-20 23:33:14,604 - trading.signal_processor - INFO - Set fixed stop loss for ARKUSDT
+2025-08-20 23:33:14,901 - exchanges.base - INFO - Set take profit for ARKUSDT: price=0.4282
+2025-08-20 23:33:14,989 - trading.signal_processor - INFO - Set take profit for ARKUSDT: 1 orders
+2025-08-20 23:33:14,989 - trading.signal_processor - INFO - Opened SHORT position for ARKUSDT: qty=1112, price=0.4460000
+2025-08-20 23:33:15,075 - trading.signal_processor - INFO - Signal 485 executed in 7.47s
+2025-08-20 23:33:19,187 - exchanges.base - WARNING - Using requested quantity 216.5 as executed quantity was 0.0
+2025-08-20 23:33:19,188 - exchanges.base - WARNING - Using market price 2.3090000 as avg price was 0.00
+2025-08-20 23:33:19,188 - exchanges.base - INFO - Opened SHORT position for ORCAUSDT: qty=216.5, price=2.3090000
+2025-08-20 23:33:19,741 - exchanges.base - INFO - Set fixed stop loss for ORCAUSDT: order_id=10456141
+2025-08-20 23:33:19,828 - trading.signal_processor - INFO - Set fixed stop loss for ORCAUSDT
+2025-08-20 23:33:20,127 - exchanges.base - INFO - Set take profit for ORCAUSDT: price=2.217
+2025-08-20 23:33:20,582 - trading.signal_processor - INFO - Set take profit for ORCAUSDT: 1 orders
+2025-08-20 23:33:20,582 - trading.signal_processor - INFO - Opened SHORT position for ORCAUSDT: qty=216.5, price=2.3090000
+2025-08-20 23:33:20,718 - trading.signal_processor - INFO - Signal 486 executed in 5.64s
+2025-08-20 23:33:20,718 - __main__ - INFO - Processed signals: {'total': 2, 'executed': 2, 'skipped': 0, 'errors': 0}
+2025-08-20 23:37:27,776 - __main__ - INFO - Today's metrics: Signals: 2, Positions: 2, PNL: $0.00
+2025-08-20 23:42:28,014 - __main__ - INFO - Today's metrics: Signals: 2, Positions: 2, PNL: $0.00
+2025-08-20 23:47:28,234 - __main__ - INFO - Today's metrics: Signals: 2, Positions: 2, PNL: $0.00
+2025-08-20 23:52:28,500 - __main__ - INFO - Today's metrics: Signals: 2, Positions: 2, PNL: $0.00
+2025-08-20 23:57:28,732 - __main__ - INFO - Today's metrics: Signals: 2, Positions: 2, PNL: $0.00
+2025-08-21 00:02:28,973 - __main__ - INFO - Today's metrics: Signals: 2, Positions: 2, PNL: $0.00
+2025-08-21 00:07:29,396 - __main__ - INFO - Today's metrics: Signals: 2, Positions: 2, PNL: $0.00
+2025-08-21 00:12:29,660 - __main__ - INFO - Today's metrics: Signals: 2, Positions: 2, PNL: $0.00
+2025-08-21 00:17:29,881 - __main__ - INFO - Today's metrics: Signals: 2, Positions: 2, PNL: $0.00
+2025-08-21 00:22:30,044 - __main__ - INFO - Today's metrics: Signals: 2, Positions: 2, PNL: $0.00
+2025-08-21 00:27:30,254 - __main__ - INFO - Today's metrics: Signals: 2, Positions: 2, PNL: $0.00
+2025-08-21 00:32:30,472 - __main__ - INFO - Today's metrics: Signals: 2, Positions: 2, PNL: $0.00
+2025-08-21 00:37:30,703 - __main__ - INFO - Today's metrics: Signals: 2, Positions: 2, PNL: $0.00
+2025-08-21 00:42:30,971 - __main__ - INFO - Today's metrics: Signals: 2, Positions: 2, PNL: $0.00
+2025-08-21 00:47:31,185 - __main__ - INFO - Today's metrics: Signals: 2, Positions: 2, PNL: $0.00
+2025-08-21 00:52:31,446 - __main__ - INFO - Today's metrics: Signals: 2, Positions: 2, PNL: $0.00
+2025-08-21 00:57:31,724 - __main__ - INFO - Today's metrics: Signals: 2, Positions: 2, PNL: $0.00
+2025-08-21 01:02:32,029 - __main__ - INFO - Today's metrics: Signals: 2, Positions: 2, PNL: $0.00
+2025-08-21 01:03:08,885 - __main__ - INFO - Found 1 new signals
+2025-08-21 01:03:14,448 - exchanges.binance - WARNING - Testnet order simulation for PYTHUSDT: qty=4119, price=0.1203000
+2025-08-21 01:03:14,449 - exchanges.base - INFO - Opened LONG position for PYTHUSDT: qty=4119, price=0.1203000
+2025-08-21 01:03:15,574 - exchanges.base - INFO - Set fixed stop loss for PYTHUSDT: order_id=7603301
+2025-08-21 01:03:15,662 - trading.signal_processor - INFO - Set fixed stop loss for PYTHUSDT
+2025-08-21 01:03:15,965 - exchanges.base - INFO - Set take profit for PYTHUSDT: price=0.1251
+2025-08-21 01:03:16,053 - trading.signal_processor - INFO - Set take profit for PYTHUSDT: 1 orders
+2025-08-21 01:03:16,054 - trading.signal_processor - INFO - Opened LONG position for PYTHUSDT: qty=4119, price=0.1203000
+2025-08-21 01:03:16,142 - trading.signal_processor - INFO - Signal 487 executed in 7.25s
+2025-08-21 01:03:16,142 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-21 01:07:32,288 - __main__ - INFO - Today's metrics: Signals: 3, Positions: 3, PNL: $0.00
+2025-08-21 01:07:51,275 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-21 01:07:51,485 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-21 01:07:51,512 - exchanges.binance - INFO - Binance connection closed
+2025-08-21 01:07:51,599 - database.connection - INFO - Database connections closed
+2025-08-21 01:07:51,600 - __main__ - INFO - Shutdown complete
+2025-08-21 01:08:03,241 - __main__ - INFO - ============================================================
+2025-08-21 01:08:03,241 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-21 01:08:03,241 - __main__ - INFO - ============================================================
+2025-08-21 01:08:03,241 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 100.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "trailing",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-21 01:08:03,241 - __main__ - INFO - Initializing database connection...
+2025-08-21 01:08:03,896 - database.connection - INFO - Database connection pool initialized
+2025-08-21 01:08:03,896 - database.connection - INFO - Database manager initialized
+2025-08-21 01:08:04,020 - __main__ - INFO - Database connection established
+2025-08-21 01:08:04,021 - __main__ - INFO - Initializing binance exchange...
+2025-08-21 01:08:04,021 - __main__ - INFO - Using testnet thresholds: volume=$1,000, spread=20.0%
+2025-08-21 01:08:04,837 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-21 01:08:06,059 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-21 01:08:06,060 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-21 01:08:06,842 - __main__ - INFO - Balance: USDT = 14932.98068134
+2025-08-21 01:08:06,842 - __main__ - INFO - Initializing signal processor...
+2025-08-21 01:08:06,842 - __main__ - INFO - Signal processor initialized
+2025-08-21 01:08:06,842 - __main__ - INFO - System initialization complete
+2025-08-21 01:08:06,842 - __main__ - INFO - ============================================================
+2025-08-21 01:08:06,842 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-21 01:08:06,842 - __main__ - INFO - ============================================================
+2025-08-21 01:08:06,843 - __main__ - INFO - Starting signal monitor...
+2025-08-21 01:08:06,843 - __main__ - INFO - Starting position monitor...
+2025-08-21 01:08:06,843 - __main__ - INFO - Starting prediction listener...
+2025-08-21 01:08:06,845 - __main__ - INFO - Starting cleanup task...
+2025-08-21 01:08:07,261 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-21 01:08:07,404 - __main__ - INFO - Today's metrics: Signals: 3, Positions: 3, PNL: $0.00
+2025-08-21 01:08:17,198 - __main__ - INFO - Found 1 new signals
+2025-08-21 01:08:21,975 - exchanges.base - WARNING - Using requested quantity 140.1 as executed quantity was 0.0
+2025-08-21 01:08:21,975 - exchanges.base - WARNING - Using market price 3.569200 as avg price was 0.00
+2025-08-21 01:08:21,975 - exchanges.base - INFO - Opened LONG position for SUIUSDT: qty=140.1, price=3.569200
+2025-08-21 01:08:22,318 - exchanges.base - ERROR - Error setting stop loss: 'dict' object has no attribute 'risk'
+2025-08-21 01:08:22,318 - trading.signal_processor - ERROR - Failed to set stop loss: 'dict' object has no attribute 'risk'
+2025-08-21 01:08:22,614 - exchanges.base - INFO - Set take profit for SUIUSDT: price=3.7120
+2025-08-21 01:08:22,703 - trading.signal_processor - INFO - Set take profit for SUIUSDT: 1 orders
+2025-08-21 01:08:22,703 - trading.signal_processor - INFO - Opened LONG position for SUIUSDT: qty=140.1, price=3.569200
+2025-08-21 01:08:22,791 - trading.signal_processor - INFO - Signal 488 executed in 5.59s
+2025-08-21 01:08:22,792 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-21 01:13:07,715 - __main__ - INFO - Today's metrics: Signals: 4, Positions: 4, PNL: $0.00
+2025-08-21 01:14:09,566 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-21 01:14:09,604 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-21 01:14:09,607 - exchanges.binance - INFO - Binance connection closed
+2025-08-21 01:14:09,694 - database.connection - INFO - Database connections closed
+2025-08-21 01:14:09,695 - __main__ - INFO - Shutdown complete
+2025-08-21 01:14:11,391 - __main__ - INFO - ============================================================
+2025-08-21 01:14:11,392 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-21 01:14:11,392 - __main__ - INFO - ============================================================
+2025-08-21 01:14:11,392 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 100.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "trailing",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-21 01:14:11,392 - __main__ - INFO - Initializing database connection...
+2025-08-21 01:14:11,999 - database.connection - INFO - Database connection pool initialized
+2025-08-21 01:14:11,999 - database.connection - INFO - Database manager initialized
+2025-08-21 01:14:12,127 - __main__ - INFO - Database connection established
+2025-08-21 01:14:12,127 - __main__ - INFO - Initializing binance exchange...
+2025-08-21 01:14:12,127 - __main__ - INFO - Using testnet thresholds: volume=$1,000, spread=20.0%
+2025-08-21 01:14:13,361 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-21 01:14:14,585 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-21 01:14:14,585 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-21 01:14:15,357 - __main__ - INFO - Balance: USDT = 14930.73043563
+2025-08-21 01:14:15,357 - __main__ - INFO - Initializing signal processor...
+2025-08-21 01:14:15,357 - __main__ - INFO - Signal processor initialized
+2025-08-21 01:14:15,357 - __main__ - INFO - System initialization complete
+2025-08-21 01:14:15,357 - __main__ - INFO - ============================================================
+2025-08-21 01:14:15,358 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-21 01:14:15,358 - __main__ - INFO - ============================================================
+2025-08-21 01:14:15,358 - __main__ - INFO - Starting signal monitor...
+2025-08-21 01:14:15,358 - __main__ - INFO - Starting position monitor...
+2025-08-21 01:14:15,359 - __main__ - INFO - Starting prediction listener...
+2025-08-21 01:14:15,360 - __main__ - INFO - Starting cleanup task...
+2025-08-21 01:14:15,784 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-21 01:14:15,922 - __main__ - INFO - Today's metrics: Signals: 4, Positions: 4, PNL: $0.00
+2025-08-21 01:14:30,802 - __main__ - INFO - Found 1 new signals
+2025-08-21 01:14:36,359 - exchanges.binance - WARNING - Testnet order simulation for SEIUSDT: qty=1631, price=0.3063000
+2025-08-21 01:14:36,359 - exchanges.base - INFO - Opened LONG position for SEIUSDT: qty=1631, price=0.3063000
+2025-08-21 01:14:36,750 - exchanges.base - INFO - Setting trailing stop for SEIUSDT: callback_rate=2.0%, activation_price=0.3093630000000000027204904995 (+1.0% from 0.3063000)
+2025-08-21 01:14:37,047 - exchanges.binance - ERROR - Error placing trailing stop order: APIError(code=-1102): Mandatory parameter 'activationprice' was not sent, was empty/null, or malformed.
+2025-08-21 01:14:37,047 - trading.signal_processor - ERROR - Failed to set stop loss: APIError(code=-1102): Mandatory parameter 'activationprice' was not sent, was empty/null, or malformed.
+2025-08-21 01:14:37,809 - exchanges.base - INFO - Set take profit for SEIUSDT: price=0.3186
+2025-08-21 01:14:37,893 - trading.signal_processor - INFO - Set take profit for SEIUSDT: 1 orders
+2025-08-21 01:14:37,894 - trading.signal_processor - INFO - Opened LONG position for SEIUSDT: qty=1631, price=0.3063000
+2025-08-21 01:14:37,983 - trading.signal_processor - INFO - Signal 489 executed in 7.18s
+2025-08-21 01:14:37,983 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-21 01:17:38,045 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-21 01:17:38,049 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-21 01:17:38,050 - exchanges.binance - INFO - Binance connection closed
+2025-08-21 01:17:38,138 - database.connection - INFO - Database connections closed
+2025-08-21 01:17:38,139 - __main__ - INFO - Shutdown complete
+2025-08-21 01:17:41,538 - __main__ - INFO - ============================================================
+2025-08-21 01:17:41,538 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-21 01:17:41,538 - __main__ - INFO - ============================================================
+2025-08-21 01:17:41,538 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 100.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "trailing",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-21 01:17:41,538 - __main__ - INFO - Initializing database connection...
+2025-08-21 01:17:42,161 - database.connection - INFO - Database connection pool initialized
+2025-08-21 01:17:42,161 - database.connection - INFO - Database manager initialized
+2025-08-21 01:17:42,287 - __main__ - INFO - Database connection established
+2025-08-21 01:17:42,287 - __main__ - INFO - Initializing binance exchange...
+2025-08-21 01:17:42,287 - __main__ - INFO - Using testnet thresholds: volume=$1,000, spread=20.0%
+2025-08-21 01:17:43,517 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-21 01:17:44,722 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-21 01:17:44,723 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-21 01:17:45,500 - __main__ - INFO - Balance: USDT = 14929.96980669
+2025-08-21 01:17:45,500 - __main__ - INFO - Initializing signal processor...
+2025-08-21 01:17:45,500 - __main__ - INFO - Signal processor initialized
+2025-08-21 01:17:45,500 - __main__ - INFO - System initialization complete
+2025-08-21 01:17:45,500 - __main__ - INFO - ============================================================
+2025-08-21 01:17:45,501 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-21 01:17:45,501 - __main__ - INFO - ============================================================
+2025-08-21 01:17:45,501 - __main__ - INFO - Starting signal monitor...
+2025-08-21 01:17:45,502 - __main__ - INFO - Starting position monitor...
+2025-08-21 01:17:45,502 - __main__ - INFO - Starting prediction listener...
+2025-08-21 01:17:45,504 - __main__ - INFO - Starting cleanup task...
+2025-08-21 01:17:45,906 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-21 01:17:46,046 - __main__ - INFO - Today's metrics: Signals: 5, Positions: 5, PNL: $0.00
+2025-08-21 01:18:06,040 - __main__ - INFO - Found 1 new signals
+2025-08-21 01:18:10,744 - exchanges.binance - WARNING - Testnet order simulation for ADAUSDT: qty=568, price=0.87990
+2025-08-21 01:18:10,745 - exchanges.base - INFO - Opened LONG position for ADAUSDT: qty=568, price=0.87990
+2025-08-21 01:18:11,137 - exchanges.base - INFO - Setting trailing stop for ADAUSDT: callback_rate=2.0%, activation_price=0.8886990000000000078150819149 (+1.0% from 0.87990)
+2025-08-21 01:18:11,903 - exchanges.binance - ERROR - Error placing trailing stop order: APIError(code=-1102): Mandatory parameter 'activationprice' was not sent, was empty/null, or malformed.
+2025-08-21 01:18:11,904 - trading.signal_processor - ERROR - Failed to set stop loss: APIError(code=-1102): Mandatory parameter 'activationprice' was not sent, was empty/null, or malformed.
+2025-08-21 01:18:12,197 - exchanges.base - INFO - Set take profit for ADAUSDT: price=0.9151
+2025-08-21 01:18:12,280 - trading.signal_processor - INFO - Set take profit for ADAUSDT: 1 orders
+2025-08-21 01:18:12,280 - trading.signal_processor - INFO - Opened LONG position for ADAUSDT: qty=568, price=0.87990
+2025-08-21 01:18:12,407 - trading.signal_processor - INFO - Signal 490 executed in 6.37s
+2025-08-21 01:18:12,407 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-21 01:22:46,313 - __main__ - INFO - Today's metrics: Signals: 6, Positions: 6, PNL: $0.00
+2025-08-21 01:24:00,247 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-21 01:24:00,369 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-21 01:24:00,372 - exchanges.binance - INFO - Binance connection closed
+2025-08-21 01:24:00,460 - database.connection - INFO - Database connections closed
+2025-08-21 01:24:00,460 - __main__ - INFO - Shutdown complete
+2025-08-21 01:24:04,370 - __main__ - INFO - ============================================================
+2025-08-21 01:24:04,370 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-21 01:24:04,370 - __main__ - INFO - ============================================================
+2025-08-21 01:24:04,370 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 100.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "trailing",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-21 01:24:04,370 - __main__ - INFO - Initializing database connection...
+2025-08-21 01:24:05,006 - database.connection - INFO - Database connection pool initialized
+2025-08-21 01:24:05,006 - database.connection - INFO - Database manager initialized
+2025-08-21 01:24:05,141 - __main__ - INFO - Database connection established
+2025-08-21 01:24:05,141 - __main__ - INFO - Initializing binance exchange...
+2025-08-21 01:24:05,141 - __main__ - INFO - Using testnet thresholds: volume=$1,000, spread=20.0%
+2025-08-21 01:24:06,388 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-21 01:24:07,598 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-21 01:24:07,599 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-21 01:24:08,381 - __main__ - INFO - Balance: USDT = 14931.05341331
+2025-08-21 01:24:08,381 - __main__ - INFO - Initializing signal processor...
+2025-08-21 01:24:08,381 - __main__ - INFO - Signal processor initialized
+2025-08-21 01:24:08,381 - __main__ - INFO - System initialization complete
+2025-08-21 01:24:08,382 - __main__ - INFO - ============================================================
+2025-08-21 01:24:08,382 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-21 01:24:08,382 - __main__ - INFO - ============================================================
+2025-08-21 01:24:08,382 - __main__ - INFO - Starting signal monitor...
+2025-08-21 01:24:08,383 - __main__ - INFO - Starting position monitor...
+2025-08-21 01:24:08,384 - __main__ - INFO - Starting prediction listener...
+2025-08-21 01:24:08,386 - __main__ - INFO - Starting cleanup task...
+2025-08-21 01:24:08,792 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-21 01:24:08,936 - __main__ - INFO - Today's metrics: Signals: 6, Positions: 6, PNL: $0.00
+2025-08-21 01:24:23,826 - __main__ - INFO - Found 1 new signals
+2025-08-21 01:24:28,617 - exchanges.base - WARNING - Using requested quantity 168.3 as executed quantity was 0.0
+2025-08-21 01:24:28,617 - exchanges.base - WARNING - Using market price 2.9705 as avg price was 0.00
+2025-08-21 01:24:28,618 - exchanges.base - INFO - Opened LONG position for XRPUSDT: qty=168.3, price=2.9705
+2025-08-21 01:24:28,971 - exchanges.base - INFO - Setting trailing stop for XRPUSDT: callback_rate=2.0%, activation_price=3.0002 (+1.0% from 2.9705)
+2025-08-21 01:24:29,745 - exchanges.binance - ERROR - Error placing trailing stop order: APIError(code=-1102): Mandatory parameter 'quantity' was not sent, was empty/null, or malformed.
+2025-08-21 01:24:29,745 - trading.signal_processor - ERROR - Failed to set stop loss: APIError(code=-1102): Mandatory parameter 'quantity' was not sent, was empty/null, or malformed.
+2025-08-21 01:24:30,043 - exchanges.base - INFO - Set take profit for XRPUSDT: price=3.0893
+2025-08-21 01:24:30,128 - trading.signal_processor - INFO - Set take profit for XRPUSDT: 1 orders
+2025-08-21 01:24:30,128 - trading.signal_processor - INFO - Opened LONG position for XRPUSDT: qty=168.3, price=2.9705
+2025-08-21 01:24:30,211 - trading.signal_processor - INFO - Signal 491 executed in 6.38s
+2025-08-21 01:24:30,212 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-21 01:29:09,194 - __main__ - INFO - Today's metrics: Signals: 7, Positions: 7, PNL: $0.00
+2025-08-21 01:29:29,297 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-21 01:29:29,495 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-21 01:29:29,498 - exchanges.binance - INFO - Binance connection closed
+2025-08-21 01:29:29,586 - database.connection - INFO - Database connections closed
+2025-08-21 01:29:29,586 - __main__ - INFO - Shutdown complete
+2025-08-21 01:29:53,345 - __main__ - INFO - ============================================================
+2025-08-21 01:29:53,345 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-21 01:29:53,345 - __main__ - INFO - ============================================================
+2025-08-21 01:29:53,345 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 100.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "trailing",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-21 01:29:53,345 - __main__ - INFO - Initializing database connection...
+2025-08-21 01:29:53,989 - database.connection - INFO - Database connection pool initialized
+2025-08-21 01:29:53,989 - database.connection - INFO - Database manager initialized
+2025-08-21 01:29:54,125 - __main__ - INFO - Database connection established
+2025-08-21 01:29:54,125 - __main__ - INFO - Initializing binance exchange...
+2025-08-21 01:29:54,125 - __main__ - INFO - Using testnet thresholds: volume=$1,000, spread=20.0%
+2025-08-21 01:29:54,897 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-21 01:29:56,142 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-21 01:29:56,143 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-21 01:29:56,919 - __main__ - INFO - Balance: USDT = 14931.62710679
+2025-08-21 01:29:56,919 - __main__ - INFO - Initializing signal processor...
+2025-08-21 01:29:56,919 - __main__ - INFO - Signal processor initialized
+2025-08-21 01:29:56,919 - __main__ - INFO - System initialization complete
+2025-08-21 01:29:56,920 - __main__ - INFO - ============================================================
+2025-08-21 01:29:56,920 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-21 01:29:56,920 - __main__ - INFO - ============================================================
+2025-08-21 01:29:56,920 - __main__ - INFO - Starting signal monitor...
+2025-08-21 01:29:56,920 - __main__ - INFO - Starting position monitor...
+2025-08-21 01:29:56,921 - __main__ - INFO - Starting prediction listener...
+2025-08-21 01:29:56,922 - __main__ - INFO - Starting cleanup task...
+2025-08-21 01:29:57,337 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-21 01:29:57,467 - __main__ - INFO - Today's metrics: Signals: 7, Positions: 7, PNL: $0.00
+2025-08-21 01:30:17,458 - __main__ - INFO - Found 1 new signals
+2025-08-21 01:30:22,236 - exchanges.binance - WARNING - Testnet order simulation for SOLUSDT: qty=3, price=186.9000
+2025-08-21 01:30:22,237 - exchanges.base - INFO - Opened LONG position for SOLUSDT: qty=3, price=186.9000
+2025-08-21 01:30:22,595 - exchanges.base - INFO - Setting trailing stop for SOLUSDT: callback_rate=2.0%, activation_price=188.8 (+1.0% from 186.9000)
+2025-08-21 01:30:22,596 - exchanges.binance - INFO - Creating trailing stop with activation at 188.8
+2025-08-21 01:30:22,892 - exchanges.binance - INFO - Trailing stop order placed successfully: orderId=563669283, symbol=SOLUSDT, quantity=3, callbackRate=2.0%, activationPrice=188.8
+2025-08-21 01:30:22,892 - exchanges.base - INFO - Set trailing stop loss for SOLUSDT: order_id=563669283
+2025-08-21 01:30:22,976 - trading.signal_processor - INFO - Set trailing stop loss for SOLUSDT
+2025-08-21 01:30:23,737 - exchanges.base - INFO - Set take profit for SOLUSDT: price=194.4
+2025-08-21 01:30:23,869 - trading.signal_processor - INFO - Set take profit for SOLUSDT: 1 orders
+2025-08-21 01:30:23,870 - trading.signal_processor - INFO - Opened LONG position for SOLUSDT: qty=3, price=186.9000
+2025-08-21 01:30:23,999 - trading.signal_processor - INFO - Signal 492 executed in 6.54s
+2025-08-21 01:30:23,999 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-21 01:33:06,988 - __main__ - INFO - Found 1 new signals
+2025-08-21 01:33:07,335 - trading.signal_processor - INFO - Skipped signal 493: Bybit not yet implemented
+2025-08-21 01:33:07,335 - trading.signal_processor - WARNING - Skipped Bybit signal for GLMRUSDT - not implemented
+2025-08-21 01:33:07,335 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 0, 'skipped': 1, 'errors': 0}
+2025-08-21 01:34:57,749 - __main__ - INFO - Today's metrics: Signals: 8, Positions: 8, PNL: $0.00
+2025-08-21 01:39:57,980 - __main__ - INFO - Today's metrics: Signals: 8, Positions: 8, PNL: $0.00
+2025-08-21 01:44:58,202 - __main__ - INFO - Today's metrics: Signals: 8, Positions: 8, PNL: $0.00
+2025-08-21 01:48:08,634 - __main__ - INFO - Found 1 new signals
+2025-08-21 01:48:10,298 - trading.signal_processor - INFO - Skipped signal 494: Risk check failed: Position already exists for PYTHUSDT
+2025-08-21 01:48:10,299 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 0, 'skipped': 1, 'errors': 0}
+2025-08-21 01:49:58,327 - __main__ - INFO - Today's metrics: Signals: 8, Positions: 8, PNL: $0.00
+2025-08-21 01:52:38,789 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-21 01:52:38,917 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-21 01:52:38,924 - exchanges.binance - INFO - Binance connection closed
+2025-08-21 01:52:39,013 - database.connection - INFO - Database connections closed
+2025-08-21 01:52:39,014 - __main__ - INFO - Shutdown complete
+2025-08-21 01:52:41,279 - __main__ - INFO - ============================================================
+2025-08-21 01:52:41,279 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-21 01:52:41,279 - __main__ - INFO - ============================================================
+2025-08-21 01:52:41,280 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 100.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "trailing",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-21 01:52:41,280 - __main__ - INFO - Initializing database connection...
+2025-08-21 01:52:41,915 - database.connection - INFO - Database connection pool initialized
+2025-08-21 01:52:41,915 - database.connection - INFO - Database manager initialized
+2025-08-21 01:52:42,046 - __main__ - INFO - Database connection established
+2025-08-21 01:52:42,046 - __main__ - INFO - Initializing binance exchange...
+2025-08-21 01:52:42,046 - __main__ - INFO - Using testnet thresholds: volume=$1,000, spread=20.0%
+2025-08-21 01:52:43,289 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-21 01:52:44,508 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-21 01:52:44,509 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-21 01:52:45,288 - __main__ - INFO - Balance: USDT = 14964.10369745
+2025-08-21 01:52:45,289 - __main__ - INFO - Initializing signal processor...
+2025-08-21 01:52:45,289 - __main__ - INFO - Signal processor initialized
+2025-08-21 01:52:45,289 - __main__ - INFO - System initialization complete
+2025-08-21 01:52:45,289 - __main__ - INFO - ============================================================
+2025-08-21 01:52:45,289 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-21 01:52:45,289 - __main__ - INFO - ============================================================
+2025-08-21 01:52:45,289 - __main__ - INFO - Starting signal monitor...
+2025-08-21 01:52:45,290 - __main__ - INFO - Starting position monitor...
+2025-08-21 01:52:45,290 - __main__ - INFO - Starting prediction listener...
+2025-08-21 01:52:45,291 - __main__ - INFO - Starting cleanup task...
+2025-08-21 01:52:45,687 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-21 01:52:45,815 - __main__ - INFO - Today's metrics: Signals: 8, Positions: 8, PNL: $0.00
+2025-08-21 01:53:05,869 - __main__ - INFO - Found 1 new signals
+2025-08-21 01:53:10,680 - exchanges.base - WARNING - Using requested quantity 686.7 as executed quantity was 0.0
+2025-08-21 01:53:10,680 - exchanges.base - WARNING - Using market price 0.7281000 as avg price was 0.00
+2025-08-21 01:53:10,680 - exchanges.base - INFO - Opened LONG position for OPUSDT: qty=686.7, price=0.7281000
+2025-08-21 01:53:11,017 - exchanges.base - INFO - Setting trailing stop for OPUSDT: callback_rate=2.0%, activation_price=0.7354 (+1.0% from 0.7281000)
+2025-08-21 01:53:11,017 - exchanges.binance - INFO - Creating trailing stop with activation at 0.7354
+2025-08-21 01:53:11,313 - exchanges.binance - INFO - Trailing stop order placed successfully: orderId=30818127, symbol=OPUSDT, quantity=686.7, callbackRate=2.0%, activationPrice=0.7354
+2025-08-21 01:53:11,313 - exchanges.base - INFO - Set trailing stop loss for OPUSDT: order_id=30818127
+2025-08-21 01:53:11,313 - trading.signal_processor - ERROR - Error setting stop loss: 'PositionRepository' object has no attribute 'update'
+2025-08-21 01:53:12,085 - exchanges.base - INFO - Set take profit for OPUSDT: price=0.7572
+2025-08-21 01:53:12,085 - trading.signal_processor - ERROR - Error setting take profit: 'PositionRepository' object has no attribute 'update'
+2025-08-21 01:53:12,085 - trading.signal_processor - INFO - Opened LONG position for OPUSDT: qty=686.7, price=0.7281000
+2025-08-21 01:53:12,168 - trading.signal_processor - INFO - Signal 495 executed in 6.30s
+2025-08-21 01:53:12,169 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-21 01:57:46,071 - __main__ - INFO - Today's metrics: Signals: 9, Positions: 9, PNL: $0.00
+2025-08-21 01:59:12,149 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-21 01:59:12,467 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-21 01:59:12,468 - exchanges.binance - INFO - Binance connection closed
+2025-08-21 01:59:12,560 - database.connection - INFO - Database connections closed
+2025-08-21 01:59:12,560 - __main__ - INFO - Shutdown complete
+2025-08-21 01:59:14,908 - __main__ - INFO - ============================================================
+2025-08-21 01:59:14,908 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-21 01:59:14,909 - __main__ - INFO - ============================================================
+2025-08-21 01:59:14,909 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 100.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "trailing",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-21 01:59:14,909 - __main__ - INFO - Initializing database connection...
+2025-08-21 01:59:15,526 - database.connection - INFO - Database connection pool initialized
+2025-08-21 01:59:15,526 - database.connection - INFO - Database manager initialized
+2025-08-21 01:59:15,663 - __main__ - INFO - Database connection established
+2025-08-21 01:59:15,663 - __main__ - INFO - Initializing binance exchange...
+2025-08-21 01:59:15,663 - __main__ - INFO - Using testnet thresholds: volume=$1,000, spread=20.0%
+2025-08-21 01:59:16,462 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-21 01:59:17,670 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-21 01:59:17,672 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-21 01:59:18,453 - __main__ - INFO - Balance: USDT = 14860.50847501
+2025-08-21 01:59:18,454 - __main__ - INFO - Initializing signal processor...
+2025-08-21 01:59:18,454 - __main__ - INFO - Signal processor initialized
+2025-08-21 01:59:18,454 - __main__ - INFO - System initialization complete
+2025-08-21 01:59:18,454 - __main__ - INFO - ============================================================
+2025-08-21 01:59:18,454 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-21 01:59:18,454 - __main__ - INFO - ============================================================
+2025-08-21 01:59:18,454 - __main__ - INFO - Starting signal monitor...
+2025-08-21 01:59:18,455 - __main__ - INFO - Starting position monitor...
+2025-08-21 01:59:18,455 - __main__ - INFO - Starting prediction listener...
+2025-08-21 01:59:18,457 - __main__ - INFO - Starting cleanup task...
+2025-08-21 01:59:18,873 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-21 01:59:19,012 - __main__ - INFO - Today's metrics: Signals: 9, Positions: 9, PNL: $0.00
+2025-08-21 01:59:39,003 - __main__ - INFO - Found 1 new signals
+2025-08-21 01:59:43,292 - exchanges.base - WARNING - Using requested quantity 970.9 as executed quantity was 0.0
+2025-08-21 01:59:43,293 - exchanges.base - WARNING - Using market price 0.515000 as avg price was 0.00
+2025-08-21 01:59:43,293 - exchanges.base - INFO - Opened LONG position for ARBUSDT: qty=970.9, price=0.515000
+2025-08-21 01:59:43,634 - exchanges.base - INFO - Setting trailing stop for ARBUSDT: callback_rate=2.0%, activation_price=0.5202 (+1.0% from 0.515000)
+2025-08-21 01:59:43,634 - exchanges.binance - INFO - Creating trailing stop with activation at 0.5202
+2025-08-21 01:59:43,930 - exchanges.binance - INFO - Trailing stop order placed successfully: orderId=12544049, symbol=ARBUSDT, quantity=970.9, callbackRate=2.0%, activationPrice=0.5202
+2025-08-21 01:59:43,930 - exchanges.base - INFO - Set trailing stop loss for ARBUSDT: order_id=12544049
+2025-08-21 01:59:43,930 - database.connection - ERROR - Error updating position: 'PositionRepository' object has no attribute 'pool'
+2025-08-21 01:59:43,930 - trading.signal_processor - INFO - Set trailing stop loss for ARBUSDT: order_id=12544049
+2025-08-21 01:59:44,702 - exchanges.base - INFO - Set take profit for ARBUSDT: price=0.5356
+2025-08-21 01:59:44,702 - database.connection - ERROR - Error updating position: 'PositionRepository' object has no attribute 'pool'
+2025-08-21 01:59:44,792 - trading.signal_processor - INFO - Set take profit for ARBUSDT: 1 orders
+2025-08-21 01:59:44,792 - trading.signal_processor - INFO - Opened LONG position for ARBUSDT: qty=970.9, price=0.515000
+2025-08-21 01:59:44,875 - trading.signal_processor - INFO - Signal 496 executed in 5.87s
+2025-08-21 01:59:44,875 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-21 02:04:18,126 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-21 02:04:18,130 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-21 02:04:18,134 - exchanges.binance - INFO - Binance connection closed
+2025-08-21 02:04:18,227 - database.connection - INFO - Database connections closed
+2025-08-21 02:04:18,227 - __main__ - INFO - Shutdown complete
+2025-08-21 02:04:21,002 - __main__ - INFO - ============================================================
+2025-08-21 02:04:21,003 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-21 02:04:21,003 - __main__ - INFO - ============================================================
+2025-08-21 02:04:21,003 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 100.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "trailing",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-21 02:04:21,003 - __main__ - INFO - Initializing database connection...
+2025-08-21 02:04:21,644 - database.connection - INFO - Database connection pool initialized
+2025-08-21 02:04:21,644 - database.connection - INFO - Database manager initialized
+2025-08-21 02:04:21,775 - __main__ - INFO - Database connection established
+2025-08-21 02:04:21,775 - __main__ - INFO - Initializing binance exchange...
+2025-08-21 02:04:21,776 - __main__ - INFO - Using testnet thresholds: volume=$1,000, spread=20.0%
+2025-08-21 02:04:23,013 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-21 02:04:24,236 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-21 02:04:24,237 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-21 02:04:25,016 - __main__ - INFO - Balance: USDT = 14866.86009335
+2025-08-21 02:04:25,017 - __main__ - INFO - Initializing signal processor...
+2025-08-21 02:04:25,017 - __main__ - INFO - Signal processor initialized
+2025-08-21 02:04:25,018 - __main__ - INFO - System initialization complete
+2025-08-21 02:04:25,018 - __main__ - INFO - ============================================================
+2025-08-21 02:04:25,019 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-21 02:04:25,019 - __main__ - INFO - ============================================================
+2025-08-21 02:04:25,019 - __main__ - INFO - Starting signal monitor...
+2025-08-21 02:04:25,019 - __main__ - INFO - Starting position monitor...
+2025-08-21 02:04:25,019 - __main__ - INFO - Starting prediction listener...
+2025-08-21 02:04:25,020 - __main__ - INFO - Starting cleanup task...
+2025-08-21 02:04:25,425 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-21 02:04:25,565 - __main__ - INFO - Today's metrics: Signals: 10, Positions: 10, PNL: $0.00
+2025-08-21 02:04:50,637 - __main__ - INFO - Found 1 new signals
+2025-08-21 02:04:54,151 - exchanges.base - WARNING - Using requested quantity 2070.9 as executed quantity was 0.0
+2025-08-21 02:04:54,151 - exchanges.base - WARNING - Using market price 0.2414400 as avg price was 0.00
+2025-08-21 02:04:54,151 - exchanges.base - INFO - Opened LONG position for OMUSDT: qty=2070.9, price=0.2414400
+2025-08-21 02:04:54,545 - exchanges.base - INFO - Setting trailing stop for OMUSDT: callback_rate=2.0%, activation_price=0.24385 (+1.0% from 0.2414400)
+2025-08-21 02:04:54,545 - exchanges.binance - INFO - Creating trailing stop with activation at 0.24385
+2025-08-21 02:04:55,310 - exchanges.binance - INFO - Trailing stop order placed successfully: orderId=24444781, symbol=OMUSDT, quantity=2070.9, callbackRate=2.0%, activationPrice=0.24385
+2025-08-21 02:04:55,310 - exchanges.base - INFO - Set trailing stop loss for OMUSDT: order_id=24444781
+2025-08-21 02:04:55,310 - database.connection - ERROR - Error updating position: 'Position' object has no attribute 'pnl'
+2025-08-21 02:04:55,310 - trading.signal_processor - INFO - Set trailing stop loss for OMUSDT: order_id=24444781
+2025-08-21 02:04:56,073 - exchanges.base - INFO - Set take profit for OMUSDT: price=0.25110
+2025-08-21 02:04:56,074 - database.connection - ERROR - Error updating position: 'Position' object has no attribute 'pnl'
+2025-08-21 02:04:56,202 - trading.signal_processor - INFO - Set take profit for OMUSDT: 1 orders
+2025-08-21 02:04:56,203 - trading.signal_processor - INFO - Opened LONG position for OMUSDT: qty=2070.9, price=0.2414400
+2025-08-21 02:04:56,287 - trading.signal_processor - INFO - Signal 497 executed in 5.65s
+2025-08-21 02:04:56,287 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-21 02:07:05,261 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-21 02:07:05,623 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-21 02:07:05,630 - exchanges.binance - INFO - Binance connection closed
+2025-08-21 02:07:05,721 - database.connection - INFO - Database connections closed
+2025-08-21 02:07:05,721 - __main__ - INFO - Shutdown complete
+2025-08-21 02:07:08,694 - __main__ - INFO - ============================================================
+2025-08-21 02:07:08,694 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-21 02:07:08,694 - __main__ - INFO - ============================================================
+2025-08-21 02:07:08,695 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 100.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "trailing",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-21 02:07:08,695 - __main__ - INFO - Initializing database connection...
+2025-08-21 02:07:09,326 - database.connection - INFO - Database connection pool initialized
+2025-08-21 02:07:09,326 - database.connection - INFO - Database manager initialized
+2025-08-21 02:07:09,454 - __main__ - INFO - Database connection established
+2025-08-21 02:07:09,455 - __main__ - INFO - Initializing binance exchange...
+2025-08-21 02:07:09,455 - __main__ - INFO - Using testnet thresholds: volume=$1,000, spread=20.0%
+2025-08-21 02:07:10,687 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-21 02:07:11,902 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-21 02:07:11,903 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-21 02:07:12,685 - __main__ - INFO - Balance: USDT = 14876.34896105
+2025-08-21 02:07:12,686 - __main__ - INFO - Initializing signal processor...
+2025-08-21 02:07:12,686 - __main__ - INFO - Signal processor initialized
+2025-08-21 02:07:12,686 - __main__ - INFO - System initialization complete
+2025-08-21 02:07:12,686 - __main__ - INFO - ============================================================
+2025-08-21 02:07:12,686 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-21 02:07:12,686 - __main__ - INFO - ============================================================
+2025-08-21 02:07:12,687 - __main__ - INFO - Starting signal monitor...
+2025-08-21 02:07:12,687 - __main__ - INFO - Starting position monitor...
+2025-08-21 02:07:12,688 - __main__ - INFO - Starting prediction listener...
+2025-08-21 02:07:12,690 - __main__ - INFO - Starting cleanup task...
+2025-08-21 02:07:13,099 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-21 02:07:13,226 - __main__ - INFO - Today's metrics: Signals: 11, Positions: 11, PNL: $0.00
+2025-08-21 02:07:28,139 - __main__ - INFO - Found 1 new signals
+2025-08-21 02:07:33,222 - exchanges.binance - WARNING - Testnet order simulation for IMXUSDT: qty=898, price=0.5578
+2025-08-21 02:07:33,223 - exchanges.base - INFO - Opened LONG position for IMXUSDT: qty=898, price=0.5578
+2025-08-21 02:07:33,576 - exchanges.base - INFO - Setting trailing stop for IMXUSDT: callback_rate=2.0%, activation_price=0.5634 (+1.0% from 0.5578)
+2025-08-21 02:07:33,576 - exchanges.binance - INFO - Creating trailing stop with activation at 0.5634
+2025-08-21 02:07:34,339 - exchanges.binance - INFO - Trailing stop order placed successfully: orderId=22982811, symbol=IMXUSDT, quantity=898, callbackRate=2.0%, activationPrice=0.5634
+2025-08-21 02:07:34,339 - exchanges.base - INFO - Set trailing stop loss for IMXUSDT: order_id=22982811
+2025-08-21 02:07:34,467 - database.connection - ERROR - Error updating position: column "pnl" of relation "positions" does not exist
+2025-08-21 02:07:34,467 - trading.signal_processor - INFO - Set trailing stop loss for IMXUSDT: order_id=22982811
+2025-08-21 02:07:34,770 - exchanges.base - INFO - Set take profit for IMXUSDT: price=0.5801
+2025-08-21 02:07:34,900 - database.connection - ERROR - Error updating position: column "pnl" of relation "positions" does not exist
+2025-08-21 02:07:34,991 - trading.signal_processor - INFO - Set take profit for IMXUSDT: 1 orders
+2025-08-21 02:07:34,991 - trading.signal_processor - INFO - Opened LONG position for IMXUSDT: qty=898, price=0.5578
+2025-08-21 02:07:35,073 - trading.signal_processor - INFO - Signal 498 executed in 6.93s
+2025-08-21 02:07:35,074 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-21 02:10:48,073 - __main__ - INFO - Received signal 2, initiating shutdown...
+2025-08-21 02:10:48,087 - __main__ - INFO - Initiating graceful shutdown...
+2025-08-21 02:10:48,097 - exchanges.binance - INFO - Binance connection closed
+2025-08-21 02:10:48,181 - database.connection - INFO - Database connections closed
+2025-08-21 02:10:48,181 - __main__ - INFO - Shutdown complete
+2025-08-21 02:10:51,133 - __main__ - INFO - ============================================================
+2025-08-21 02:10:51,133 - __main__ - INFO - ATS 2.0 - Automated Trading System
+2025-08-21 02:10:51,134 - __main__ - INFO - ============================================================
+2025-08-21 02:10:51,134 - __main__ - INFO - Configuration: {
+  "mode": "live",
+  "exchange": "binance",
+  "testnet": true,
+  "position_size": 100.0,
+  "leverage": 5,
+  "max_positions": 500,
+  "stop_loss": {
+    "enabled": true,
+    "type": "trailing",
+    "percent": 3.0
+  },
+  "take_profit": {
+    "enabled": true,
+    "type": "simple",
+    "percent": 4.0
+  }
+}
+2025-08-21 02:10:51,134 - __main__ - INFO - Initializing database connection...
+2025-08-21 02:10:51,764 - database.connection - INFO - Database connection pool initialized
+2025-08-21 02:10:51,765 - database.connection - INFO - Database manager initialized
+2025-08-21 02:10:51,897 - __main__ - INFO - Database connection established
+2025-08-21 02:10:51,897 - __main__ - INFO - Initializing binance exchange...
+2025-08-21 02:10:51,897 - __main__ - INFO - Using testnet thresholds: volume=$1,000, spread=20.0%
+2025-08-21 02:10:52,664 - exchanges.binance - INFO - Connected to Binance Futures Testnet
+2025-08-21 02:10:53,876 - exchanges.binance - INFO - Loaded 495 tradeable symbols
+2025-08-21 02:10:53,877 - __main__ - INFO - Exchange initialized (Testnet)
+2025-08-21 02:10:54,652 - __main__ - INFO - Balance: USDT = 14865.38893540
+2025-08-21 02:10:54,652 - __main__ - INFO - Initializing signal processor...
+2025-08-21 02:10:54,652 - __main__ - INFO - Signal processor initialized
+2025-08-21 02:10:54,652 - __main__ - INFO - System initialization complete
+2025-08-21 02:10:54,652 - __main__ - INFO - ============================================================
+2025-08-21 02:10:54,652 - __main__ - INFO - System is running. Press Ctrl+C to stop.
+2025-08-21 02:10:54,652 - __main__ - INFO - ============================================================
+2025-08-21 02:10:54,653 - __main__ - INFO - Starting signal monitor...
+2025-08-21 02:10:54,653 - __main__ - INFO - Starting position monitor...
+2025-08-21 02:10:54,653 - __main__ - INFO - Starting prediction listener...
+2025-08-21 02:10:54,655 - __main__ - INFO - Starting cleanup task...
+2025-08-21 02:10:55,065 - database.connection - INFO - Listening to channel: smart_predictions
+2025-08-21 02:10:55,192 - __main__ - INFO - Today's metrics: Signals: 12, Positions: 12, PNL: $0.00
+2025-08-21 02:10:59,919 - __main__ - INFO - Found 1 new signals
+2025-08-21 02:11:00,393 - trading.signal_processor - INFO - Skipped signal 499: Not tradeable: Symbol not found
+2025-08-21 02:11:00,393 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 0, 'skipped': 1, 'errors': 0}
+2025-08-21 02:11:41,215 - __main__ - INFO - Found 1 new signals
+2025-08-21 02:11:43,228 - trading.signal_processor - INFO - Skipped signal 500: Not tradeable: Spread too high: 378.14%
+2025-08-21 02:11:43,229 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 0, 'skipped': 1, 'errors': 0}
+2025-08-21 02:12:24,025 - __main__ - INFO - Found 1 new signals
+2025-08-21 02:12:27,914 - exchanges.base - WARNING - Using requested quantity 111.1 as executed quantity was 0.0
+2025-08-21 02:12:27,914 - exchanges.base - WARNING - Using market price 4.50100 as avg price was 0.00
+2025-08-21 02:12:27,914 - exchanges.base - INFO - Opened LONG position for APTUSDT: qty=111.1, price=4.50100
+2025-08-21 02:12:28,266 - exchanges.base - INFO - Setting trailing stop for APTUSDT: callback_rate=2.0%, activation_price=4.546 (+1.0% from 4.50100)
+2025-08-21 02:12:28,267 - exchanges.binance - INFO - Creating trailing stop with activation at 4.546
+2025-08-21 02:12:29,033 - exchanges.binance - INFO - Trailing stop order placed successfully: orderId=33474103, symbol=APTUSDT, quantity=111.1, callbackRate=2.0%, activationPrice=4.546
+2025-08-21 02:12:29,033 - exchanges.base - INFO - Set trailing stop loss for APTUSDT: order_id=33474103
+2025-08-21 02:12:29,162 - trading.signal_processor - INFO - Set trailing stop loss for APTUSDT: order_id=33474103
+2025-08-21 02:12:29,456 - exchanges.base - INFO - Set take profit for APTUSDT: price=4.681
+2025-08-21 02:12:29,629 - trading.signal_processor - INFO - Set take profit for APTUSDT: 1 orders
+2025-08-21 02:12:29,629 - trading.signal_processor - INFO - Opened LONG position for APTUSDT: qty=111.1, price=4.50100
+2025-08-21 02:12:29,716 - trading.signal_processor - INFO - Signal 501 executed in 5.69s
+2025-08-21 02:12:29,716 - __main__ - INFO - Processed signals: {'total': 1, 'executed': 1, 'skipped': 0, 'errors': 0}
+2025-08-21 02:15:55,456 - __main__ - INFO - Today's metrics: Signals: 13, Positions: 13, PNL: $0.00
+2025-08-21 02:20:55,796 - __main__ - INFO - Today's metrics: Signals: 13, Positions: 13, PNL: $0.00
+2025-08-21 02:25:56,017 - __main__ - INFO - Today's metrics: Signals: 13, Positions: 13, PNL: $0.00
+2025-08-21 02:30:56,278 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 02:35:56,598 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 02:40:56,820 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 02:45:57,082 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 02:50:57,307 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 02:55:57,555 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 03:00:57,782 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 03:05:58,092 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 03:10:58,661 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 03:15:59,095 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 03:20:59,637 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 03:25:59,907 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 03:31:00,105 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 03:36:00,381 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 03:41:00,652 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 03:46:00,923 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 03:51:01,189 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 03:56:01,454 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 04:01:01,726 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 04:06:01,988 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 04:11:02,216 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
+2025-08-21 04:16:02,478 - __main__ - INFO - Today's metrics: Signals: 0, Positions: 0, PNL: $0.00
