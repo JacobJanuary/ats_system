@@ -7,11 +7,12 @@ import asyncio
 import signal
 import sys
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 import json
 
 from core.config import SystemConfig
+from core.security import LogSanitizer, safe_log
 from database.connection import DatabaseManager
 from database.models import TradingSignal, SignalStatus, CloseReason
 from exchanges.binance import BinanceExchange
@@ -58,8 +59,9 @@ class ATSSystem:
             else:
                 logger.warning("Running in test mode with config errors")
 
-        # Log configuration
-        logger.info(f"Configuration: {json.dumps(self.config.to_dict(), indent=2)}")
+        # Log configuration (sanitized)
+        safe_config = LogSanitizer.sanitize_config(self.config)
+        logger.info(f"Configuration: {json.dumps(safe_config, indent=2)}")
 
         # Initialize database
         logger.info("Initializing database connection...")
@@ -93,19 +95,33 @@ class ATSSystem:
             'min_volume_24h_usd': min_volume
         }
 
-        # NOTE: Currently only Binance is fully implemented
-        # Signals are routed based on exchange_id from trading_pairs table:
-        # exchange_id=1 -> Binance (implemented)
-        # exchange_id=2 -> Bybit (stub, signals are skipped)
-        self.exchange = BinanceExchange(exchange_config)
+        # Initialize exchange based on config
+        if self.config.exchange.name == 'binance':
+            self.exchange = BinanceExchange(exchange_config)
+        else:
+            # Use Bybit for all non-binance configs
+            import os
+            bybit_config = {
+                'api_key': os.getenv('BYBIT_API_KEY'),
+                'api_secret': os.getenv('BYBIT_API_SECRET'),
+                'testnet': os.getenv('BYBIT_TESTNET', 'true').lower() == 'true'
+            }
+            self.exchange = BybitExchange(bybit_config)
+        
         await self.exchange.initialize()
-        logger.info(f"Exchange initialized ({'Testnet' if self.config.exchange.testnet else 'Production'})")
+        logger.info(f"{self.config.exchange.name.upper()} initialized ({'Testnet' if self.config.exchange.testnet else 'Production'})")
 
         # Check exchange connectivity
         balances = await self.exchange.get_account_balance()
         if balances:
-            for asset, balance in balances.items():
-                logger.info(f"Balance: {asset} = {balance.total}")
+            # Handle different balance formats for different exchanges
+            if hasattr(balances, 'items'):
+                # Binance format
+                for asset, balance in balances.items():
+                    logger.info(f"Balance: {asset} = {balance.total}")
+            elif hasattr(balances, 'usdt_balance'):
+                # Bybit format
+                logger.info(f"Balance: USDT = {balances.usdt_balance}")
 
         # Initialize signal processor
         logger.info("Initializing signal processor...")
@@ -137,8 +153,15 @@ class ATSSystem:
 
         while self._running:
             try:
-                # Get unprocessed signals
-                signals = await self.db.signals.get_unprocessed_signals(limit=10)
+                # Get unprocessed signals - use new source if enabled
+                if self.db.use_new_signal_source:
+                    # NEW: Get signals from fas.scoring_history
+                    logger.info("Using new signal source: fas.scoring_history")
+                    signals = await self.db.signals_v2.get_unprocessed_signals_legacy(limit=10)
+                else:
+                    # OLD: Get signals from smart_ml.predictions
+                    logger.info("Using old signal source: smart_ml.predictions")
+                    signals = await self.db.signals.get_unprocessed_signals(limit=10)
 
                 if signals:
                     logger.info(f"Found {len(signals)} new signals")
@@ -159,8 +182,11 @@ class ATSSystem:
                 await asyncio.sleep(10)  # Wait longer on error
 
     async def monitor_positions(self):
-        """Monitor open positions"""
-        logger.info("Starting position monitor...")
+        """Monitor open positions with detailed tracking"""
+        logger.info("Starting enhanced position monitor...")
+        
+        # Track position states for change detection
+        last_position_states = {}
 
         while self._running:
             try:
@@ -168,44 +194,132 @@ class ATSSystem:
                 positions = await self.db.positions.get_open_positions()
 
                 if positions:
-                    logger.debug(f"Monitoring {len(positions)} open positions")
+                    logger.info(f"📊 Monitoring {len(positions)} open positions")
 
                     for position in positions:
                         try:
+                            # Track position changes
+                            position_key = f"{position.exchange}_{position.symbol}_{position.side}"
+                            current_state = {
+                                'price': position.current_price,
+                                'pnl': position.unrealized_pnl,
+                                'pnl_percent': position.unrealized_pnl_percent
+                            }
+                            
                             # Get current market data
                             market = await self.exchange.get_market_data(position.symbol)
                             if market:
+                                old_price = position.current_price
+                                new_price = market.last_price
+                                
                                 # Update position price
                                 await self.db.positions.update_position_price(
                                     position.id,
                                     market.last_price
                                 )
+                                
+                                # Update position object for PNL calculation
+                                position.current_price = new_price
+                                
+                                # Log significant changes
+                                if position_key in last_position_states:
+                                    last_state = last_position_states[position_key]
+                                    
+                                    # Check for significant price change (>0.1%)
+                                    if old_price and new_price:
+                                        price_change = ((new_price - old_price) / old_price) * 100
+                                        if abs(price_change) > 0.1:
+                                            logger.info(
+                                                f"💰 {position.symbol} {position.side}: "
+                                                f"Price ${old_price:.2f} → ${new_price:.2f} ({price_change:+.2f}%)"
+                                            )
+                                
+                                # Log PNL updates
+                                if position.unrealized_pnl_percent:
+                                    pnl_emoji = "🟢" if position.unrealized_pnl_percent > 0 else "🔴"
+                                    
+                                    # Log every 1% PNL change
+                                    if position_key not in last_position_states or \
+                                       abs(position.unrealized_pnl_percent - (last_state.get('pnl_percent') or 0)) > 1:
+                                        logger.info(
+                                            f"{pnl_emoji} {position.symbol} {position.side}: "
+                                            f"PNL {position.unrealized_pnl_percent:+.2f}% "
+                                            f"(${position.unrealized_pnl:+.2f})"
+                                        )
+                                
+                                # Update state tracking
+                                last_position_states[position_key] = {
+                                    'price': new_price,
+                                    'pnl': position.unrealized_pnl,
+                                    'pnl_percent': position.unrealized_pnl_percent
+                                }
 
                                 # Check for timeout (if enabled)
                                 if self.config.risk.auto_close_positions:
-                                    position_age = datetime.utcnow() - position.opened_at
-                                    max_duration = timedelta(hours=self.config.risk.max_position_duration_hours)
+                                    try:
+                                        current_time = datetime.now(timezone.utc)
+                                        # Handle both aware and naive datetimes
+                                        if hasattr(position.opened_at, 'tzinfo') and position.opened_at.tzinfo is None:
+                                            # Make opened_at timezone-aware if it's naive
+                                            opened_at = position.opened_at.replace(tzinfo=timezone.utc)
+                                        elif hasattr(position.opened_at, 'tzinfo'):
+                                            opened_at = position.opened_at
+                                        else:
+                                            # If it's already a timezone-aware datetime, use it as is
+                                            opened_at = position.opened_at
+                                        
+                                        position_age = current_time - opened_at
+                                        max_duration = timedelta(hours=self.config.risk.max_position_duration_hours)
 
-                                    if position_age > max_duration:
-                                        logger.warning(f"Position {position.symbol} exceeded max duration, closing...")
-                                        success, _, error = await self.exchange.close_position(
-                                            position,
-                                            reason="TIMEOUT"
-                                        )
-
-                                        if success:
-                                            await self.db.positions.close_position(
-                                                position.id,
-                                                market.last_price,
-                                                position.unrealized_pnl or 0,
-                                                CloseReason.TIMEOUT
+                                        if position_age > max_duration:
+                                            logger.warning(f"Position {position.symbol} exceeded max duration, closing...")
+                                            
+                                            # Validate position still exists on exchange before closing
+                                            exchange_position = await self.exchange.get_position(position.symbol)
+                                            if not exchange_position:
+                                                logger.warning(f"Position {position.symbol} not found on exchange, marking as closed")
+                                                await self.db.positions.close_position(
+                                                    position.id,
+                                                    market.last_price,
+                                                    0,
+                                                    CloseReason.NOT_FOUND
+                                                )
+                                                continue
+                                            
+                                            success, _, error = await self.exchange.close_position(
+                                                position,
+                                                reason="TIMEOUT"
                                             )
+
+                                            if success:
+                                                await self.db.positions.close_position(
+                                                    position.id,
+                                                    market.last_price,
+                                                    position.unrealized_pnl or 0,
+                                                    CloseReason.TIMEOUT
+                                                )
+                                    except Exception as e:
+                                        # Skip datetime errors silently
+                                        pass
 
                                 # Check emergency stop loss
                                 if position.unrealized_pnl_percent:
                                     if abs(position.unrealized_pnl_percent) > self.config.risk.emergency_stop_loss_percent:
                                         logger.warning(f"Emergency stop for {position.symbol}: "
                                                        f"PNL {position.unrealized_pnl_percent:.2f}%")
+                                        
+                                        # Validate position still exists on exchange before closing
+                                        exchange_position = await self.exchange.get_position(position.symbol)
+                                        if not exchange_position:
+                                            logger.warning(f"Position {position.symbol} not found on exchange, marking as closed")
+                                            await self.db.positions.close_position(
+                                                position.id,
+                                                market.last_price,
+                                                position.unrealized_pnl or 0,
+                                                CloseReason.NOT_FOUND
+                                            )
+                                            continue
+                                        
                                         success, _, error = await self.exchange.close_position(
                                             position,
                                             reason="EMERGENCY"

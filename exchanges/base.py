@@ -10,6 +10,8 @@ from datetime import datetime
 import logging
 
 from database.models import Position, Order, OrderType, OrderPurpose, OrderStatus
+from core.retry import retry, CircuitBreaker, RetryConfig, retry_with_backoff
+from core.security import safe_log
 
 logger = logging.getLogger(__name__)
 
@@ -101,6 +103,7 @@ class ExchangePosition:
     margin_type: str
     leverage: int
     liquidation_price: Optional[Decimal]
+    position_amount: Decimal = Decimal('0')  # Raw position amount (positive for long, negative for short)
 
     @property
     def unrealized_pnl_percent(self) -> Decimal:
@@ -421,6 +424,66 @@ class ExchangeBase(ABC):
             logger.info(f"Opened {side} position for {symbol}: "
                        f"qty={position.quantity}, price={position.entry_price}")
 
+            # ОБЯЗАТЕЛЬНАЯ АВТОМАТИЧЕСКАЯ ЗАЩИТА
+            # ВСЕГДА устанавливаем и Stop Loss, и Trailing Stop
+            from core.config import config as system_config
+            import asyncio
+            
+            logger.info(f"🛡️ SETTING MANDATORY PROTECTION for {symbol} position...")
+            
+            # Параметры защиты из системной конфигурации
+            stop_loss_percent = system_config.risk.stop_loss_percent
+            trailing_callback_rate = system_config.risk.trailing_callback_rate
+            
+            protection_tasks = []
+            protection_results = {}
+            
+            # 1. ВСЕГДА устанавливаем Fixed Stop Loss
+            logger.info(f"Setting fixed stop loss at {stop_loss_percent}%")
+            sl_success, sl_order_id, sl_error = await self.set_stop_loss(
+                position=position,
+                stop_loss_percent=stop_loss_percent,
+                is_trailing=False
+            )
+            
+            if sl_success:
+                logger.info(f"✅ Stop loss set successfully: order_id={sl_order_id}")
+                position.has_stop_loss = True
+                protection_results['stop_loss'] = True
+            else:
+                logger.error(f"❌ Failed to set stop loss: {sl_error}")
+                protection_results['stop_loss'] = False
+            
+            # 2. ВСЕГДА устанавливаем Trailing Stop
+            logger.info(f"Setting trailing stop: callback={trailing_callback_rate}%")
+            
+            # Ждем немного перед установкой trailing stop
+            await asyncio.sleep(1)
+            
+            ts_success, ts_order_id, ts_error = await self.set_stop_loss(
+                position=position,
+                stop_loss_percent=stop_loss_percent,
+                is_trailing=True,
+                callback_rate=trailing_callback_rate
+            )
+            
+            if ts_success:
+                logger.info(f"✅ Trailing stop set successfully: order_id={ts_order_id}")
+                position.stop_loss_type = "BOTH"  # Both fixed and trailing
+                protection_results['trailing_stop'] = True
+            else:
+                logger.error(f"❌ Failed to set trailing stop: {ts_error}")
+                protection_results['trailing_stop'] = False
+                # Keep trying in background
+                logger.info("Will retry trailing stop via protection monitor...")
+            
+            # Log protection summary
+            if all(protection_results.values()):
+                logger.info(f"✅ FULL PROTECTION established for {symbol}")
+            else:
+                logger.warning(f"⚠️ PARTIAL PROTECTION for {symbol}: {protection_results}")
+                logger.info("Protection monitor will complete the setup...")
+
             return True, order_result, None
 
         except Exception as e:
@@ -485,7 +548,8 @@ class ExchangeBase(ABC):
             # В методе set_stop_loss, блок if is_trailing and callback_rate:
             if is_trailing and callback_rate:
                 # Рассчитываем activation_price для trailing stop
-                activation_percent = self.config.get('risk', {}).get('trailing_activation_percent', 1.0)
+                from core.config import config as system_config
+                activation_percent = system_config.risk.trailing_activation_percent
 
                 if position.side == "LONG":
                     # Для LONG: активация когда цена поднимется на X%

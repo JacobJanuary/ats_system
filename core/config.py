@@ -34,10 +34,10 @@ class DatabaseConfig:
 @dataclass
 class ExchangeConfig:
     """Exchange-specific configuration"""
-    name: Literal['binance', 'bybit'] = 'binance'
-    api_key: str = field(default_factory=lambda: os.getenv('BINANCE_API_KEY', ''))
-    api_secret: str = field(default_factory=lambda: os.getenv('BINANCE_API_SECRET', ''))
-    testnet: bool = field(default_factory=lambda: os.getenv('BINANCE_TESTNET', 'true').lower() == 'true')
+    name: Literal['binance', 'bybit'] = 'bybit'
+    api_key: str = field(default_factory=lambda: os.getenv('BYBIT_API_KEY', ''))
+    api_secret: str = field(default_factory=lambda: os.getenv('BYBIT_API_SECRET', ''))
+    testnet: bool = field(default_factory=lambda: os.getenv('BYBIT_TESTNET', 'true').lower() == 'true')
 
     # Rate limiting
     max_requests_per_minute: int = 1200

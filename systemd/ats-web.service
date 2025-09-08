@@ -1,0 +1,31 @@
+[Unit]
+Description=ATS 2.0 Web Interface
+After=network.target postgresql.service ats-monitoring.service
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=ats
+Group=ats
+WorkingDirectory=/opt/ats-system
+Environment="PATH=/opt/ats-system/venv/bin:/usr/bin"
+Environment="PYTHONPATH=/opt/ats-system"
+EnvironmentFile=/opt/ats-system/.env
+
+# Web server
+ExecStart=/opt/ats-system/venv/bin/uvicorn monitoring.web_interface:app --host 0.0.0.0 --port 8000 --workers 4
+
+# Restart policy
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=append:/var/log/ats/web.log
+StandardError=append:/var/log/ats/web.error.log
+
+# Security
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

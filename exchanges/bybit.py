@@ -13,6 +13,8 @@ from pybit.unified_trading import HTTP
 from exchanges.base import (
     ExchangeBase, SymbolInfo, MarketData, AccountBalance, ExchangePosition
 )
+from core.retry import retry, CircuitBreaker, RetryConfig
+from core.security import safe_log
 
 logger = logging.getLogger(__name__)
 
@@ -589,6 +591,77 @@ class BybitExchange(ExchangeBase):
         except Exception as e:
             logger.error(f"Error setting leverage: {e}")
             return False
+
+    async def set_stop_loss(
+        self,
+        position: 'Position',
+        stop_loss_percent: float,
+        is_trailing: bool = False,
+        callback_rate: Optional[float] = None
+    ) -> Tuple[bool, Optional[str], Optional[str]]:
+        """
+        Set stop loss for a position
+        
+        Args:
+            position: Position object
+            stop_loss_percent: Stop loss percentage from entry price
+            is_trailing: If True, creates trailing stop loss
+            callback_rate: Trailing callback rate (required if is_trailing=True)
+            
+        Returns:
+            Tuple of (success, order_id, error_message)
+        """
+        try:
+            # Calculate stop price (convert to Decimal for proper arithmetic)
+            entry_price = Decimal(str(position.entry_price))
+            sl_factor = Decimal(str(1 - stop_loss_percent / 100)) if position.side == "LONG" else Decimal(str(1 + stop_loss_percent / 100))
+            stop_price = entry_price * sl_factor
+            
+            # Round stop price to appropriate precision
+            symbol_info = await self.get_symbol_info(position.symbol)
+            if symbol_info:
+                stop_price = round(float(stop_price), symbol_info.price_precision)
+            
+            if is_trailing and callback_rate:
+                # Place trailing stop
+                logger.info(f"Setting trailing stop for {position.symbol}: "
+                          f"callback_rate={callback_rate}%")
+                
+                result = await self.place_trailing_stop_order(
+                    symbol=position.symbol,
+                    side="SELL" if position.side == "LONG" else "BUY",
+                    quantity=Decimal(str(position.quantity)),
+                    callback_rate=Decimal(str(callback_rate / 100)),  # Convert to decimal
+                    activation_price=None  # Use current price as activation
+                )
+                
+                if result.get('status') == 'NEW':
+                    return True, result.get('orderId'), None
+                else:
+                    return False, None, result.get('msg', 'Failed to set trailing stop')
+                    
+            else:
+                # Place fixed stop loss
+                logger.info(f"Setting fixed stop loss for {position.symbol}: "
+                          f"stop_price={stop_price}")
+                
+                result = await self.place_stop_market_order(
+                    symbol=position.symbol,
+                    side="SELL" if position.side == "LONG" else "BUY",
+                    quantity=Decimal(str(position.quantity)),
+                    stop_price=Decimal(str(stop_price)),
+                    reduce_only=True,
+                    close_position=True
+                )
+                
+                if result.get('status') == 'NEW':
+                    return True, result.get('orderId'), None
+                else:
+                    return False, None, result.get('msg', 'Failed to set stop loss')
+                    
+        except Exception as e:
+            logger.error(f"Error setting stop loss: {e}")
+            return False, None, str(e)
 
     async def close(self) -> None:
         """Close connection"""

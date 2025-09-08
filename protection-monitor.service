@@ -1,0 +1,26 @@
+[Unit]
+Description=Bybit Position Protection Monitor
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=trading
+WorkingDirectory=/Users/evgeniyyanvarskiy/PycharmProjects/ats_system
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONPATH=/Users/evgeniyyanvarskiy/PycharmProjects/ats_system"
+ExecStart=/usr/bin/python3 /Users/evgeniyyanvarskiy/PycharmProjects/ats_system/enhanced_protection_monitor.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/protection-monitor.log
+StandardError=append:/var/log/protection-monitor-error.log
+
+# Resource limits
+LimitNOFILE=1024
+LimitNPROC=512
+
+# Security
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

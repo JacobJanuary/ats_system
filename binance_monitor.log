@@ -1,0 +1,24 @@
+
+============================================================
+BINANCE POSITION PROTECTION
+============================================================
+
+1. Run continuous monitor
+2. One-time position check
+0. Exit
+
+Enter choice: 2025-09-08 15:51:16,114 - INFO - BinanceEnhancedManager initialized with protection settings:
+2025-09-08 15:51:16,114 - INFO -   Stop Loss: True (6.5%)
+2025-09-08 15:51:16,114 - INFO -   Trailing Stop: 0.5% callback, 3.5% activation
+2025-09-08 15:51:16,114 - INFO -   Take Profit: False (5.0%)
+2025-09-08 15:51:16,114 - INFO - ============================================================
+2025-09-08 15:51:16,114 - INFO - 🚀 BINANCE POSITION MONITOR STARTED
+2025-09-08 15:51:16,114 - INFO - ============================================================
+2025-09-08 15:51:16,114 - INFO - Mode: TESTNET
+2025-09-08 15:51:16,114 - INFO - Check interval: 30 seconds
+2025-09-08 15:51:16,114 - INFO - Stop Loss: 6.5%
+2025-09-08 15:51:16,114 - INFO - Trailing Stop: 0.5%
+2025-09-08 15:51:16,114 - INFO - ============================================================
+2025-09-08 15:51:17,076 - INFO - Connected to Binance Futures Testnet
+2025-09-08 15:51:17,725 - INFO - Loaded 532 tradeable symbols
+2025-09-08 15:51:17,726 - INFO - ✅ Connected to Binance

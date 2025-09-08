@@ -1,0 +1,11 @@
+2025-09-08 20:03:36,270 - database.signal_repository_v2 - INFO - SignalRepositoryV2 initialized with MIN_SCORE_WEEK=50.0, MIN_SCORE_MONTH=50.0
+2025-09-08 20:03:37,456 - database.connection - INFO - Database connection pool initialized
+2025-09-08 20:03:37,456 - database.connection - INFO - Database manager initialized
+2025-09-08 20:03:37,456 - __main__ - INFO - 📊 Database Sync Service started (interval: 300s)
+2025-09-08 20:03:37,456 - __main__ - INFO - 🔄 Starting database sync at 2025-09-08 16:03:37.456866+00:00
+2025-09-08 20:03:38,490 - exchanges.bybit - INFO - Bybit testnet connected successfully
+2025-09-08 20:03:39,255 - __main__ - INFO -   ➕ Added Bybit position: PEOPLEUSDT
+2025-09-08 20:03:39,414 - __main__ - INFO -   ➕ Added Bybit position: RUNEUSDT
+2025-09-08 20:03:39,575 - __main__ - INFO -   ➕ Added Bybit position: SOLUSDT
+2025-09-08 20:03:45,233 - exchanges.bybit - INFO - Bybit connection closed
+2025-09-08 20:03:45,477 - __main__ - INFO - 📈 Sync #1 completed - Bybit: +3 -0 ~0

@@ -5,7 +5,7 @@ Processes trading signals with duplicate protection and risk checks
 import asyncio
 import logging
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from typing import Optional, Dict, Any, List, Set
 from collections import defaultdict
@@ -45,7 +45,7 @@ class DuplicateProtection:
 
             # Check cooldown period
             if signal.pair_symbol in self._recent_signals:
-                time_since_last = datetime.utcnow() - self._recent_signals[signal.pair_symbol]
+                time_since_last = datetime.now(timezone.utc) - self._recent_signals[signal.pair_symbol]
                 if time_since_last.total_seconds() < self.cooldown_seconds:
                     remaining = self.cooldown_seconds - time_since_last.total_seconds()
                     return False, f"Cooldown active, {remaining:.0f}s remaining"
@@ -53,7 +53,7 @@ class DuplicateProtection:
             # Mark as processing
             self._processing_signals.add(signal.prediction_id)
             self._processing_symbols.add(signal.pair_symbol)
-            self._recent_signals[signal.pair_symbol] = datetime.utcnow()
+            self._recent_signals[signal.pair_symbol] = datetime.now(timezone.utc)
 
             return True, "OK"
 
@@ -66,7 +66,7 @@ class DuplicateProtection:
     async def clear_old_entries(self):
         """Clear old cooldown entries"""
         async with self._lock:
-            now = datetime.utcnow()
+            now = datetime.now(timezone.utc)
             expired = []
 
             for symbol, last_time in self._recent_signals.items():
@@ -114,7 +114,14 @@ class SignalFilter:
             return False, f"Symbol {signal.pair_symbol} is blacklisted"
 
         # Check signal age
-        signal_age = (datetime.utcnow() - signal.created_at).total_seconds()
+        # Handle both timezone-aware and naive datetimes
+        if hasattr(signal.created_at, 'tzinfo') and signal.created_at.tzinfo is None:
+            # Make created_at timezone-aware if it's naive
+            signal_created_at = signal.created_at.replace(tzinfo=timezone.utc)
+        else:
+            signal_created_at = signal.created_at
+        
+        signal_age = (datetime.now(timezone.utc) - signal_created_at).total_seconds()
         if signal_age > self.config.signal.signal_timeout_seconds:
             return False, f"Signal too old: {signal_age:.0f}s"
 
@@ -129,13 +136,13 @@ class RiskManager:
         self.db = db
         self._daily_trades = 0
         self._daily_loss = Decimal(0)
-        self._last_reset = datetime.utcnow().date()
+        self._last_reset = datetime.now(timezone.utc).date()
 
     async def can_open_position(self, symbol: str) -> tuple[bool, Optional[str]]:
         """Check if new position can be opened"""
 
         # Reset daily counters if new day
-        today = datetime.utcnow().date()
+        today = datetime.now(timezone.utc).date()
         if today != self._last_reset:
             self._daily_trades = 0
             self._daily_loss = Decimal(0)
@@ -200,7 +207,7 @@ class SignalProcessor:
         Process a single trading signal
         Returns: True if signal was executed, False otherwise
         """
-        start_time = datetime.utcnow()
+        start_time = datetime.now(timezone.utc)
 
         try:
             # 1. Create signal record in database
@@ -219,13 +226,14 @@ class SignalProcessor:
                 entity_type="signals"
             )
 
-            # 2. Check if signal is for supported exchange
-            if signal.exchange_id == 2:  # Bybit
-                await self._skip_signal(signal, "Bybit not yet implemented")
-                logger.warning(f"Skipped Bybit signal for {signal.pair_symbol} - not implemented")
-                return False
-
-            if signal.exchange_id != 1:  # Not Binance
+            # 2. Check if signal is for supported exchange and route accordingly
+            if signal.exchange_id == 1:  # Binance
+                logger.info(f"Processing Binance signal for {signal.pair_symbol}")
+                # Continue with normal flow for Binance
+            elif signal.exchange_id == 2:  # Bybit
+                logger.info(f"Processing Bybit signal for {signal.pair_symbol}")
+                # Bybit processing enabled - continue with normal flow
+            else:
                 await self._skip_signal(signal, f"Unknown exchange_id: {signal.exchange_id}")
                 return False
 
@@ -279,7 +287,7 @@ class SignalProcessor:
                     self.stats['executed'] += 1
 
                     # Log success
-                    processing_time = (datetime.utcnow() - start_time).total_seconds()
+                    processing_time = (datetime.now(timezone.utc) - start_time).total_seconds()
                     logger.info(f"Signal {signal.prediction_id} executed in {processing_time:.2f}s")
 
                     return True

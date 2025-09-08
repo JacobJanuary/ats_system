@@ -5,6 +5,7 @@ Async PostgreSQL connection pool and repository pattern
 import asyncio
 import logging
 import json
+import os
 from typing import Optional, List, Dict, Any, AsyncIterator
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
@@ -19,6 +20,7 @@ from database.models import (
     SignalStatus, PositionStatus, OrderStatus, OrderPurpose,
     CloseReason
 )
+from database.signal_repository_v2 import SignalRepositoryV2
 
 logger = logging.getLogger(__name__)
 
@@ -698,10 +700,14 @@ class DatabaseManager:
 
         # Initialize repositories
         self.signals = SignalRepository(self.pool)
+        self.signals_v2 = SignalRepositoryV2(self.pool)  # NEW: Using fas.scoring_history
         self.positions = PositionRepository(self.pool)
         self.orders = OrderRepository(self.pool)
         self.audit = AuditRepository(self.pool)
         self.metrics = MetricsRepository(self.pool)
+        
+        # Flag to use new signal source
+        self.use_new_signal_source = os.getenv('USE_SCORING_HISTORY', 'true').lower() == 'true'
 
     async def initialize(self) -> None:
         """Initialize database connection"""

@@ -4,8 +4,12 @@ Binance Futures implementation of the exchange interface
 """
 import asyncio
 import logging
+import time
+import hmac
+import hashlib
+import aiohttp
 from decimal import Decimal
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Tuple
 from datetime import datetime
 
 from binance import AsyncClient
@@ -32,6 +36,12 @@ class BinanceExchange(ExchangeBase):
         # Testnet URLs
         self.testnet_base = "https://testnet.binancefuture.com"
         self.testnet_ws = "wss://stream.binancefuture.com"
+        
+        # Set base URL based on testnet flag
+        if config.get('testnet'):
+            self.base_url = self.testnet_base
+        else:
+            self.base_url = "https://fapi.binance.com"
 
         # Rate limiting
         self._request_times = []
@@ -242,14 +252,15 @@ class BinanceExchange(ExchangeBase):
                 position = ExchangePosition(
                     symbol=symbol,
                     side="LONG" if qty > 0 else "SHORT",
+                    position_amount=qty,  # Add raw position amount
                     quantity=abs(qty),
                     entry_price=Decimal(pos_data['entryPrice']),
                     mark_price=Decimal(pos_data['markPrice']),
                     unrealized_pnl=Decimal(pos_data['unRealizedProfit']),
                     realized_pnl=Decimal('0'),  # Not provided directly
-                    margin_type=pos_data['marginType'],
-                    leverage=int(pos_data['leverage']),
-                    liquidation_price=Decimal(pos_data['liquidationPrice']) if pos_data['liquidationPrice'] else None
+                    margin_type=pos_data.get('marginType', 'cross'),
+                    leverage=int(pos_data.get('leverage', 1)),
+                    liquidation_price=Decimal(pos_data['liquidationPrice']) if pos_data.get('liquidationPrice') else None
                 )
                 return position
 
@@ -274,13 +285,14 @@ class BinanceExchange(ExchangeBase):
                 position = ExchangePosition(
                     symbol=pos_data['symbol'],
                     side="LONG" if qty > 0 else "SHORT",
+                    position_amount=qty,  # Add raw position amount
                     quantity=abs(qty),
                     entry_price=Decimal(pos_data['entryPrice']),
                     mark_price=Decimal(pos_data['markPrice']),
                     unrealized_pnl=Decimal(pos_data['unRealizedProfit']),
                     realized_pnl=Decimal('0'),
-                    margin_type=pos_data['marginType'],
-                    leverage=int(pos_data['leverage']),
+                    margin_type=pos_data.get('marginType', 'cross'),
+                    leverage=int(pos_data.get('leverage', 1)),
                     liquidation_price=Decimal(pos_data['liquidationPrice']) if pos_data['liquidationPrice'] else None
                 )
                 positions.append(position)
@@ -558,4 +570,139 @@ class BinanceExchange(ExchangeBase):
             return orders
         except Exception as e:
             logger.error(f"Error getting open orders: {e}")
+            return []
+    
+    async def set_stop_loss(
+        self,
+        position: 'Position',
+        stop_loss_percent: float,
+        is_trailing: bool = False,
+        callback_rate: Optional[float] = None
+    ) -> Tuple[bool, Optional[str], Optional[str]]:
+        """
+        Set stop loss for position - supports both fixed and trailing
+        Returns: (success, order_id, error_message)
+        """
+        try:
+            # Validate position data
+            if not position.entry_price or position.entry_price <= 0:
+                return False, None, f"Invalid entry price: {position.entry_price}"
+            
+            if not position.quantity or position.quantity <= 0:
+                return False, None, f"Invalid quantity: {position.quantity}"
+            
+            # Calculate stop price for fixed stop loss
+            if position.side == "LONG":
+                stop_price = position.entry_price * (Decimal('1') - Decimal(str(stop_loss_percent)) / Decimal('100'))
+                order_side = "SELL"
+            else:  # SHORT
+                stop_price = position.entry_price * (Decimal('1') + Decimal(str(stop_loss_percent)) / Decimal('100'))
+                order_side = "BUY"
+            
+            stop_price = stop_price.quantize(Decimal('0.01'))
+            
+            # Place appropriate order type
+            if is_trailing and callback_rate:
+                # Use trailing stop for Binance
+                logger.info(f"Setting trailing stop for {position.symbol}: callback={callback_rate}%")
+                
+                # Calculate activation price (3.5% profit by default)
+                from core.config import config as system_config
+                activation_percent = system_config.risk.trailing_activation_percent
+                
+                if position.side == "LONG":
+                    # For LONG: activate when price rises X%
+                    activation_price = position.entry_price * Decimal(1 + activation_percent / 100)
+                else:
+                    # For SHORT: activate when price falls X%
+                    activation_price = position.entry_price * Decimal(1 - activation_percent / 100)
+                
+                order_result = await self.place_trailing_stop_order(
+                    symbol=position.symbol,
+                    side=order_side,
+                    callback_rate=Decimal(str(callback_rate)),
+                    activation_price=activation_price,
+                    quantity=position.quantity
+                )
+            else:
+                # Use fixed stop loss
+                logger.info(f"Setting fixed stop loss for {position.symbol} at {stop_price}")
+                
+                order_result = await self.place_stop_market_order(
+                    symbol=position.symbol,
+                    side=order_side,
+                    quantity=position.quantity,
+                    stop_price=stop_price,
+                    reduce_only=True
+                )
+            
+            # Check result
+            if order_result.get('status') == 'REJECTED':
+                error_msg = order_result.get('msg', 'Order rejected')
+                logger.error(f"Failed to set stop loss: {error_msg}")
+                return False, None, error_msg
+            
+            order_id = str(order_result.get('orderId', ''))
+            logger.info(f"✅ Stop loss set successfully: order_id={order_id}")
+            
+            return True, order_id, None
+            
+        except Exception as e:
+            logger.error(f"Error setting stop loss: {e}")
+            return False, None, str(e)
+    
+    async def get_positions(self) -> List['ExchangePosition']:
+        """Get all open positions from Binance Futures"""
+        try:
+            endpoint = "/fapi/v2/positionRisk"
+            
+            params = {
+                'timestamp': int(time.time() * 1000)
+            }
+            
+            # Generate signature
+            query_string = '&'.join([f"{k}={v}" for k, v in params.items()])
+            signature = hmac.new(
+                self.api_secret.encode('utf-8'),
+                query_string.encode('utf-8'),
+                hashlib.sha256
+            ).hexdigest()
+            
+            params['signature'] = signature
+            
+            headers = {'X-MBX-APIKEY': self.api_key}
+            url = f"{self.base_url}{endpoint}"
+            
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers=headers, params=params) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        
+                        positions = []
+                        for pos in data:
+                            position_amt = float(pos.get('positionAmt', 0))
+                            if position_amt != 0:
+                                from exchanges.base import ExchangePosition
+                                
+                                positions.append(ExchangePosition(
+                                    symbol=pos.get('symbol'),
+                                    side="LONG" if position_amt > 0 else "SHORT",
+                                    quantity=Decimal(str(abs(position_amt))),
+                                    entry_price=Decimal(pos.get('entryPrice', '0')),
+                                    mark_price=Decimal(pos.get('markPrice', '0')),
+                                    unrealized_pnl=Decimal(pos.get('unRealizedProfit', '0')),
+                                    realized_pnl=Decimal('0'),
+                                    margin_type=pos.get('marginType', 'cross'),
+                                    leverage=int(pos.get('leverage', '1')),
+                                    liquidation_price=Decimal(pos.get('liquidationPrice', '0')) if pos.get('liquidationPrice') else None
+                                ))
+                        
+                        logger.debug(f"Found {len(positions)} open positions on Binance")
+                        return positions
+                    else:
+                        logger.error(f"Failed to get Binance positions: {response.status}")
+                        return []
+                        
+        except Exception as e:
+            logger.error(f"Error getting Binance positions: {e}")
             return []
