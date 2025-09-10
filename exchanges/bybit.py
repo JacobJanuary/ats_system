@@ -453,7 +453,7 @@ class BybitExchange(BaseExchange):
         result = await self._make_request("GET", "/v5/order/realtime", params, signed=True)
         return result['list'] if result and 'list' in result else []
 
-    async def cancel_all_orders(self, symbol: str) -> bool:
+    async def cancel_all_open_orders(self, symbol: str) -> bool:
         params = {'category': 'linear', 'symbol': symbol}
         result = await self._make_request("POST", "/v5/order/cancel-all", params, signed=True)
         if result:

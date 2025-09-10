@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Protection Monitor - PRODUCTION READY v2.3 (Final Logic Fix)
-- Установлен строгий приоритет: сначала установка защиты, потом обработка таймаутов.
-- Полностью устранена 'гонка состояний' (race condition) между защитой и таймаутом.
-- Исправлены все оставшиеся ошибки и опечатки.
+Protection Monitor - PRODUCTION READY v2.5 (Stable Logic)
+- Введена строгая иерархия: позиция либо обрабатывается по таймауту, либо защищается.
+- Устранен конфликт, вызывавший постоянное создание/удаление ордеров.
+- Логика стала полностью предсказуемой.
 """
 
 import asyncio
@@ -102,25 +102,28 @@ class ProtectionMonitor:
             logger.error(f"Initialization failed: {e}", exc_info=True)
             raise
 
+    # <<< ИЗМЕНЕНИЕ: Логика таймаута теперь атомарна >>>
     async def _handle_position_duration_limit(self, exchange: BinanceExchange | BybitExchange, position: Dict):
         symbol = position['symbol']
         side = position['side'].upper()
         pnl = position['pnl']
 
-        logger.warning(f"⏰ {exchange.__class__.__name__} {symbol} exceeded max duration")
-        logger.info(f"   PnL: ${pnl:.2f}")
+        logger.warning(f"⏰ {exchange.__class__.__name__} {symbol} exceeded max duration. Entering close-only mode.")
 
         try:
+            # Шаг 1: Отменяем ВСЕ существующие ордера (включая SL/TS), чтобы избежать конфликтов
+            logger.info(f"   Cancelling all existing orders for {symbol} to set a final closing order.")
+            await exchange.cancel_all_open_orders(symbol)
+
+            # Шаг 2: Устанавливаем единственный ордер на закрытие
             if pnl >= 0:
-                logger.info(f"   Closing profitable/breakeven position {symbol} by market order")
+                logger.info(f"   Position is profitable/breakeven. Closing {symbol} by market order.")
                 if await exchange.close_position(symbol):
                     self.stats['positions_closed'] += 1
             else:
                 breakeven_price = self._calculate_breakeven_price(position['entry_price'], side)
-                logger.info(f"   Setting breakeven limit order for {symbol} at ${breakeven_price:.4f}")
-                # <<< ИЗМЕНЕНИЕ: Исправлена опечатка >>>
-                await exchange.cancel_all_open_orders(symbol)
-                # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
+                logger.info(
+                    f"   Position is at a loss. Setting final breakeven limit order for {symbol} at ${breakeven_price:.4f}")
                 await exchange.create_limit_order(
                     symbol, "SELL" if side in ["LONG", "BUY"] else "BUY",
                     position['quantity'], breakeven_price, reduce_only=True
@@ -129,37 +132,36 @@ class ProtectionMonitor:
             logger.error(f"Failed to handle duration limit for {symbol}: {e}", exc_info=True)
             self.stats['errors'] += 1
 
-    # <<< ИЗМЕНЕНИЕ: ПОЛНОСТЬЮ ПЕРЕРАБОТАННАЯ ЛОГИКА С ЧЕТКИМ ПРИОРИТЕТОМ >>>
+    # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
+
     async def _process_single_position(self, exchange_name: str, pos: Dict, orders_by_symbol: Dict[str, List[Dict]]):
         exchange = self.binance if exchange_name == 'Binance' else self.bybit
         symbol = pos['symbol']
 
         try:
-            open_orders = orders_by_symbol.get(symbol, [])
-
-            # 1. Определяем, нужна ли защита
-            protection_needed = self._is_protection_needed(exchange_name, pos, open_orders)
-
-            # 2. ПРИОРИТЕТ №1: Устанавливаем защиту, если она нужна.
-            if protection_needed:
-                await self._apply_protection(exchange_name, exchange, pos)
-                # После попытки установить защиту, завершаем обработку этой позиции на текущем цикле.
-                # Это предотвращает одновременное срабатывание защиты и таймаута.
-                return
-
-            # 3. ПРИОРИТЕТ №2: Обрабатываем таймаут, ТОЛЬКО ЕСЛИ защита уже на месте.
-            if not protection_needed and self.max_position_duration_hours > 0:
+            # <<< ИЗМЕНЕНИЕ: Строгая иерархия - сначала таймаут, потом всё остальное >>>
+            # 1. ПРИОРИТЕТ №1: Проверка на таймаут
+            if self.max_position_duration_hours > 0:
                 update_time = pos.get('updateTime', 0) if exchange_name == 'Binance' else pos.get('created_time', 0)
                 if update_time > 0:
                     age_hours = (datetime.now(timezone.utc).timestamp() * 1000 - update_time) / 3600000
                     if age_hours > self.max_position_duration_hours:
+                        # Если позиция просрочена, мы ТОЛЬКО управляем её закрытием и ничего больше.
                         await self._handle_position_duration_limit(exchange, pos)
+                        return  # <--- ВАЖНО: Завершаем обработку этой позиции
+
+            # 2. ПРИОРИТЕТ №2: Установка защиты (срабатывает, только если позиция не просрочена)
+            protection_is_incomplete = self._is_protection_incomplete(exchange_name, pos,
+                                                                      orders_by_symbol.get(symbol, []))
+            if protection_is_incomplete:
+                await self._apply_protection(exchange_name, exchange, pos)
+            # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
 
         except Exception as e:
             logger.error(f"Critical error in _process_single_position for {symbol}: {e}", exc_info=True)
             self.stats['errors'] += 1
 
-    def _is_protection_needed(self, exchange_name: str, pos: Dict, open_orders: List[Dict]) -> bool:
+    def _is_protection_incomplete(self, exchange_name: str, pos: Dict, open_orders: List[Dict]) -> bool:
         """Проверяет, соответствует ли текущая защита конфигурации."""
         if exchange_name == 'Bybit':
             has_sl = pos.get('stopLoss') and str(pos.get('stopLoss')) not in ['', '0']
@@ -171,16 +173,14 @@ class ProtectionMonitor:
             has_ts = any(o.get('type') == 'TRAILING_STOP_MARKET' for o in open_orders)
 
         if self.stop_loss_type == 'trailing':
-            return not has_ts or not has_sl  # Нужен и трейлинг, и бэкап-стоп
+            return not has_ts or not has_sl
         else:  # fixed
-            return not has_sl or not has_tp  # Нужен и стоп, и тейк-профит
+            return not has_sl or not has_tp
 
     async def _apply_protection(self, exchange_name: str, exchange: BinanceExchange | BybitExchange, pos: Dict):
-        """Применяет настроенный тип защиты (трейлинг или фиксированный)."""
         symbol = pos['symbol']
         logger.warning(f"⚠️ {exchange_name} {symbol} protection is incomplete. Applying now.")
 
-        # Для трейлинга всегда лучше отменить старые ордера, чтобы избежать конфликтов
         if self.stop_loss_type == 'trailing':
             await exchange.cancel_all_open_orders(symbol)
             ts_success = await self._set_trailing_stop(exchange, pos)
@@ -221,8 +221,6 @@ class ProtectionMonitor:
         if await exchange.set_take_profit(pos['symbol'], tp_price):
             self.stats['positions_protected'] += 1
 
-    # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
-
     async def run_with_semaphore(self, semaphore: asyncio.Semaphore, coro, *args, **kwargs):
         async with semaphore:
             return await coro(*args, **kwargs)
@@ -256,7 +254,7 @@ class ProtectionMonitor:
             self.stats['errors'] += 1
 
     async def run(self):
-        logger.info(f"🚀 Starting Protection Monitor v2.3")
+        logger.info(f"🚀 Starting Protection Monitor v2.5")
         await self.initialize()
         try:
             while True:
