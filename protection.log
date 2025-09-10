@@ -37,3 +37,162 @@ client_session: <aiohttp.client.ClientSession object at 0x10296a570>
 2025-09-10 14:58:13,611 - ERROR - Unclosed connector
 connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x102946390>, 174755.184543083), (<aiohttp.client_proto.ResponseHandler object at 0x1029474d0>, 174755.333912875), (<aiohttp.client_proto.ResponseHandler object at 0x102947770>, 174755.337561958), (<aiohttp.client_proto.ResponseHandler object at 0x102947950>, 174755.375648083), (<aiohttp.client_proto.ResponseHandler object at 0x102947b30>, 174755.378574125)]']
 connector: <aiohttp.connector.TCPConnector object at 0x10296b4d0>
+2025-09-10 15:26:55,355 - INFO - [__main__] ============================================================
+2025-09-10 15:26:55,355 - INFO - [__main__] Protection Monitor Configuration
+2025-09-10 15:26:55,355 - INFO - [__main__] ============================================================
+2025-09-10 15:26:55,355 - INFO - [__main__] Mode: TESTNET
+2025-09-10 15:26:55,355 - INFO - [__main__] Stop Loss Type: TRAILING
+2025-09-10 15:26:55,355 - INFO - [__main__] Stop Loss: 6.5%
+2025-09-10 15:26:55,355 - INFO - [__main__] Take Profit: 5.0%
+2025-09-10 15:26:55,355 - INFO - [__main__] Trailing Activation: 3.5%
+2025-09-10 15:26:55,355 - INFO - [__main__] Trailing Callback: 0.5%
+2025-09-10 15:26:55,355 - INFO - [__main__] Max Position Duration: 1 hours
+2025-09-10 15:26:55,355 - INFO - [__main__] Taker Fee: 0.06%
+2025-09-10 15:26:55,355 - INFO - [__main__] Check Interval: 30 seconds
+2025-09-10 15:26:55,355 - INFO - [__main__] ============================================================
+2025-09-10 15:26:55,355 - INFO - [__main__] 🚀 Starting Protection Monitor
+2025-09-10 15:26:56,304 - INFO - [exchanges.binance] Binance testnet initialized with 578 symbols
+2025-09-10 15:26:56,648 - INFO - [__main__] ✅ Binance connected - Balance: $11962.00
+2025-09-10 15:26:57,199 - INFO - [__main__] ✅ Bybit connected
+2025-09-10 15:26:57,199 - INFO - [__main__] === Protection Check #1 ===
+2025-09-10 15:26:57,452 - INFO - [__main__] Found 9 Bybit positions
+2025-09-10 15:26:57,452 - WARNING - [__main__] ⏰ Bybit 1000000BABYDOGEUSDT exceeded max duration
+2025-09-10 15:26:57,452 - INFO - [__main__]    PnL: $0.01, Breakeven: $0.0013
+2025-09-10 15:26:57,696 - INFO - [__main__]    Closing profitable position by market order
+2025-09-10 15:26:57,942 - ERROR - [__main__] Failed to handle duration limit for 1000000BABYDOGEUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:26:57).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "1000000BABYDOGEUSDT", "side": "Buy", "orderType": "Market", "qty": "16600.0", "reduceOnly": true}.
+2025-09-10 15:26:57,942 - WARNING - [__main__] ⏰ Bybit 10000LADYSUSDT exceeded max duration
+2025-09-10 15:26:57,942 - INFO - [__main__]    PnL: $-2.03, Breakeven: $0.0004
+2025-09-10 15:26:58,186 - INFO - [__main__]    Setting breakeven limit order
+2025-09-10 15:26:58,675 - ERROR - [__main__] Failed to handle duration limit for 10000LADYSUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:26:58).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "10000LADYSUSDT", "side": "Buy", "orderType": "Limit", "qty": "63300.0", "price": "0.00035", "reduceOnly": true}.
+2025-09-10 15:26:58,675 - WARNING - [__main__] ⏰ Bybit WAVESUSDT exceeded max duration
+2025-09-10 15:26:58,675 - INFO - [__main__]    PnL: $-1.64, Breakeven: $1.1368
+2025-09-10 15:26:58,920 - INFO - [__main__]    Setting breakeven limit order
+2025-09-10 15:26:59,411 - ERROR - [__main__] Failed to handle duration limit for WAVESUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:26:59).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "WAVESUSDT", "side": "Buy", "orderType": "Limit", "qty": "121.3", "price": "1.13679", "reduceOnly": true}.
+2025-09-10 15:26:59,411 - WARNING - [__main__] ⏰ Bybit RAYDIUMUSDT exceeded max duration
+2025-09-10 15:26:59,411 - INFO - [__main__]    PnL: $0.00, Breakeven: $3.1932
+2025-09-10 15:26:59,655 - INFO - [__main__]    Setting breakeven limit order
+2025-09-10 15:27:00,149 - ERROR - [__main__] Failed to handle duration limit for RAYDIUMUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:27:00).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "RAYDIUMUSDT", "side": "Buy", "orderType": "Limit", "qty": "6.5", "price": "3.19323", "reduceOnly": true}.
+2025-09-10 15:27:00,150 - WARNING - [__main__] ⏰ Bybit SHIB1000USDT exceeded max duration
+2025-09-10 15:27:00,150 - INFO - [__main__]    PnL: $21.05, Breakeven: $0.0058
+2025-09-10 15:27:00,395 - INFO - [__main__]    Closing profitable position by market order
+2025-09-10 15:27:00,639 - ERROR - [__main__] Failed to handle duration limit for SHIB1000USDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:27:00).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "SHIB1000USDT", "side": "Buy", "orderType": "Market", "qty": "83760.0", "reduceOnly": true}.
+2025-09-10 15:27:00,640 - WARNING - [__main__] ⏰ Bybit TAIUSDT exceeded max duration
+2025-09-10 15:27:00,640 - INFO - [__main__]    PnL: $0.08, Breakeven: $0.0622
+2025-09-10 15:27:00,887 - INFO - [__main__]    Closing profitable position by market order
+2025-09-10 15:27:01,133 - ERROR - [__main__] Failed to handle duration limit for TAIUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:27:01).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "TAIUSDT", "side": "Buy", "orderType": "Market", "qty": "1386.0", "reduceOnly": true}.
+2025-09-10 15:27:01,133 - WARNING - [__main__] ⏰ Bybit CELRUSDT exceeded max duration
+2025-09-10 15:27:01,133 - INFO - [__main__]    PnL: $-59.83, Breakeven: $0.0066
+2025-09-10 15:27:01,378 - INFO - [__main__]    Setting breakeven limit order
+2025-09-10 15:27:01,863 - ERROR - [__main__] Failed to handle duration limit for CELRUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:27:01).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "CELRUSDT", "side": "Buy", "orderType": "Limit", "qty": "137017.0", "price": "0.00658", "reduceOnly": true}.
+2025-09-10 15:27:01,864 - WARNING - [__main__] ⏰ Bybit SOSOUSDT exceeded max duration
+2025-09-10 15:27:01,864 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.6131
+2025-09-10 15:27:02,108 - INFO - [__main__]    Setting breakeven limit order
+2025-09-10 15:27:02,594 - ERROR - [__main__] Failed to handle duration limit for SOSOUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:27:02).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "SOSOUSDT", "side": "Buy", "orderType": "Limit", "qty": "33.0", "price": "0.61313", "reduceOnly": true}.
+2025-09-10 15:27:02,594 - WARNING - [__main__] ⏰ Bybit DOGUSDT exceeded max duration
+2025-09-10 15:27:02,595 - INFO - [__main__]    PnL: $-3.77, Breakeven: $0.0023
+2025-09-10 15:27:02,843 - INFO - [__main__]    Setting breakeven limit order
+2025-09-10 15:27:03,331 - ERROR - [__main__] Failed to handle duration limit for DOGUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:27:03).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "DOGUSDT", "side": "Buy", "orderType": "Limit", "qty": "17000.0", "price": "0.00227", "reduceOnly": true}.
+2025-09-10 15:27:03,334 - INFO - [__main__] Found 9 Binance positions
+2025-09-10 15:27:03,639 - WARNING - [__main__] ⚠️ Binance TAUSDT missing STOP LOSS (backup)
+2025-09-10 15:27:03,817 - WARNING - [__main__] ⚠️ Binance BBUSDT missing STOP LOSS (backup)
+2025-09-10 15:27:03,849 - WARNING - [__main__] ⚠️ Binance SSVUSDT missing STOP LOSS (backup)
+2025-09-10 15:27:04,320 - INFO - [__main__] ✅ Protected Binance position: TAUSDT
+2025-09-10 15:27:04,538 - INFO - [__main__] ✅ Protected Binance position: SSVUSDT
+2025-09-10 15:27:04,902 - INFO - [__main__] ✅ Protected Binance position: BBUSDT
+2025-09-10 15:27:34,904 - INFO - [__main__] === Protection Check #2 ===
+2025-09-10 15:27:35,156 - INFO - [__main__] Found 9 Bybit positions
+2025-09-10 15:27:35,157 - WARNING - [__main__] ⏰ Bybit 1000000BABYDOGEUSDT exceeded max duration
+2025-09-10 15:27:35,157 - INFO - [__main__]    PnL: $0.01, Breakeven: $0.0013
+2025-09-10 15:27:35,403 - INFO - [__main__]    Closing profitable position by market order
+2025-09-10 15:27:35,644 - ERROR - [__main__] Failed to handle duration limit for 1000000BABYDOGEUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:27:35).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "1000000BABYDOGEUSDT", "side": "Buy", "orderType": "Market", "qty": "16600.0", "reduceOnly": true}.
+2025-09-10 15:27:35,644 - WARNING - [__main__] ⏰ Bybit 10000LADYSUSDT exceeded max duration
+2025-09-10 15:27:35,644 - INFO - [__main__]    PnL: $-2.03, Breakeven: $0.0004
+2025-09-10 15:27:35,887 - INFO - [__main__]    Setting breakeven limit order
+2025-09-10 15:27:36,380 - ERROR - [__main__] Failed to handle duration limit for 10000LADYSUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:27:36).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "10000LADYSUSDT", "side": "Buy", "orderType": "Limit", "qty": "63300.0", "price": "0.00035", "reduceOnly": true}.
+2025-09-10 15:27:36,380 - WARNING - [__main__] ⏰ Bybit WAVESUSDT exceeded max duration
+2025-09-10 15:27:36,380 - INFO - [__main__]    PnL: $-1.65, Breakeven: $1.1368
+2025-09-10 15:27:36,627 - INFO - [__main__]    Setting breakeven limit order
+2025-09-10 15:27:37,116 - ERROR - [__main__] Failed to handle duration limit for WAVESUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:27:37).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "WAVESUSDT", "side": "Buy", "orderType": "Limit", "qty": "121.3", "price": "1.13679", "reduceOnly": true}.
+2025-09-10 15:27:37,116 - WARNING - [__main__] ⏰ Bybit RAYDIUMUSDT exceeded max duration
+2025-09-10 15:27:37,116 - INFO - [__main__]    PnL: $0.00, Breakeven: $3.1932
+2025-09-10 15:27:37,366 - INFO - [__main__]    Setting breakeven limit order
+2025-09-10 15:27:37,854 - ERROR - [__main__] Failed to handle duration limit for RAYDIUMUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:27:37).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "RAYDIUMUSDT", "side": "Buy", "orderType": "Limit", "qty": "6.5", "price": "3.19323", "reduceOnly": true}.
+2025-09-10 15:27:37,854 - WARNING - [__main__] ⏰ Bybit SHIB1000USDT exceeded max duration
+2025-09-10 15:27:37,854 - INFO - [__main__]    PnL: $21.05, Breakeven: $0.0058
+2025-09-10 15:27:38,101 - INFO - [__main__]    Closing profitable position by market order
+2025-09-10 15:27:38,345 - ERROR - [__main__] Failed to handle duration limit for SHIB1000USDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:27:38).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "SHIB1000USDT", "side": "Buy", "orderType": "Market", "qty": "83760.0", "reduceOnly": true}.
+2025-09-10 15:27:38,345 - WARNING - [__main__] ⏰ Bybit TAIUSDT exceeded max duration
+2025-09-10 15:27:38,345 - INFO - [__main__]    PnL: $0.08, Breakeven: $0.0622
+2025-09-10 15:27:38,591 - INFO - [__main__]    Closing profitable position by market order
+2025-09-10 15:27:39,155 - ERROR - [__main__] Failed to handle duration limit for TAIUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:27:39).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "TAIUSDT", "side": "Buy", "orderType": "Market", "qty": "1386.0", "reduceOnly": true}.
+2025-09-10 15:27:39,156 - WARNING - [__main__] ⏰ Bybit CELRUSDT exceeded max duration
+2025-09-10 15:27:39,156 - INFO - [__main__]    PnL: $-59.83, Breakeven: $0.0066
+2025-09-10 15:27:39,406 - INFO - [__main__]    Setting breakeven limit order
+2025-09-10 15:27:39,890 - ERROR - [__main__] Failed to handle duration limit for CELRUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:27:39).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "CELRUSDT", "side": "Buy", "orderType": "Limit", "qty": "137017.0", "price": "0.00658", "reduceOnly": true}.
+2025-09-10 15:27:39,890 - WARNING - [__main__] ⏰ Bybit SOSOUSDT exceeded max duration
+2025-09-10 15:27:39,890 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.6131
+2025-09-10 15:27:40,133 - INFO - [__main__]    Setting breakeven limit order
+2025-09-10 15:27:40,626 - ERROR - [__main__] Failed to handle duration limit for SOSOUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:27:40).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "SOSOUSDT", "side": "Buy", "orderType": "Limit", "qty": "33.0", "price": "0.61313", "reduceOnly": true}.
+2025-09-10 15:27:40,627 - WARNING - [__main__] ⏰ Bybit DOGUSDT exceeded max duration
+2025-09-10 15:27:40,627 - INFO - [__main__]    PnL: $-3.77, Breakeven: $0.0023
+2025-09-10 15:27:40,872 - INFO - [__main__]    Setting breakeven limit order
+2025-09-10 15:27:41,671 - ERROR - [__main__] Failed to handle duration limit for DOGUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:27:41).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "DOGUSDT", "side": "Buy", "orderType": "Limit", "qty": "17000.0", "price": "0.00227", "reduceOnly": true}.
+2025-09-10 15:27:42,177 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-1021,"msg":"Timestamp for this request is outside of the recvWindow."}
+2025-09-10 15:28:12,178 - INFO - [__main__] === Protection Check #3 ===
+2025-09-10 15:28:12,445 - INFO - [__main__] Found 9 Bybit positions
+2025-09-10 15:28:12,446 - WARNING - [__main__] ⏰ Bybit 1000000BABYDOGEUSDT exceeded max duration
+2025-09-10 15:28:12,447 - INFO - [__main__]    PnL: $0.01, Breakeven: $0.0013
+2025-09-10 15:28:12,690 - INFO - [__main__]    Closing profitable position by market order
+2025-09-10 15:28:12,933 - ERROR - [__main__] Failed to handle duration limit for 1000000BABYDOGEUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:28:12).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "1000000BABYDOGEUSDT", "side": "Buy", "orderType": "Market", "qty": "16600.0", "reduceOnly": true}.
+2025-09-10 15:28:12,934 - WARNING - [__main__] ⏰ Bybit 10000LADYSUSDT exceeded max duration
+2025-09-10 15:28:12,934 - INFO - [__main__]    PnL: $-2.03, Breakeven: $0.0004
+2025-09-10 15:28:13,180 - INFO - [__main__]    Setting breakeven limit order
+2025-09-10 15:28:13,671 - ERROR - [__main__] Failed to handle duration limit for 10000LADYSUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:28:13).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "10000LADYSUSDT", "side": "Buy", "orderType": "Limit", "qty": "63300.0", "price": "0.00035", "reduceOnly": true}.
+2025-09-10 15:28:13,671 - WARNING - [__main__] ⏰ Bybit WAVESUSDT exceeded max duration
+2025-09-10 15:28:13,671 - INFO - [__main__]    PnL: $-1.63, Breakeven: $1.1368
+2025-09-10 15:28:13,919 - INFO - [__main__]    Setting breakeven limit order
+2025-09-10 15:28:14,405 - ERROR - [__main__] Failed to handle duration limit for WAVESUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:28:14).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "WAVESUSDT", "side": "Buy", "orderType": "Limit", "qty": "121.3", "price": "1.13679", "reduceOnly": true}.
+2025-09-10 15:28:14,406 - WARNING - [__main__] ⏰ Bybit RAYDIUMUSDT exceeded max duration
+2025-09-10 15:28:14,406 - INFO - [__main__]    PnL: $0.00, Breakeven: $3.1932
+2025-09-10 15:28:14,654 - INFO - [__main__]    Closing profitable position by market order
+2025-09-10 15:28:14,898 - ERROR - [__main__] Failed to handle duration limit for RAYDIUMUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:28:14).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "RAYDIUMUSDT", "side": "Buy", "orderType": "Market", "qty": "6.5", "reduceOnly": true}.
+2025-09-10 15:28:14,898 - WARNING - [__main__] ⏰ Bybit SHIB1000USDT exceeded max duration
+2025-09-10 15:28:14,899 - INFO - [__main__]    PnL: $21.30, Breakeven: $0.0058
+2025-09-10 15:28:15,142 - INFO - [__main__]    Closing profitable position by market order
+2025-09-10 15:28:15,388 - ERROR - [__main__] Failed to handle duration limit for SHIB1000USDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:28:15).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "SHIB1000USDT", "side": "Buy", "orderType": "Market", "qty": "83760.0", "reduceOnly": true}.
+2025-09-10 15:28:15,388 - WARNING - [__main__] ⏰ Bybit TAIUSDT exceeded max duration
+2025-09-10 15:28:15,388 - INFO - [__main__]    PnL: $0.08, Breakeven: $0.0622
+2025-09-10 15:28:15,633 - INFO - [__main__]    Closing profitable position by market order
+2025-09-10 15:28:15,873 - ERROR - [__main__] Failed to handle duration limit for TAIUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:28:15).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "TAIUSDT", "side": "Buy", "orderType": "Market", "qty": "1386.0", "reduceOnly": true}.
+2025-09-10 15:28:15,873 - WARNING - [__main__] ⏰ Bybit CELRUSDT exceeded max duration
+2025-09-10 15:28:15,873 - INFO - [__main__]    PnL: $-59.83, Breakeven: $0.0066
+2025-09-10 15:28:16,119 - INFO - [__main__]    Setting breakeven limit order
+2025-09-10 15:28:16,607 - ERROR - [__main__] Failed to handle duration limit for CELRUSDT: reduce-only order has same side with current position (ErrCode: 110017) (ErrTime: 11:28:16).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "CELRUSDT", "side": "Buy", "orderType": "Limit", "qty": "137017.0", "price": "0.00658", "reduceOnly": true}.
+2025-09-10 15:28:16,607 - WARNING - [__main__] ⏰ Bybit SOSOUSDT exceeded max duration
+2025-09-10 15:28:16,607 - INFO - [__main__]    PnL: $0.01, Breakeven: $0.6131
+2025-09-10 15:28:16,851 - INFO - [__main__]    Closing profitable position by market order
