@@ -422,37 +422,52 @@ class BinanceExchange(BaseExchange):
         return None
 
     async def set_stop_loss(self, symbol: str, stop_price: float) -> bool:
-        """Set stop loss order"""
-        positions = await self.get_open_positions()
-        for pos in positions:
-            if pos['symbol'] == symbol:
-                side = 'SELL' if pos['side'] == 'LONG' else 'BUY'
-                params = {
-                    'symbol': symbol,
-                    'side': side,
-                    'type': 'STOP_MARKET',
-                    'stopPrice': self.format_price(symbol, stop_price),
-                    'closePosition': 'true'
-                }
-                result = await self._make_request("POST", "/fapi/v1/order", params, signed=True)
-                return result is not None
+        """Set stop loss order with retry logic."""
+        for attempt in range(4):
+            try:
+                positions = await self.get_open_positions()
+                pos = next((p for p in positions if p['symbol'] == symbol), None)
+                if pos:
+                    side = 'SELL' if pos['side'] == 'LONG' else 'BUY'
+                    params = {'symbol': symbol, 'side': side, 'type': 'STOP_MARKET',
+                              'stopPrice': self.format_price(symbol, stop_price), 'closePosition': 'true'}
+                    result = await self._make_request("POST", "/fapi/v1/order", params, signed=True)
+                    if result and result.get('orderId'):
+                        logger.info(f"✅ Stop Loss set for {symbol} at {stop_price}")
+                        return True
+
+                # Если позиция не найдена, ждем и пробуем снова
+                await asyncio.sleep(0.5 + attempt)
+
+            except Exception as e:
+                logger.error(f"Attempt {attempt + 1} to set SL for {symbol} failed: {e}")
+                await asyncio.sleep(0.5 + attempt)
+
+        logger.error(f"❌ Failed to set Stop Loss for {symbol} after multiple attempts.")
         return False
 
     async def set_take_profit(self, symbol: str, take_profit_price: float) -> bool:
-        """Set take profit order"""
-        positions = await self.get_open_positions()
-        for pos in positions:
-            if pos['symbol'] == symbol:
-                side = 'SELL' if pos['side'] == 'LONG' else 'BUY'
-                params = {
-                    'symbol': symbol,
-                    'side': side,
-                    'type': 'TAKE_PROFIT_MARKET',
-                    'stopPrice': self.format_price(symbol, take_profit_price),
-                    'closePosition': 'true'
-                }
-                result = await self._make_request("POST", "/fapi/v1/order", params, signed=True)
-                return result is not None
+        """Set take profit order with retry logic."""
+        for attempt in range(4):
+            try:
+                positions = await self.get_open_positions()
+                pos = next((p for p in positions if p['symbol'] == symbol), None)
+                if pos:
+                    side = 'SELL' if pos['side'] == 'LONG' else 'BUY'
+                    params = {'symbol': symbol, 'side': side, 'type': 'TAKE_PROFIT_MARKET',
+                              'stopPrice': self.format_price(symbol, take_profit_price), 'closePosition': 'true'}
+                    result = await self._make_request("POST", "/fapi/v1/order", params, signed=True)
+                    if result and result.get('orderId'):
+                        logger.info(f"✅ Take Profit set for {symbol} at {take_profit_price}")
+                        return True
+
+                await asyncio.sleep(0.5 + attempt)
+
+            except Exception as e:
+                logger.error(f"Attempt {attempt + 1} to set TP for {symbol} failed: {e}")
+                await asyncio.sleep(0.5 + attempt)
+
+        logger.error(f"❌ Failed to set Take Profit for {symbol} after multiple attempts.")
         return False
 
     async def get_open_orders(self, symbol: str = None) -> List[Dict]:
@@ -464,31 +479,29 @@ class BinanceExchange(BaseExchange):
         return orders if orders else []
 
     async def set_trailing_stop(self, symbol: str, activation_price: float, callback_rate: float) -> bool:
-        """Set trailing stop order with proper parameters"""
-        positions = await self.get_open_positions()
-        for pos in positions:
-            if pos['symbol'] == symbol:
-                side = 'SELL' if pos['side'] == 'LONG' else 'BUY'
+        """Set trailing stop order with retry logic."""
+        for attempt in range(4):
+            try:
+                positions = await self.get_open_positions()
+                pos = next((p for p in positions if p['symbol'] == symbol), None)
+                if pos:
+                    side = 'SELL' if pos['side'] == 'LONG' else 'BUY'
+                    callback_rate = max(0.1, min(5.0, callback_rate))
+                    params = {'symbol': symbol, 'side': side, 'type': 'TRAILING_STOP_MARKET',
+                              'callbackRate': callback_rate,
+                              'activationPrice': self.format_price(symbol, activation_price),
+                              'quantity': self.format_quantity(symbol, pos['quantity'])}
+                    result = await self._make_request("POST", "/fapi/v1/order", params, signed=True)
+                    if result and 'orderId' in result:
+                        logger.info(
+                            f"✅ Trailing stop set for {symbol}: activation={activation_price}, callback={callback_rate}%")
+                        return True
 
-                # Ensure callback rate is within allowed range (0.1% to 5%)
-                callback_rate = max(0.1, min(5.0, callback_rate))
+                await asyncio.sleep(0.5 + attempt)
 
-                params = {
-                    'symbol': symbol,
-                    'side': side,
-                    'type': 'TRAILING_STOP_MARKET',
-                    'callbackRate': callback_rate,
-                    'activationPrice': self.format_price(symbol, activation_price),
-                    'quantity': self.format_quantity(symbol, pos['quantity'])
-                }
+            except Exception as e:
+                logger.error(f"Attempt {attempt + 1} to set Trailing Stop for {symbol} failed: {e}")
+                await asyncio.sleep(0.5 + attempt)
 
-                result = await self._make_request("POST", "/fapi/v1/order", params, signed=True)
-
-                if result and 'orderId' in result:
-                    logger.info(
-                        f"Trailing stop set for {symbol}: activation={activation_price}, callback={callback_rate}%")
-                    return True
-                else:
-                    logger.error(f"Failed to set trailing stop for {symbol}")
-                    return False
+        logger.error(f"❌ Failed to set Trailing Stop for {symbol} after multiple attempts.")
         return False

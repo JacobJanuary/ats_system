@@ -160,26 +160,32 @@ class BybitExchange(BaseExchange):
                 return None
 
     async def _handle_response(self, response):
+        """Handle API response"""
         try:
             data = await response.json()
             if response.status == 200:
-                if data.get('retCode') == 0:
+                ret_code = data.get('retCode')
+                if ret_code == 0:
                     return data.get('result', data)
+
+                # Считаем "not modified" успешным результатом, т.к. желаемое состояние достигнуто
+                if ret_code == 34040:
+                    logger.debug(f"Bybit: State not modified (retCode {ret_code}), treating as success.")
+                    return data  # Возвращаем не None, чтобы retry-цикл остановился
+
+                ret_msg = data.get('retMsg', 'Unknown error')
+                if ret_code == 10001:
+                    logger.error(f"Bybit: Parameter error - {ret_msg}")
+                elif ret_code == 10004:
+                    logger.error(f"Bybit: Sign error - {ret_msg}")
+                elif ret_code == 110043:
+                    logger.debug(f"Bybit: Leverage not modified - {ret_msg}")
+                    return data
                 else:
-                    ret_code = data.get('retCode')
-                    ret_msg = data.get('retMsg', 'Unknown error')
-                    if ret_code == 10001:
-                        logger.error(f"Bybit: Parameter error - {ret_msg}")
-                    elif ret_code == 10004:
-                        logger.error(f"Bybit: Sign error - {ret_msg}")
-                    elif ret_code == 110043:
-                        logger.debug(f"Bybit: Leverage not modified - {ret_msg}")
-                        return data
-                    else:
-                        logger.error(f"Bybit API error {ret_code}: {ret_msg}")
-                    return None
+                    logger.error(f"Bybit API error {ret_code}: {ret_msg}")
+                return None  # Возвращаем None для всех настоящих ошибок
             else:
-                logger.error(f"Bybit HTTP error {response.status}: {data}")
+                logger.error(f"Bybit HTTP error {response.status}: {await response.text()}")
                 return None
         except Exception as e:
             logger.error(f"Error parsing Bybit response: {e}")
@@ -365,54 +371,85 @@ class BybitExchange(BaseExchange):
         return False
 
     async def set_stop_loss(self, symbol: str, stop_price: float) -> bool:
-        params = {
-            'category': 'linear', 'symbol': symbol,
-            'stopLoss': self.format_price(symbol, stop_price),
-            'slTriggerBy': 'MarkPrice', 'positionIdx': 0
-        }
-        result = await self._make_request("POST", "/v5/position/trading-stop", params, signed=True)
-        if result:
-            logger.info(f"Stop loss set for {symbol} at {stop_price}")
-            return True
-        logger.error(f"Failed to set stop loss for {symbol}")
+        """Set stop loss with retry logic."""
+        params = {'category': 'linear', 'symbol': symbol, 'stopLoss': self.format_price(symbol, stop_price),
+                  'slTriggerBy': 'MarkPrice', 'positionIdx': 0}
+        for attempt in range(4):
+            try:
+                result = await self._make_request("POST", "/v5/position/trading-stop", params, signed=True)
+                if result:
+                    logger.info(f"✅ Stop loss set for {symbol} at {stop_price}")
+                    return True
+
+                logger.warning(f"Attempt {attempt + 1} to set SL for {symbol} failed. Retrying...")
+                await asyncio.sleep(0.5 + attempt)
+            except Exception as e:
+                logger.error(f"Attempt {attempt + 1} to set SL for {symbol} threw an exception: {e}")
+                await asyncio.sleep(0.5 + attempt)
+
+        logger.error(f"❌ Failed to set stop loss for {symbol} after multiple attempts.")
         return False
 
     async def set_take_profit(self, symbol: str, take_profit_price: float) -> bool:
-        params = {
-            'category': 'linear', 'symbol': symbol,
-            'takeProfit': self.format_price(symbol, take_profit_price),
-            'tpTriggerBy': 'MarkPrice', 'positionIdx': 0
-        }
-        result = await self._make_request("POST", "/v5/position/trading-stop", params, signed=True)
-        if result:
-            logger.info(f"Take profit set for {symbol} at {take_profit_price}")
-            return True
-        logger.error(f"Failed to set take profit for {symbol}")
+        """Set take profit with retry logic."""
+        params = {'category': 'linear', 'symbol': symbol, 'takeProfit': self.format_price(symbol, take_profit_price),
+                  'tpTriggerBy': 'MarkPrice', 'positionIdx': 0}
+        for attempt in range(4):
+            try:
+                result = await self._make_request("POST", "/v5/position/trading-stop", params, signed=True)
+                if result:
+                    logger.info(f"✅ Take profit set for {symbol} at {take_profit_price}")
+                    return True
+
+                logger.warning(f"Attempt {attempt + 1} to set TP for {symbol} failed. Retrying...")
+                await asyncio.sleep(0.5 + attempt)
+            except Exception as e:
+                logger.error(f"Attempt {attempt + 1} to set TP for {symbol} threw an exception: {e}")
+                await asyncio.sleep(0.5 + attempt)
+
+        logger.error(f"❌ Failed to set take profit for {symbol} after multiple attempts.")
         return False
 
     async def set_trailing_stop(self, symbol: str, activation_price: float, callback_rate: float) -> bool:
-        positions = await self.get_open_positions()
-        pos_found = next((p for p in positions if p['symbol'] == symbol), None)
+        """Set trailing stop with retry logic."""
+        params = None
+        for attempt in range(4):
+            try:
+                # Нам нужно получить цену входа для расчета дистанции, поэтому получаем позицию
+                if not params:
+                    positions = await self.get_open_positions()
+                    pos_found = next((p for p in positions if p['symbol'] == symbol), None)
+                    if pos_found:
+                        trailing_stop_distance = pos_found['entry_price'] * (callback_rate / 100)
+                        params = {'category': 'linear', 'symbol': symbol,
+                                  'trailingStop': self.format_price(symbol, trailing_stop_distance),
+                                  'activePrice': self.format_price(symbol, activation_price), 'positionIdx': 0}
+                    else:
+                        # Позиция не найдена, ждем и пробуем снова
+                        await asyncio.sleep(0.5 + attempt)
+                        continue
 
-        if pos_found:
-            trailing_stop_distance = pos_found['entry_price'] * (callback_rate / 100)
-            params = {
-                'category': 'linear', 'symbol': symbol,
-                'trailingStop': self.format_price(symbol, trailing_stop_distance),
-                'activePrice': self.format_price(symbol, activation_price),
-                'positionIdx': 0
-            }
-            result = await self._make_request("POST", "/v5/position/trading-stop", params, signed=True)
-            if result:
-                logger.info(f"Trailing stop set for {symbol}")
-                return True
-        logger.error(f"Failed to set trailing stop for {symbol}")
+                result = await self._make_request("POST", "/v5/position/trading-stop", params, signed=True)
+                if result:
+                    logger.info(f"✅ Trailing stop set for {symbol}")
+                    return True
+
+                logger.warning(f"Attempt {attempt + 1} to set TS for {symbol} failed. Retrying...")
+                await asyncio.sleep(0.5 + attempt)
+
+            except Exception as e:
+                logger.error(f"Attempt {attempt + 1} to set TS for {symbol} threw an exception: {e}")
+                await asyncio.sleep(0.5 + attempt)
+
+        logger.error(f"❌ Failed to set trailing stop for {symbol} after multiple attempts.")
         return False
 
     async def get_open_orders(self, symbol: str = None) -> List[Dict]:
-        params = {'category': 'linear'}
+        """Get open orders"""
+        params = {'category': 'linear', 'settleCoin': 'USDT'} # Явно указываем монету
         if symbol:
             params['symbol'] = symbol
+
         result = await self._make_request("GET", "/v5/order/realtime", params, signed=True)
         return result['list'] if result and 'list' in result else []
 
@@ -424,16 +461,18 @@ class BybitExchange(BaseExchange):
             return True
         return False
 
-    async def create_limit_order(self, symbol: str, side: str, quantity: float, price: float,
-                                 reduce_only: bool = False) -> Optional[Dict]:
+    async def create_limit_order(self, symbol: str, side: str, quantity: float, price: float, reduce_only: bool = False) -> Optional[Dict]:
         """Create limit order"""
         params = {
-            'category': 'linear', 'symbol': symbol, 'side': side, 'orderType': 'Limit',
+            'category': 'linear', 'symbol': symbol,
+            'side': side.capitalize(),  # 'SELL' -> 'Sell', 'BUY' -> 'Buy'
+            'orderType': 'Limit',
             'qty': self.format_quantity(symbol, quantity),
             'price': self.format_price(symbol, price),
             'timeInForce': 'GTC', 'reduceOnly': reduce_only
         }
         return await self._make_request("POST", "/v5/order/create", params, signed=True)
+
 
     async def close(self):
         if self.session:

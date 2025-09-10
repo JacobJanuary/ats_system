@@ -196,3 +196,1418 @@ Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "li
 2025-09-10 15:28:16,607 - WARNING - [__main__] ⏰ Bybit SOSOUSDT exceeded max duration
 2025-09-10 15:28:16,607 - INFO - [__main__]    PnL: $0.01, Breakeven: $0.6131
 2025-09-10 15:28:16,851 - INFO - [__main__]    Closing profitable position by market order
+2025-09-11 01:12:12,699 - INFO - [__main__] ============================================================
+2025-09-11 01:12:12,699 - INFO - [__main__] Protection Monitor Configuration
+2025-09-11 01:12:12,699 - INFO - [__main__] ============================================================
+2025-09-11 01:12:12,699 - INFO - [__main__] Mode: TESTNET
+2025-09-11 01:12:12,699 - INFO - [__main__] Stop Loss Type: TRAILING
+2025-09-11 01:12:12,699 - INFO - [__main__] Stop Loss: 6.5%
+2025-09-11 01:12:12,699 - INFO - [__main__] Take Profit: 3.0%
+2025-09-11 01:12:12,699 - INFO - [__main__] Trailing Activation: 3.5%
+2025-09-11 01:12:12,699 - INFO - [__main__] Trailing Callback: 0.5%
+2025-09-11 01:12:12,699 - INFO - [__main__] Max Position Duration: 1 hours
+2025-09-11 01:12:12,699 - INFO - [__main__] Taker Fee: 0.06%
+2025-09-11 01:12:12,699 - INFO - [__main__] Check Interval: 30 seconds
+2025-09-11 01:12:12,699 - INFO - [__main__] ============================================================
+2025-09-11 01:12:12,699 - INFO - [__main__] 🚀 Starting Protection Monitor v2.0
+2025-09-11 01:12:14,451 - INFO - [exchanges.binance] Binance testnet initialized
+2025-09-11 01:12:14,452 - INFO - [exchanges.binance] Loaded 531 active perpetual contracts
+2025-09-11 01:12:14,452 - INFO - [exchanges.binance] ✅ PUFFERUSDT found in exchange info
+2025-09-11 01:12:14,452 - INFO - [exchanges.binance] ✅ SKATEUSDT found in exchange info
+2025-09-11 01:12:15,277 - INFO - [__main__] ✅ Binance connected - Balance: $872.37
+2025-09-11 01:12:17,994 - INFO - [exchanges.bybit] Bybit testnet initialized
+2025-09-11 01:12:17,994 - INFO - [exchanges.bybit] Position mode: one-way
+2025-09-11 01:12:17,994 - INFO - [exchanges.bybit] Loaded 616 active symbols
+2025-09-11 01:12:18,259 - INFO - [__main__] ✅ Bybit connected - Balance: $9878.47
+2025-09-11 01:12:18,259 - INFO - [__main__] === Protection Check #1 ===
+2025-09-11 01:12:18,613 - INFO - [__main__] Found 10 Binance positions
+2025-09-11 01:12:19,034 - INFO - [__main__] Found 20 Bybit positions
+2025-09-11 01:12:19,297 - ERROR - [exchanges.bybit] Bybit: Parameter error - Missing some parameters that must be filled in, symbol or settleCoin or baseCoin
+2025-09-11 01:12:19,298 - WARNING - [__main__] ⏰ Bybit BLASTUSDT exceeded max duration
+2025-09-11 01:12:19,298 - INFO - [__main__]    PnL: $0.36, Breakeven: $0.0029
+2025-09-11 01:12:19,298 - INFO - [__main__]    Closing profitable position by market order
+2025-09-11 01:12:19,298 - WARNING - [__main__] ⚠️ Bybit PENDLEUSDT missing TRAILING STOP
+2025-09-11 01:12:19,298 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT missing TRAILING STOP
+2025-09-11 01:12:19,298 - WARNING - [__main__] ⚠️ Bybit PRIMEUSDT missing TRAILING STOP
+2025-09-11 01:12:19,298 - WARNING - [__main__] ⚠️ Bybit BLURUSDT missing TRAILING STOP
+2025-09-11 01:12:19,298 - WARNING - [__main__] ⏰ Bybit 10000WENUSDT exceeded max duration
+2025-09-11 01:12:19,298 - INFO - [__main__]    PnL: $2.13, Breakeven: $0.3163
+2025-09-11 01:12:19,298 - INFO - [__main__]    Closing profitable position by market order
+2025-09-11 01:12:19,299 - WARNING - [__main__] ⚠️ Bybit INJUSDT missing TRAILING STOP
+2025-09-11 01:12:19,299 - WARNING - [__main__] ⏰ Bybit MAVIAUSDT exceeded max duration
+2025-09-11 01:12:19,299 - INFO - [__main__]    PnL: $-0.01, Breakeven: $0.1555
+2025-09-11 01:12:19,299 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:12:19,299 - WARNING - [__main__] ⏰ Bybit A8USDT exceeded max duration
+2025-09-11 01:12:19,299 - INFO - [__main__]    PnL: $-0.41, Breakeven: $0.1027
+2025-09-11 01:12:19,299 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:12:19,299 - WARNING - [__main__] ⏰ Bybit BOBAUSDT exceeded max duration
+2025-09-11 01:12:19,299 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.0888
+2025-09-11 01:12:19,299 - INFO - [__main__]    Closing profitable position by market order
+2025-09-11 01:12:19,299 - WARNING - [__main__] ⏰ Bybit AINUSDT exceeded max duration
+2025-09-11 01:12:19,299 - INFO - [__main__]    PnL: $-0.01, Breakeven: $0.1224
+2025-09-11 01:12:19,299 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:12:19,299 - WARNING - [__main__] ⏰ Bybit ALEOUSDT exceeded max duration
+2025-09-11 01:12:19,299 - INFO - [__main__]    PnL: $0.37, Breakeven: $0.2425
+2025-09-11 01:12:19,299 - INFO - [__main__]    Closing profitable position by market order
+2025-09-11 01:12:19,299 - WARNING - [__main__] ⚠️ Bybit HMSTRUSDT missing TRAILING STOP
+2025-09-11 01:12:19,299 - WARNING - [__main__] ⏰ Bybit SUIUSDT exceeded max duration
+2025-09-11 01:12:19,299 - INFO - [__main__]    PnL: $-0.19, Breakeven: $3.6191
+2025-09-11 01:12:19,299 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:12:19,300 - WARNING - [__main__] ⏰ Bybit APTUSDT exceeded max duration
+2025-09-11 01:12:19,300 - INFO - [__main__]    PnL: $0.00, Breakeven: $4.4914
+2025-09-11 01:12:19,300 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:12:19,300 - WARNING - [__main__] ⚠️ Bybit APEXUSDT missing TRAILING STOP
+2025-09-11 01:12:19,300 - WARNING - [__main__] ⏰ Bybit BNBUSDT exceeded max duration
+2025-09-11 01:12:19,300 - INFO - [__main__]    PnL: $0.01, Breakeven: $891.8690
+2025-09-11 01:12:19,300 - INFO - [__main__]    Closing profitable position by market order
+2025-09-11 01:12:19,300 - WARNING - [__main__] ⏰ Bybit ETHUSDT exceeded max duration
+2025-09-11 01:12:19,300 - INFO - [__main__]    PnL: $0.06, Breakeven: $7297.0860
+2025-09-11 01:12:19,300 - INFO - [__main__]    Closing profitable position by market order
+2025-09-11 01:12:19,300 - WARNING - [__main__] ⏰ Bybit BTCUSDT exceeded max duration
+2025-09-11 01:12:19,300 - INFO - [__main__]    PnL: $-0.01, Breakeven: $79118.7287
+2025-09-11 01:12:19,300 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:12:19,300 - WARNING - [__main__] ⚠️ Bybit ORDIUSDT missing TRAILING STOP
+2025-09-11 01:12:19,418 - WARNING - [__main__] ⚠️ Binance AVNTUSDT missing TRAILING STOP
+2025-09-11 01:12:19,419 - WARNING - [__main__] ⚠️ Binance BIDUSDT missing TRAILING STOP
+2025-09-11 01:12:19,419 - WARNING - [__main__] ⚠️ Binance BNBUSDT missing TRAILING STOP
+2025-09-11 01:12:19,419 - WARNING - [__main__] ⚠️ Binance TSTUSDT missing TRAILING STOP
+2025-09-11 01:12:19,419 - WARNING - [__main__] ⚠️ Binance LITUSDT missing TRAILING STOP
+2025-09-11 01:12:19,420 - WARNING - [__main__] ⚠️ Binance BALUSDT missing TRAILING STOP
+2025-09-11 01:12:19,420 - WARNING - [__main__] ⚠️ Binance MYXUSDT missing TRAILING STOP
+2025-09-11 01:12:19,420 - WARNING - [__main__] ⚠️ Binance BTCUSDT missing TRAILING STOP
+2025-09-11 01:12:19,420 - WARNING - [__main__] ⚠️ Binance QUSDT missing TRAILING STOP
+2025-09-11 01:12:19,420 - WARNING - [__main__] ⚠️ Binance BROCCOLIF3BUSDT missing TRAILING STOP
+2025-09-11 01:12:20,108 - INFO - [exchanges.bybit] All orders cancelled for SUIUSDT
+2025-09-11 01:12:20,110 - INFO - [exchanges.bybit] All orders cancelled for A8USDT
+2025-09-11 01:12:20,111 - INFO - [exchanges.bybit] All orders cancelled for APTUSDT
+2025-09-11 01:12:20,111 - INFO - [exchanges.bybit] All orders cancelled for BTCUSDT
+2025-09-11 01:12:20,112 - INFO - [exchanges.bybit] All orders cancelled for AINUSDT
+2025-09-11 01:12:20,114 - INFO - [exchanges.bybit] All orders cancelled for MAVIAUSDT
+2025-09-11 01:12:20,295 - WARNING - [exchanges.bybit] Attempt 1 to set TS for ORDIUSDT failed. Retrying...
+2025-09-11 01:12:20,373 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:12:20,632 - WARNING - [exchanges.bybit] Attempt 1 to set TS for BLURUSDT failed. Retrying...
+2025-09-11 01:12:20,669 - INFO - [exchanges.bybit] Position close order created for BLASTUSDT: 42527e9d-8072-4b9b-9eee-d685eae07727
+2025-09-11 01:12:20,709 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:12:20,712 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:12:20,712 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:12:20,714 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:12:20,714 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:12:20,876 - INFO - [exchanges.bybit] Position close order created for BNBUSDT: ecd1bc41-e009-44d8-9557-f2ffbcf577c9
+2025-09-11 01:12:20,892 - INFO - [exchanges.bybit] Position close order created for 10000WENUSDT: 48cff29f-75f1-4ca2-8643-6eb431030ba3
+2025-09-11 01:12:20,892 - INFO - [exchanges.bybit] Position close order created for ALEOUSDT: 98127575-6c1a-4e2a-9709-32bce950f438
+2025-09-11 01:12:20,893 - INFO - [exchanges.bybit] Position close order created for ETHUSDT: 1dc2e535-5524-403f-b216-b394208acd50
+2025-09-11 01:12:20,893 - INFO - [exchanges.bybit] Position close order created for BOBAUSDT: 5d6a1a39-bf4a-4f08-b14b-d52ae8379f1c
+2025-09-11 01:12:21,061 - INFO - [exchanges.bybit] ✅ Trailing stop set for ORDIUSDT
+2025-09-11 01:12:21,061 - WARNING - [__main__] ⚠️ Bybit ORDIUSDT missing STOP LOSS (backup)
+2025-09-11 01:12:21,113 - INFO - [exchanges.binance] ✅ Trailing stop set for BIDUSDT: activation=0.12810195, callback=0.5%
+2025-09-11 01:12:21,113 - WARNING - [__main__] ⚠️ Binance BIDUSDT missing STOP LOSS (backup)
+2025-09-11 01:12:21,135 - WARNING - [exchanges.bybit] Attempt 1 to set TS for BAKEUSDT failed. Retrying...
+2025-09-11 01:12:21,137 - WARNING - [exchanges.bybit] Attempt 1 to set TS for PRIMEUSDT failed. Retrying...
+2025-09-11 01:12:21,160 - WARNING - [exchanges.bybit] Attempt 1 to set TS for APEXUSDT failed. Retrying...
+2025-09-11 01:12:21,334 - WARNING - [exchanges.bybit] Attempt 1 to set SL for ORDIUSDT failed. Retrying...
+2025-09-11 01:12:21,381 - INFO - [exchanges.binance] ✅ Trailing stop set for AVNTUSDT: activation=0.44525849999999995, callback=0.5%
+2025-09-11 01:12:21,381 - INFO - [__main__] ✅ Protected Binance position: AVNTUSDT
+2025-09-11 01:12:21,400 - INFO - [exchanges.bybit] ✅ Trailing stop set for BLURUSDT
+2025-09-11 01:12:21,400 - WARNING - [__main__] ⚠️ Bybit BLURUSDT missing STOP LOSS (backup)
+2025-09-11 01:12:21,482 - WARNING - [exchanges.bybit] Attempt 1 to set TS for INJUSDT failed. Retrying...
+2025-09-11 01:12:21,490 - WARNING - [exchanges.bybit] Attempt 1 to set TS for PENDLEUSDT failed. Retrying...
+2025-09-11 01:12:21,493 - WARNING - [exchanges.bybit] Attempt 1 to set TS for HMSTRUSDT failed. Retrying...
+2025-09-11 01:12:21,571 - INFO - [exchanges.binance] ✅ Trailing stop set for BNBUSDT: activation=982.7221499999999, callback=0.5%
+2025-09-11 01:12:21,572 - WARNING - [__main__] ⚠️ Binance BNBUSDT missing STOP LOSS (backup)
+2025-09-11 01:12:21,578 - INFO - [exchanges.binance] ✅ Trailing stop set for BALUSDT: activation=1.14885, callback=0.5%
+2025-09-11 01:12:21,578 - INFO - [__main__] ✅ Protected Binance position: BALUSDT
+2025-09-11 01:12:21,590 - INFO - [exchanges.binance] ✅ Trailing stop set for MYXUSDT: activation=17.781299999999998, callback=0.5%
+2025-09-11 01:12:21,591 - WARNING - [__main__] ⚠️ Binance MYXUSDT missing STOP LOSS (backup)
+2025-09-11 01:12:21,591 - INFO - [exchanges.binance] ✅ Trailing stop set for BTCUSDT: activation=117561.92399999998, callback=0.5%
+2025-09-11 01:12:21,591 - INFO - [__main__] ✅ Protected Binance position: BTCUSDT
+2025-09-11 01:12:21,667 - WARNING - [exchanges.bybit] Attempt 1 to set SL for BLURUSDT failed. Retrying...
+2025-09-11 01:12:21,903 - INFO - [exchanges.bybit] ✅ Trailing stop set for BAKEUSDT
+2025-09-11 01:12:21,903 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT missing STOP LOSS (backup)
+2025-09-11 01:12:21,904 - INFO - [exchanges.bybit] ✅ Trailing stop set for PRIMEUSDT
+2025-09-11 01:12:21,905 - WARNING - [__main__] ⚠️ Bybit PRIMEUSDT missing STOP LOSS (backup)
+2025-09-11 01:12:21,923 - INFO - [exchanges.binance] ✅ Trailing stop set for QUSDT: activation=0.016753544999999998, callback=0.5%
+2025-09-11 01:12:21,924 - WARNING - [__main__] ⚠️ Binance QUSDT missing STOP LOSS (backup)
+2025-09-11 01:12:21,924 - INFO - [exchanges.bybit] ✅ Trailing stop set for APEXUSDT
+2025-09-11 01:12:21,925 - WARNING - [__main__] ⚠️ Bybit APEXUSDT missing STOP LOSS (backup)
+2025-09-11 01:12:22,051 - INFO - [exchanges.binance] ✅ Trailing stop set for TSTUSDT: activation=0.029114549999999996, callback=0.5%
+2025-09-11 01:12:22,051 - INFO - [__main__] ✅ Protected Binance position: TSTUSDT
+2025-09-11 01:12:22,076 - INFO - [exchanges.binance] ✅ Trailing stop set for BROCCOLIF3BUSDT: activation=0.011122238132379, callback=0.5%
+2025-09-11 01:12:22,076 - INFO - [__main__] ✅ Protected Binance position: BROCCOLIF3BUSDT
+2025-09-11 01:12:22,082 - INFO - [exchanges.binance] ✅ Trailing stop set for LITUSDT: activation=0.69345, callback=0.5%
+2025-09-11 01:12:22,082 - INFO - [__main__] ✅ Protected Binance position: LITUSDT
+2025-09-11 01:12:22,102 - INFO - [exchanges.bybit] ✅ Stop loss set for ORDIUSDT at 8.44305
+2025-09-11 01:12:22,103 - INFO - [__main__] ✅ Protected Bybit position: ORDIUSDT
+2025-09-11 01:12:22,172 - WARNING - [exchanges.bybit] Attempt 1 to set SL for PRIMEUSDT failed. Retrying...
+2025-09-11 01:12:22,172 - WARNING - [exchanges.bybit] Attempt 1 to set SL for BAKEUSDT failed. Retrying...
+2025-09-11 01:12:22,187 - WARNING - [exchanges.bybit] Attempt 1 to set SL for APEXUSDT failed. Retrying...
+2025-09-11 01:12:22,248 - INFO - [exchanges.bybit] ✅ Trailing stop set for INJUSDT
+2025-09-11 01:12:22,249 - WARNING - [__main__] ⚠️ Bybit INJUSDT missing STOP LOSS (backup)
+2025-09-11 01:12:22,257 - INFO - [exchanges.bybit] ✅ Trailing stop set for PENDLEUSDT
+2025-09-11 01:12:22,257 - WARNING - [__main__] ⚠️ Bybit PENDLEUSDT missing STOP LOSS (backup)
+2025-09-11 01:12:22,258 - INFO - [exchanges.bybit] ✅ Trailing stop set for HMSTRUSDT
+2025-09-11 01:12:22,258 - WARNING - [__main__] ⚠️ Bybit HMSTRUSDT missing STOP LOSS (backup)
+2025-09-11 01:12:22,266 - INFO - [exchanges.binance] ✅ Stop Loss set for BNBUSDT at 887.7731500000001
+2025-09-11 01:12:22,267 - INFO - [__main__] ✅ Protected Binance position: BNBUSDT
+2025-09-11 01:12:22,285 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:12:22,436 - INFO - [exchanges.bybit] ✅ Stop loss set for BLURUSDT at 0.06865171115
+2025-09-11 01:12:22,437 - INFO - [__main__] ✅ Protected Bybit position: BLURUSDT
+2025-09-11 01:12:22,526 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:72930 set for Buy position should lower than base_price:67160??MarkPrice
+2025-09-11 01:12:22,527 - WARNING - [exchanges.bybit] Attempt 1 to set SL for HMSTRUSDT failed. Retrying...
+2025-09-11 01:12:22,750 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:12:22,853 - WARNING - [exchanges.bybit] Attempt 1 to set SL for INJUSDT failed. Retrying...
+2025-09-11 01:12:22,869 - WARNING - [exchanges.bybit] Attempt 1 to set SL for PENDLEUSDT failed. Retrying...
+2025-09-11 01:12:22,939 - INFO - [exchanges.bybit] ✅ Stop loss set for PRIMEUSDT at 1.831665
+2025-09-11 01:12:22,939 - INFO - [__main__] ✅ Protected Bybit position: PRIMEUSDT
+2025-09-11 01:12:23,077 - INFO - [exchanges.binance] ✅ Stop Loss set for QUSDT at 0.015134845000000001
+2025-09-11 01:12:23,077 - INFO - [__main__] ✅ Protected Binance position: QUSDT
+2025-09-11 01:12:23,277 - INFO - [exchanges.bybit] ✅ Stop loss set for BAKEUSDT at 0.059624949999999996
+2025-09-11 01:12:23,278 - INFO - [__main__] ✅ Protected Bybit position: BAKEUSDT
+2025-09-11 01:12:23,287 - INFO - [exchanges.bybit] ✅ Stop loss set for APEXUSDT at 0.23749
+2025-09-11 01:12:23,287 - INFO - [__main__] ✅ Protected Bybit position: APEXUSDT
+2025-09-11 01:12:23,291 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:72930 set for Buy position should lower than base_price:67160??MarkPrice
+2025-09-11 01:12:23,291 - WARNING - [exchanges.bybit] Attempt 2 to set SL for HMSTRUSDT failed. Retrying...
+2025-09-11 01:12:23,618 - INFO - [exchanges.bybit] ✅ Stop loss set for INJUSDT at 13.44156
+2025-09-11 01:12:23,618 - INFO - [__main__] ✅ Protected Bybit position: INJUSDT
+2025-09-11 01:12:23,635 - INFO - [exchanges.bybit] ✅ Stop loss set for PENDLEUSDT at 5.131093
+2025-09-11 01:12:23,636 - INFO - [__main__] ✅ Protected Bybit position: PENDLEUSDT
+2025-09-11 01:12:23,929 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:12:23,954 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:12:25,060 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:72930 set for Buy position should lower than base_price:67170??MarkPrice
+2025-09-11 01:12:25,060 - WARNING - [exchanges.bybit] Attempt 3 to set SL for HMSTRUSDT failed. Retrying...
+2025-09-11 01:12:26,587 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:12:27,147 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:12:27,825 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:72930 set for Buy position should lower than base_price:67160??MarkPrice
+2025-09-11 01:12:27,825 - WARNING - [exchanges.bybit] Attempt 4 to set SL for HMSTRUSDT failed. Retrying...
+2025-09-11 01:12:30,247 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:12:30,808 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:12:31,326 - ERROR - [exchanges.bybit] ❌ Failed to set stop loss for HMSTRUSDT after multiple attempts.
+2025-09-11 01:12:31,326 - INFO - [__main__] ✅ Protected Bybit position: HMSTRUSDT
+2025-09-11 01:12:33,749 - ERROR - [exchanges.binance] ❌ Failed to set Stop Loss for MYXUSDT after multiple attempts.
+2025-09-11 01:12:33,750 - INFO - [__main__] ✅ Protected Binance position: MYXUSDT
+2025-09-11 01:12:34,310 - ERROR - [exchanges.binance] ❌ Failed to set Stop Loss for BIDUSDT after multiple attempts.
+2025-09-11 01:12:34,310 - INFO - [__main__] ✅ Protected Binance position: BIDUSDT
+2025-09-11 01:13:04,312 - INFO - [__main__] === Protection Check #2 ===
+2025-09-11 01:13:04,854 - INFO - [__main__] Found 10 Binance positions
+2025-09-11 01:13:04,948 - INFO - [__main__] Found 20 Bybit positions
+2025-09-11 01:13:05,213 - ERROR - [exchanges.bybit] Bybit: Parameter error - Missing some parameters that must be filled in, symbol or settleCoin or baseCoin
+2025-09-11 01:13:05,213 - WARNING - [__main__] ⚠️ Bybit PENDLEUSDT missing TRAILING STOP
+2025-09-11 01:13:05,215 - WARNING - [__main__] ⚠️ Bybit INJUSDT missing TRAILING STOP
+2025-09-11 01:13:05,215 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT missing TRAILING STOP
+2025-09-11 01:13:05,215 - WARNING - [__main__] ⚠️ Bybit PRIMEUSDT missing TRAILING STOP
+2025-09-11 01:13:05,216 - WARNING - [__main__] ⚠️ Bybit BLURUSDT missing TRAILING STOP
+2025-09-11 01:13:05,216 - WARNING - [__main__] ⚠️ Bybit HMSTRUSDT missing TRAILING STOP
+2025-09-11 01:13:05,216 - WARNING - [__main__] ⚠️ Bybit ORDIUSDT missing TRAILING STOP
+2025-09-11 01:13:05,216 - WARNING - [__main__] ⏰ Bybit 10000WENUSDT exceeded max duration
+2025-09-11 01:13:05,216 - INFO - [__main__]    PnL: $2.13, Breakeven: $0.3163
+2025-09-11 01:13:05,221 - INFO - [__main__]    Closing profitable position by market order
+2025-09-11 01:13:05,222 - WARNING - [__main__] ⏰ Bybit MAVIAUSDT exceeded max duration
+2025-09-11 01:13:05,222 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.1555
+2025-09-11 01:13:05,222 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:13:05,223 - WARNING - [__main__] ⏰ Bybit A8USDT exceeded max duration
+2025-09-11 01:13:05,223 - INFO - [__main__]    PnL: $-0.34, Breakeven: $0.1027
+2025-09-11 01:13:05,223 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:13:05,223 - WARNING - [__main__] ⏰ Bybit BOBAUSDT exceeded max duration
+2025-09-11 01:13:05,223 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.0888
+2025-09-11 01:13:05,223 - INFO - [__main__]    Closing profitable position by market order
+2025-09-11 01:13:05,224 - WARNING - [__main__] ⏰ Bybit AINUSDT exceeded max duration
+2025-09-11 01:13:05,224 - INFO - [__main__]    PnL: $-0.01, Breakeven: $0.1224
+2025-09-11 01:13:05,224 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:13:05,224 - WARNING - [__main__] ⏰ Bybit SUIUSDT exceeded max duration
+2025-09-11 01:13:05,225 - INFO - [__main__]    PnL: $-0.21, Breakeven: $3.6191
+2025-09-11 01:13:05,225 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:13:05,225 - WARNING - [__main__] ⏰ Bybit APTUSDT exceeded max duration
+2025-09-11 01:13:05,225 - INFO - [__main__]    PnL: $0.00, Breakeven: $4.4914
+2025-09-11 01:13:05,225 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:13:05,225 - WARNING - [__main__] ⏰ Bybit BTCUSDT exceeded max duration
+2025-09-11 01:13:05,225 - INFO - [__main__]    PnL: $-0.02, Breakeven: $79118.7287
+2025-09-11 01:13:05,225 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:13:05,226 - WARNING - [__main__] ⏰ Bybit SOSOUSDT exceeded max duration
+2025-09-11 01:13:05,226 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.6131
+2025-09-11 01:13:05,226 - INFO - [__main__]    Closing profitable position by market order
+2025-09-11 01:13:05,226 - WARNING - [__main__] ⏰ Bybit 1000000BABYDOGEUSDT exceeded max duration
+2025-09-11 01:13:05,226 - INFO - [__main__]    PnL: $-1.38, Breakeven: $0.0012
+2025-09-11 01:13:05,226 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:13:05,226 - WARNING - [__main__] ⏰ Bybit SHIB1000USDT exceeded max duration
+2025-09-11 01:13:05,226 - INFO - [__main__]    PnL: $20.25, Breakeven: $0.0058
+2025-09-11 01:13:05,226 - INFO - [__main__]    Closing profitable position by market order
+2025-09-11 01:13:05,227 - WARNING - [__main__] ⏰ Bybit COREUSDT exceeded max duration
+2025-09-11 01:13:05,227 - INFO - [__main__]    PnL: $0.01, Breakeven: $0.4143
+2025-09-11 01:13:05,227 - INFO - [__main__]    Closing profitable position by market order
+2025-09-11 01:13:05,227 - WARNING - [__main__] ⏰ Bybit DOGUSDT exceeded max duration
+2025-09-11 01:13:05,227 - INFO - [__main__]    PnL: $0.17, Breakeven: $0.0022
+2025-09-11 01:13:05,227 - INFO - [__main__]    Closing profitable position by market order
+2025-09-11 01:13:05,664 - WARNING - [__main__] ⚠️ Binance BIDUSDT missing STOP LOSS (backup)
+2025-09-11 01:13:05,665 - WARNING - [__main__] ⚠️ Binance MYXUSDT missing STOP LOSS (backup)
+2025-09-11 01:13:06,036 - INFO - [exchanges.bybit] All orders cancelled for BTCUSDT
+2025-09-11 01:13:06,037 - INFO - [exchanges.bybit] All orders cancelled for MAVIAUSDT
+2025-09-11 01:13:06,038 - INFO - [exchanges.bybit] All orders cancelled for APTUSDT
+2025-09-11 01:13:06,039 - INFO - [exchanges.bybit] All orders cancelled for SUIUSDT
+2025-09-11 01:13:06,040 - INFO - [exchanges.bybit] All orders cancelled for AINUSDT
+2025-09-11 01:13:06,041 - INFO - [exchanges.bybit] All orders cancelled for A8USDT
+2025-09-11 01:13:06,042 - INFO - [exchanges.bybit] All orders cancelled for 1000000BABYDOGEUSDT
+2025-09-11 01:13:06,637 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:13:06,638 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:13:06,639 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:13:06,649 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:13:06,650 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:13:06,650 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:13:06,650 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:13:06,726 - INFO - [exchanges.bybit] ✅ Trailing stop set for INJUSDT
+2025-09-11 01:13:06,726 - WARNING - [__main__] ⚠️ Bybit INJUSDT missing STOP LOSS (backup)
+2025-09-11 01:13:06,738 - INFO - [exchanges.bybit] ✅ Trailing stop set for PRIMEUSDT
+2025-09-11 01:13:06,738 - WARNING - [__main__] ⚠️ Bybit PRIMEUSDT missing STOP LOSS (backup)
+2025-09-11 01:13:06,739 - INFO - [exchanges.bybit] ✅ Trailing stop set for HMSTRUSDT
+2025-09-11 01:13:06,739 - WARNING - [__main__] ⚠️ Bybit HMSTRUSDT missing STOP LOSS (backup)
+2025-09-11 01:13:06,795 - INFO - [exchanges.bybit] Position close order created for 10000WENUSDT: 053138bf-b41d-41ac-9a05-250a05a94212
+2025-09-11 01:13:06,803 - INFO - [exchanges.bybit] Position close order created for BOBAUSDT: dc9a5f52-e75c-44c0-8ffc-dbe413ba5ab6
+2025-09-11 01:13:06,810 - INFO - [exchanges.bybit] Position close order created for DOGUSDT: 4fb2a92e-2d16-4efc-8f88-a1580985e362
+2025-09-11 01:13:06,813 - INFO - [exchanges.bybit] Position close order created for SHIB1000USDT: ae97e68e-1996-43df-b91d-74a20e57d262
+2025-09-11 01:13:06,818 - ERROR - [exchanges.bybit] Bybit API error 10006: Too many visits. Exceeded the API Rate Limit.
+2025-09-11 01:13:06,818 - ERROR - [exchanges.bybit] Bybit API error 10006: Too many visits. Exceeded the API Rate Limit.
+2025-09-11 01:13:06,857 - INFO - [exchanges.bybit] ✅ Trailing stop set for PENDLEUSDT
+2025-09-11 01:13:06,857 - WARNING - [__main__] ⚠️ Bybit PENDLEUSDT missing STOP LOSS (backup)
+2025-09-11 01:13:06,991 - INFO - [exchanges.bybit] ✅ Stop loss set for INJUSDT at 13.44156
+2025-09-11 01:13:06,991 - INFO - [__main__] ✅ Protected Bybit position: INJUSDT
+2025-09-11 01:13:07,008 - INFO - [exchanges.bybit] ✅ Stop loss set for PRIMEUSDT at 1.831665
+2025-09-11 01:13:07,008 - INFO - [__main__] ✅ Protected Bybit position: PRIMEUSDT
+2025-09-11 01:13:07,028 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:13:07,066 - INFO - [exchanges.bybit] ✅ Trailing stop set for ORDIUSDT
+2025-09-11 01:13:07,067 - WARNING - [__main__] ⚠️ Bybit ORDIUSDT missing STOP LOSS (backup)
+2025-09-11 01:13:07,073 - INFO - [exchanges.bybit] ✅ Trailing stop set for BAKEUSDT
+2025-09-11 01:13:07,074 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT missing STOP LOSS (backup)
+2025-09-11 01:13:07,080 - INFO - [exchanges.bybit] ✅ Trailing stop set for BLURUSDT
+2025-09-11 01:13:07,080 - WARNING - [__main__] ⚠️ Bybit BLURUSDT missing STOP LOSS (backup)
+2025-09-11 01:13:07,120 - INFO - [exchanges.bybit] ✅ Stop loss set for PENDLEUSDT at 5.131093
+2025-09-11 01:13:07,120 - INFO - [__main__] ✅ Protected Bybit position: PENDLEUSDT
+2025-09-11 01:13:07,294 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:13:07,334 - INFO - [exchanges.bybit] ✅ Stop loss set for ORDIUSDT at 8.44305
+2025-09-11 01:13:07,334 - INFO - [__main__] ✅ Protected Bybit position: ORDIUSDT
+2025-09-11 01:13:07,341 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:72930 set for Buy position should lower than base_price:67220??MarkPrice
+2025-09-11 01:13:07,341 - WARNING - [exchanges.bybit] Attempt 1 to set SL for HMSTRUSDT failed. Retrying...
+2025-09-11 01:13:07,351 - INFO - [exchanges.bybit] ✅ Stop loss set for BLURUSDT at 0.06865171115
+2025-09-11 01:13:07,352 - INFO - [__main__] ✅ Protected Bybit position: BLURUSDT
+2025-09-11 01:13:07,675 - INFO - [exchanges.bybit] ✅ Stop loss set for BAKEUSDT at 0.059624949999999996
+2025-09-11 01:13:07,675 - INFO - [__main__] ✅ Protected Bybit position: BAKEUSDT
+2025-09-11 01:13:08,109 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:72930 set for Buy position should lower than base_price:67220??MarkPrice
+2025-09-11 01:13:08,109 - WARNING - [exchanges.bybit] Attempt 2 to set SL for HMSTRUSDT failed. Retrying...
+2025-09-11 01:13:08,679 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:13:08,947 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:13:09,877 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:72930 set for Buy position should lower than base_price:67220??MarkPrice
+2025-09-11 01:13:09,878 - WARNING - [exchanges.bybit] Attempt 3 to set SL for HMSTRUSDT failed. Retrying...
+2025-09-11 01:13:11,144 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:13:11,366 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:13:12,649 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:72930 set for Buy position should lower than base_price:67220??MarkPrice
+2025-09-11 01:13:12,650 - WARNING - [exchanges.bybit] Attempt 4 to set SL for HMSTRUSDT failed. Retrying...
+2025-09-11 01:13:14,552 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:13:15,294 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:13:16,151 - ERROR - [exchanges.bybit] ❌ Failed to set stop loss for HMSTRUSDT after multiple attempts.
+2025-09-11 01:13:16,152 - INFO - [__main__] ✅ Protected Bybit position: HMSTRUSDT
+2025-09-11 01:13:18,055 - ERROR - [exchanges.binance] ❌ Failed to set Stop Loss for MYXUSDT after multiple attempts.
+2025-09-11 01:13:18,055 - INFO - [__main__] ✅ Protected Binance position: MYXUSDT
+2025-09-11 01:13:18,796 - ERROR - [exchanges.binance] ❌ Failed to set Stop Loss for BIDUSDT after multiple attempts.
+2025-09-11 01:13:18,796 - INFO - [__main__] ✅ Protected Binance position: BIDUSDT
+2025-09-11 01:13:48,798 - INFO - [__main__] === Protection Check #3 ===
+2025-09-11 01:13:49,871 - INFO - [__main__] Found 20 Bybit positions
+2025-09-11 01:13:49,904 - INFO - [__main__] Found 10 Binance positions
+2025-09-11 01:13:50,476 - ERROR - [exchanges.bybit] Bybit: Parameter error - Missing some parameters that must be filled in, symbol or settleCoin or baseCoin
+2025-09-11 01:13:50,476 - WARNING - [__main__] ⚠️ Bybit PENDLEUSDT missing TRAILING STOP
+2025-09-11 01:13:50,477 - WARNING - [__main__] ⚠️ Bybit INJUSDT missing TRAILING STOP
+2025-09-11 01:13:50,478 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT missing TRAILING STOP
+2025-09-11 01:13:50,478 - WARNING - [__main__] ⚠️ Bybit PRIMEUSDT missing TRAILING STOP
+2025-09-11 01:13:50,478 - WARNING - [__main__] ⚠️ Bybit BLURUSDT missing TRAILING STOP
+2025-09-11 01:13:50,479 - WARNING - [__main__] ⚠️ Bybit HMSTRUSDT missing TRAILING STOP
+2025-09-11 01:13:50,479 - WARNING - [__main__] ⚠️ Bybit ORDIUSDT missing TRAILING STOP
+2025-09-11 01:13:50,479 - WARNING - [__main__] ⏰ Bybit 10000WENUSDT exceeded max duration
+2025-09-11 01:13:50,479 - INFO - [__main__]    PnL: $2.16, Breakeven: $0.3163
+2025-09-11 01:13:50,479 - INFO - [__main__]    Closing profitable position by market order
+2025-09-11 01:13:50,480 - WARNING - [__main__] ⏰ Bybit MAVIAUSDT exceeded max duration
+2025-09-11 01:13:50,480 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.1555
+2025-09-11 01:13:50,480 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:13:50,480 - WARNING - [__main__] ⏰ Bybit A8USDT exceeded max duration
+2025-09-11 01:13:50,480 - INFO - [__main__]    PnL: $-0.28, Breakeven: $0.1027
+2025-09-11 01:13:50,480 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:13:50,480 - WARNING - [__main__] ⏰ Bybit BOBAUSDT exceeded max duration
+2025-09-11 01:13:50,481 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.0888
+2025-09-11 01:13:50,481 - INFO - [__main__]    Closing profitable position by market order
+2025-09-11 01:13:50,481 - WARNING - [__main__] ⏰ Bybit AINUSDT exceeded max duration
+2025-09-11 01:13:50,481 - INFO - [__main__]    PnL: $-0.01, Breakeven: $0.1224
+2025-09-11 01:13:50,481 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:13:50,481 - WARNING - [__main__] ⏰ Bybit SUIUSDT exceeded max duration
+2025-09-11 01:13:50,481 - INFO - [__main__]    PnL: $-0.18, Breakeven: $3.6191
+2025-09-11 01:13:50,481 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:13:50,482 - WARNING - [__main__] ⏰ Bybit APTUSDT exceeded max duration
+2025-09-11 01:13:50,482 - INFO - [__main__]    PnL: $0.00, Breakeven: $4.4914
+2025-09-11 01:13:50,482 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:13:50,482 - WARNING - [__main__] ⏰ Bybit BTCUSDT exceeded max duration
+2025-09-11 01:13:50,482 - INFO - [__main__]    PnL: $-0.02, Breakeven: $79118.7287
+2025-09-11 01:13:50,482 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:13:50,482 - WARNING - [__main__] ⏰ Bybit SOSOUSDT exceeded max duration
+2025-09-11 01:13:50,482 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.6131
+2025-09-11 01:13:50,482 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:13:50,482 - WARNING - [__main__] ⏰ Bybit 1000000BABYDOGEUSDT exceeded max duration
+2025-09-11 01:13:50,482 - INFO - [__main__]    PnL: $-1.39, Breakeven: $0.0012
+2025-09-11 01:13:50,482 - INFO - [__main__]    Setting breakeven limit order
+2025-09-11 01:13:50,483 - WARNING - [__main__] ⏰ Bybit SHIB1000USDT exceeded max duration
+2025-09-11 01:13:50,483 - INFO - [__main__]    PnL: $20.86, Breakeven: $0.0058
+2025-09-11 01:13:50,483 - INFO - [__main__]    Closing profitable position by market order
+2025-09-11 01:13:50,483 - WARNING - [__main__] ⏰ Bybit COREUSDT exceeded max duration
+2025-09-11 01:13:50,483 - INFO - [__main__]    PnL: $0.01, Breakeven: $0.4143
+2025-09-11 01:13:50,483 - INFO - [__main__]    Closing profitable position by market order
+2025-09-11 01:13:50,483 - WARNING - [__main__] ⏰ Bybit DOGUSDT exceeded max duration
+2025-09-11 01:13:50,483 - INFO - [__main__]    PnL: $0.12, Breakeven: $0.0022
+2025-09-11 01:13:50,484 - INFO - [__main__]    Closing profitable position by market order
+2025-09-11 01:13:50,699 - WARNING - [__main__] ⚠️ Binance BIDUSDT missing STOP LOSS (backup)
+2025-09-11 01:13:50,700 - WARNING - [__main__] ⚠️ Binance MYXUSDT missing STOP LOSS (backup)
+2025-09-11 01:13:51,285 - INFO - [exchanges.bybit] All orders cancelled for MAVIAUSDT
+2025-09-11 01:13:51,292 - INFO - [exchanges.bybit] All orders cancelled for BTCUSDT
+2025-09-11 01:13:51,296 - INFO - [exchanges.bybit] All orders cancelled for 1000000BABYDOGEUSDT
+2025-09-11 01:13:51,297 - INFO - [exchanges.bybit] All orders cancelled for APTUSDT
+2025-09-11 01:13:51,297 - INFO - [exchanges.bybit] All orders cancelled for AINUSDT
+2025-09-11 01:13:51,298 - INFO - [exchanges.bybit] All orders cancelled for A8USDT
+2025-09-11 01:13:51,298 - INFO - [exchanges.bybit] All orders cancelled for SUIUSDT
+2025-09-11 01:13:51,300 - INFO - [exchanges.bybit] All orders cancelled for SOSOUSDT
+2025-09-11 01:13:51,563 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:13:51,737 - INFO - [exchanges.bybit] Position close order created for COREUSDT: b707c328-140f-4e49-b412-62be07a8413b
+2025-09-11 01:13:51,887 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:13:51,891 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:13:51,896 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:13:51,897 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:13:51,897 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:13:51,900 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:13:51,901 - ERROR - [exchanges.bybit] Bybit: Parameter error - Side invalid
+2025-09-11 01:13:51,977 - INFO - [exchanges.bybit] ✅ Trailing stop set for INJUSDT
+2025-09-11 01:13:51,978 - WARNING - [__main__] ⚠️ Bybit INJUSDT missing STOP LOSS (backup)
+2025-09-11 01:13:51,981 - INFO - [exchanges.bybit] ✅ Trailing stop set for HMSTRUSDT
+2025-09-11 01:13:51,981 - WARNING - [__main__] ⚠️ Bybit HMSTRUSDT missing STOP LOSS (backup)
+2025-09-11 01:13:51,988 - INFO - [exchanges.bybit] ✅ Trailing stop set for BLURUSDT
+2025-09-11 01:13:51,988 - WARNING - [__main__] ⚠️ Bybit BLURUSDT missing STOP LOSS (backup)
+2025-09-11 01:13:52,055 - INFO - [exchanges.bybit] Position close order created for BOBAUSDT: 376a1bde-5c81-4b44-9a76-b62d3cb6e402
+2025-09-11 01:13:52,057 - INFO - [exchanges.bybit] Position close order created for SHIB1000USDT: 0f7b3ba3-6830-4eae-b859-d4987e31488c
+2025-09-11 01:13:52,058 - INFO - [exchanges.bybit] Position close order created for DOGUSDT: b506e69f-8171-4932-96e7-7871bf405edc
+2025-09-11 01:13:52,064 - INFO - [exchanges.bybit] Position close order created for 10000WENUSDT: 9bd7b1a1-a24b-4ec0-92b0-a065eadff69b
+2025-09-11 01:13:52,126 - INFO - [exchanges.bybit] ✅ Trailing stop set for PENDLEUSDT
+2025-09-11 01:13:52,126 - WARNING - [__main__] ⚠️ Bybit PENDLEUSDT missing STOP LOSS (backup)
+2025-09-11 01:13:52,248 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:72930 set for Buy position should lower than base_price:67510??MarkPrice
+2025-09-11 01:13:52,248 - WARNING - [exchanges.bybit] Attempt 1 to set SL for HMSTRUSDT failed. Retrying...
+2025-09-11 01:13:52,248 - INFO - [exchanges.bybit] ✅ Stop loss set for INJUSDT at 13.44156
+2025-09-11 01:13:52,248 - INFO - [__main__] ✅ Protected Bybit position: INJUSDT
+2025-09-11 01:13:52,256 - INFO - [exchanges.bybit] ✅ Stop loss set for BLURUSDT at 0.06865171115
+2025-09-11 01:13:52,256 - INFO - [__main__] ✅ Protected Bybit position: BLURUSDT
+2025-09-11 01:13:52,314 - INFO - [exchanges.bybit] ✅ Trailing stop set for BAKEUSDT
+2025-09-11 01:13:52,314 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT missing STOP LOSS (backup)
+2025-09-11 01:13:52,319 - INFO - [exchanges.bybit] ✅ Trailing stop set for PRIMEUSDT
+2025-09-11 01:13:52,319 - WARNING - [__main__] ⚠️ Bybit PRIMEUSDT missing STOP LOSS (backup)
+2025-09-11 01:13:52,339 - INFO - [exchanges.bybit] ✅ Trailing stop set for ORDIUSDT
+2025-09-11 01:13:52,339 - WARNING - [__main__] ⚠️ Bybit ORDIUSDT missing STOP LOSS (backup)
+2025-09-11 01:13:52,371 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:13:52,559 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:13:52,584 - INFO - [exchanges.bybit] ✅ Stop loss set for PRIMEUSDT at 1.831665
+2025-09-11 01:13:52,584 - INFO - [__main__] ✅ Protected Bybit position: PRIMEUSDT
+2025-09-11 01:13:52,606 - INFO - [exchanges.bybit] ✅ Stop loss set for ORDIUSDT at 8.44305
+2025-09-11 01:13:52,606 - INFO - [__main__] ✅ Protected Bybit position: ORDIUSDT
+2025-09-11 01:13:52,726 - INFO - [exchanges.bybit] ✅ Stop loss set for PENDLEUSDT at 5.131093
+2025-09-11 01:13:52,727 - INFO - [__main__] ✅ Protected Bybit position: PENDLEUSDT
+2025-09-11 01:13:52,911 - INFO - [exchanges.bybit] ✅ Stop loss set for BAKEUSDT at 0.059624949999999996
+2025-09-11 01:13:52,911 - INFO - [__main__] ✅ Protected Bybit position: BAKEUSDT
+2025-09-11 01:13:53,013 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:72930 set for Buy position should lower than base_price:67520??MarkPrice
+2025-09-11 01:13:53,013 - WARNING - [exchanges.bybit] Attempt 2 to set SL for HMSTRUSDT failed. Retrying...
+2025-09-11 01:13:53,556 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:13:54,214 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:13:54,779 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:72930 set for Buy position should lower than base_price:67530??MarkPrice
+2025-09-11 01:13:54,779 - WARNING - [exchanges.bybit] Attempt 3 to set SL for HMSTRUSDT failed. Retrying...
+2025-09-11 01:13:55,760 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:13:56,918 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:13:57,543 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:72930 set for Buy position should lower than base_price:67560??MarkPrice
+2025-09-11 01:13:57,544 - WARNING - [exchanges.bybit] Attempt 4 to set SL for HMSTRUSDT failed. Retrying...
+2025-09-11 01:13:58,983 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:14:00,580 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:14:01,045 - ERROR - [exchanges.bybit] ❌ Failed to set stop loss for HMSTRUSDT after multiple attempts.
+2025-09-11 01:14:01,045 - INFO - [__main__] ✅ Protected Bybit position: HMSTRUSDT
+2025-09-11 01:14:02,484 - ERROR - [exchanges.binance] ❌ Failed to set Stop Loss for BIDUSDT after multiple attempts.
+2025-09-11 01:14:02,484 - INFO - [__main__] ✅ Protected Binance position: BIDUSDT
+2025-09-11 01:14:04,082 - ERROR - [exchanges.binance] ❌ Failed to set Stop Loss for MYXUSDT after multiple attempts.
+2025-09-11 01:14:04,083 - INFO - [__main__] ✅ Protected Binance position: MYXUSDT
+2025-09-11 01:14:11,718 - INFO - [__main__] 🧹 Cleaning up...
+2025-09-11 01:14:11,720 - INFO - [__main__] ============================================================
+2025-09-11 01:14:11,720 - INFO - [__main__] Performance Statistics
+2025-09-11 01:14:11,720 - INFO - [__main__] ============================================================
+2025-09-11 01:14:11,720 - INFO - [__main__] Uptime: 0.03 hours
+2025-09-11 01:14:11,720 - INFO - [__main__] Checks performed: 3
+2025-09-11 01:14:11,720 - INFO - [__main__] Positions protected: 36
+2025-09-11 01:14:11,720 - INFO - [__main__] Positions closed: 17
+2025-09-11 01:14:11,720 - INFO - [__main__] Errors encountered: 0
+2025-09-11 01:14:11,720 - INFO - [__main__] ============================================================
+2025-09-11 01:14:11,721 - INFO - [__main__] Binance connection closed
+2025-09-11 01:14:11,722 - INFO - [__main__] Bybit connection closed
+2025-09-11 01:14:11,722 - INFO - [__main__] ✅ Cleanup complete
+2025-09-11 01:53:31,171 - INFO - [__main__] ============================================================
+2025-09-11 01:53:31,171 - INFO - [__main__] Protection Monitor Configuration
+2025-09-11 01:53:31,171 - INFO - [__main__] ============================================================
+2025-09-11 01:53:31,171 - INFO - [__main__] Mode: TESTNET
+2025-09-11 01:53:31,171 - INFO - [__main__] Stop Loss Type: TRAILING
+2025-09-11 01:53:31,171 - INFO - [__main__] Stop Loss: 6.5%
+2025-09-11 01:53:31,171 - INFO - [__main__] Take Profit: 3.0%
+2025-09-11 01:53:31,171 - INFO - [__main__] Trailing Activation: 3.5%
+2025-09-11 01:53:31,171 - INFO - [__main__] Trailing Callback: 0.5%
+2025-09-11 01:53:31,171 - INFO - [__main__] Max Position Duration: 1 hours
+2025-09-11 01:53:31,171 - INFO - [__main__] Taker Fee: 0.06%
+2025-09-11 01:53:31,171 - INFO - [__main__] Check Interval: 30 seconds
+2025-09-11 01:53:31,171 - INFO - [__main__] ============================================================
+2025-09-11 01:53:31,171 - INFO - [__main__] 🚀 Starting Protection Monitor v2.2
+2025-09-11 01:53:33,348 - INFO - [exchanges.binance] Binance testnet initialized
+2025-09-11 01:53:33,349 - INFO - [exchanges.binance] Loaded 531 active perpetual contracts
+2025-09-11 01:53:33,349 - INFO - [exchanges.binance] ✅ PUFFERUSDT found in exchange info
+2025-09-11 01:53:33,349 - INFO - [exchanges.binance] ✅ SKATEUSDT found in exchange info
+2025-09-11 01:53:34,173 - INFO - [__main__] ✅ Binance connected - Balance: $876.17
+2025-09-11 01:53:36,252 - INFO - [exchanges.bybit] Bybit testnet initialized
+2025-09-11 01:53:36,252 - INFO - [exchanges.bybit] Position mode: one-way
+2025-09-11 01:53:36,252 - INFO - [exchanges.bybit] Loaded 616 active symbols
+2025-09-11 01:53:36,524 - INFO - [__main__] ✅ Bybit connected - Balance: $9878.13
+2025-09-11 01:53:36,525 - INFO - [__main__] === Protection Check #1 ===
+2025-09-11 01:53:37,301 - INFO - [__main__] Found 20 Bybit positions
+2025-09-11 01:53:37,357 - INFO - [__main__] Found 8 Binance positions
+2025-09-11 01:53:37,907 - WARNING - [__main__] ⏰ Bybit PENDLEUSDT exceeded max duration
+2025-09-11 01:53:37,907 - INFO - [__main__]    PnL: $-0.09, Breakeven: $5.4944
+2025-09-11 01:53:37,907 - INFO - [__main__]    Setting breakeven limit order for PENDLEUSDT
+2025-09-11 01:53:37,908 - WARNING - [__main__] ⏰ Bybit INJUSDT exceeded max duration
+2025-09-11 01:53:37,908 - INFO - [__main__]    PnL: $-0.49, Breakeven: $14.3933
+2025-09-11 01:53:37,908 - INFO - [__main__]    Setting breakeven limit order for INJUSDT
+2025-09-11 01:53:37,909 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT missing TRAILING STOP
+2025-09-11 01:53:37,909 - WARNING - [__main__] ⏰ Bybit PRIMEUSDT exceeded max duration
+2025-09-11 01:53:37,909 - INFO - [__main__]    PnL: $-0.02, Breakeven: $1.9614
+2025-09-11 01:53:37,909 - INFO - [__main__]    Setting breakeven limit order for PRIMEUSDT
+2025-09-11 01:53:37,909 - WARNING - [__main__] ⏰ Bybit BLURUSDT exceeded max duration
+2025-09-11 01:53:37,909 - INFO - [__main__]    PnL: $0.40, Breakeven: $0.0735
+2025-09-11 01:53:37,909 - INFO - [__main__]    Closing profitable/breakeven position BLURUSDT by market order
+2025-09-11 01:53:38,164 - WARNING - [__main__] ⚠️ Binance BIDUSDT missing STOP LOSS (backup)
+2025-09-11 01:53:38,177 - INFO - [exchanges.bybit] All orders cancelled for PENDLEUSDT
+2025-09-11 01:53:38,448 - WARNING - [__main__] ⏰ Bybit HMSTRUSDT exceeded max duration
+2025-09-11 01:53:38,448 - INFO - [__main__]    PnL: $-1.41, Breakeven: $0.0008
+2025-09-11 01:53:38,448 - INFO - [__main__]    Setting breakeven limit order for HMSTRUSDT
+2025-09-11 01:53:38,699 - INFO - [exchanges.bybit] All orders cancelled for INJUSDT
+2025-09-11 01:53:38,721 - INFO - [exchanges.bybit] All orders cancelled for PRIMEUSDT
+2025-09-11 01:53:38,797 - INFO - [exchanges.bybit] Position close order created for BLURUSDT: a84e2d73-5d10-4ff2-959a-3c7b389faa7c
+2025-09-11 01:53:38,797 - WARNING - [__main__] ⏰ Bybit ORDIUSDT exceeded max duration
+2025-09-11 01:53:38,797 - INFO - [__main__]    PnL: $0.00, Breakeven: $9.0408
+2025-09-11 01:53:38,797 - INFO - [__main__]    Closing profitable/breakeven position ORDIUSDT by market order
+2025-09-11 01:53:38,966 - WARNING - [__main__] ⏰ Bybit MAVIAUSDT exceeded max duration
+2025-09-11 01:53:38,966 - INFO - [__main__]    PnL: $-0.01, Breakeven: $0.1555
+2025-09-11 01:53:38,967 - INFO - [__main__]    Setting breakeven limit order for MAVIAUSDT
+2025-09-11 01:53:38,989 - WARNING - [__main__] ⏰ Bybit A8USDT exceeded max duration
+2025-09-11 01:53:38,989 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.1027
+2025-09-11 01:53:38,989 - INFO - [__main__]    Closing profitable/breakeven position A8USDT by market order
+2025-09-11 01:53:39,051 - INFO - [exchanges.bybit] All orders cancelled for HMSTRUSDT
+2025-09-11 01:53:39,231 - INFO - [exchanges.bybit] All orders cancelled for MAVIAUSDT
+2025-09-11 01:53:39,317 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:53:39,317 - WARNING - [__main__] ⏰ Bybit BOBAUSDT exceeded max duration
+2025-09-11 01:53:39,317 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.0888
+2025-09-11 01:53:39,318 - INFO - [__main__]    Closing profitable/breakeven position BOBAUSDT by market order
+2025-09-11 01:53:39,515 - INFO - [exchanges.bybit] Position close order created for ORDIUSDT: 07654605-380d-4477-a62a-be6d5e66884c
+2025-09-11 01:53:39,515 - WARNING - [__main__] ⏰ Bybit AINUSDT exceeded max duration
+2025-09-11 01:53:39,516 - INFO - [__main__]    PnL: $0.22, Breakeven: $0.1224
+2025-09-11 01:53:39,516 - INFO - [__main__]    Closing profitable/breakeven position AINUSDT by market order
+2025-09-11 01:53:39,731 - WARNING - [exchanges.bybit] Attempt 1 to set TS for BAKEUSDT failed. Retrying...
+2025-09-11 01:53:39,838 - WARNING - [__main__] ⏰ Bybit SUIUSDT exceeded max duration
+2025-09-11 01:53:39,838 - INFO - [__main__]    PnL: $-0.19, Breakeven: $3.6191
+2025-09-11 01:53:39,838 - INFO - [__main__]    Setting breakeven limit order for SUIUSDT
+2025-09-11 01:53:40,030 - INFO - [exchanges.bybit] Position close order created for A8USDT: 459f675a-561a-4a86-a798-4172c6da5075
+2025-09-11 01:53:40,030 - WARNING - [__main__] ⏰ Bybit APTUSDT exceeded max duration
+2025-09-11 01:53:40,030 - INFO - [__main__]    PnL: $0.03, Breakeven: $4.4914
+2025-09-11 01:53:40,030 - INFO - [__main__]    Closing profitable/breakeven position APTUSDT by market order
+2025-09-11 01:53:40,053 - INFO - [exchanges.bybit] Position close order created for AINUSDT: a530a16e-fa55-4fe3-a787-671d4039993a
+2025-09-11 01:53:40,053 - WARNING - [__main__] ⏰ Bybit BTCUSDT exceeded max duration
+2025-09-11 01:53:40,053 - INFO - [__main__]    PnL: $0.01, Breakeven: $79118.7287
+2025-09-11 01:53:40,053 - INFO - [__main__]    Closing profitable/breakeven position BTCUSDT by market order
+2025-09-11 01:53:40,109 - INFO - [exchanges.bybit] All orders cancelled for SUIUSDT
+2025-09-11 01:53:40,359 - INFO - [exchanges.bybit] Position close order created for BOBAUSDT: 24747799-653a-4a97-a612-2e467846996f
+2025-09-11 01:53:40,360 - WARNING - [__main__] ⏰ Bybit SOSOUSDT exceeded max duration
+2025-09-11 01:53:40,360 - INFO - [__main__]    PnL: $0.01, Breakeven: $0.6131
+2025-09-11 01:53:40,360 - INFO - [__main__]    Closing profitable/breakeven position SOSOUSDT by market order
+2025-09-11 01:53:40,378 - WARNING - [__main__] ⏰ Bybit 1000000BABYDOGEUSDT exceeded max duration
+2025-09-11 01:53:40,378 - INFO - [__main__]    PnL: $-1.39, Breakeven: $0.0012
+2025-09-11 01:53:40,378 - INFO - [__main__]    Setting breakeven limit order for 1000000BABYDOGEUSDT
+2025-09-11 01:53:40,497 - INFO - [exchanges.bybit] ✅ Trailing stop set for BAKEUSDT
+2025-09-11 01:53:40,497 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT missing STOP LOSS (backup)
+2025-09-11 01:53:40,568 - INFO - [exchanges.bybit] Position close order created for APTUSDT: 05aaa294-4c28-4209-abec-0a1e96f1e72f
+2025-09-11 01:53:40,568 - WARNING - [__main__] ⏰ Bybit SHIB1000USDT exceeded max duration
+2025-09-11 01:53:40,568 - INFO - [__main__]    PnL: $20.25, Breakeven: $0.0058
+2025-09-11 01:53:40,568 - INFO - [__main__]    Closing profitable/breakeven position SHIB1000USDT by market order
+2025-09-11 01:53:40,645 - INFO - [exchanges.bybit] All orders cancelled for 1000000BABYDOGEUSDT
+2025-09-11 01:53:40,913 - WARNING - [__main__] ⏰ Bybit COREUSDT exceeded max duration
+2025-09-11 01:53:40,913 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.4143
+2025-09-11 01:53:40,913 - INFO - [__main__]    Closing profitable/breakeven position COREUSDT by market order
+2025-09-11 01:53:40,986 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:53:41,094 - INFO - [exchanges.bybit] Position close order created for BTCUSDT: ff49a502-e042-43cc-9fa0-13c14dc9cdc7
+2025-09-11 01:53:41,095 - WARNING - [__main__] ⏰ Bybit DOGUSDT exceeded max duration
+2025-09-11 01:53:41,095 - INFO - [__main__]    PnL: $-0.05, Breakeven: $0.0022
+2025-09-11 01:53:41,095 - INFO - [__main__]    Setting breakeven limit order for DOGUSDT
+2025-09-11 01:53:41,100 - INFO - [exchanges.bybit] ✅ Stop loss set for BAKEUSDT at 0.059624949999999996
+2025-09-11 01:53:41,100 - INFO - [__main__] ✅ Protected Bybit position: BAKEUSDT
+2025-09-11 01:53:41,100 - WARNING - [__main__] ⏰ Bybit CELRUSDT exceeded max duration
+2025-09-11 01:53:41,100 - INFO - [__main__]    PnL: $-59.83, Breakeven: $0.0066
+2025-09-11 01:53:41,100 - INFO - [__main__]    Setting breakeven limit order for CELRUSDT
+2025-09-11 01:53:41,358 - INFO - [exchanges.bybit] All orders cancelled for DOGUSDT
+2025-09-11 01:53:41,363 - INFO - [exchanges.bybit] All orders cancelled for CELRUSDT
+2025-09-11 01:53:41,401 - INFO - [exchanges.bybit] Position close order created for SOSOUSDT: eeb1e7b8-15ee-4fbe-b086-aaee8d117cde
+2025-09-11 01:53:41,618 - INFO - [exchanges.bybit] Position close order created for SHIB1000USDT: 3ca8854a-7247-4464-a649-9fab0b99ba28
+2025-09-11 01:53:41,978 - INFO - [exchanges.bybit] Position close order created for COREUSDT: 66efde80-bcb2-459f-90b3-7b06f91ad0e8
+2025-09-11 01:53:44,114 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:53:47,787 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:53:51,290 - ERROR - [exchanges.binance] ❌ Failed to set Stop Loss for BIDUSDT after multiple attempts.
+2025-09-11 01:54:21,295 - INFO - [__main__] === Protection Check #2 ===
+2025-09-11 01:54:22,262 - INFO - [__main__] Found 19 Bybit positions
+2025-09-11 01:54:22,304 - INFO - [__main__] Found 8 Binance positions
+2025-09-11 01:54:22,647 - WARNING - [__main__] ⚠️ Binance BIDUSDT missing STOP LOSS (backup)
+2025-09-11 01:54:22,868 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT missing TRAILING STOP
+2025-09-11 01:54:22,869 - WARNING - [__main__] ⏰ Bybit PENDLEUSDT exceeded max duration
+2025-09-11 01:54:22,870 - INFO - [__main__]    PnL: $-0.09, Breakeven: $5.4944
+2025-09-11 01:54:22,870 - INFO - [__main__]    Breakeven order already exists for PENDLEUSDT
+2025-09-11 01:54:22,870 - WARNING - [__main__] ⏰ Bybit INJUSDT exceeded max duration
+2025-09-11 01:54:22,870 - INFO - [__main__]    PnL: $-0.49, Breakeven: $14.3933
+2025-09-11 01:54:22,870 - INFO - [__main__]    Breakeven order already exists for INJUSDT
+2025-09-11 01:54:22,870 - WARNING - [__main__] ⏰ Bybit PRIMEUSDT exceeded max duration
+2025-09-11 01:54:22,870 - INFO - [__main__]    PnL: $-0.01, Breakeven: $1.9614
+2025-09-11 01:54:22,870 - INFO - [__main__]    Breakeven order already exists for PRIMEUSDT
+2025-09-11 01:54:22,870 - WARNING - [__main__] ⏰ Bybit BLURUSDT exceeded max duration
+2025-09-11 01:54:22,870 - INFO - [__main__]    PnL: $0.40, Breakeven: $0.0735
+2025-09-11 01:54:22,870 - INFO - [__main__]    Closing profitable/breakeven position BLURUSDT by market order
+2025-09-11 01:54:22,871 - WARNING - [__main__] ⏰ Bybit HMSTRUSDT exceeded max duration
+2025-09-11 01:54:22,871 - INFO - [__main__]    PnL: $-1.41, Breakeven: $0.0008
+2025-09-11 01:54:22,871 - INFO - [__main__]    Breakeven order already exists for HMSTRUSDT
+2025-09-11 01:54:22,871 - WARNING - [__main__] ⏰ Bybit ORDIUSDT exceeded max duration
+2025-09-11 01:54:22,871 - INFO - [__main__]    PnL: $0.00, Breakeven: $9.0408
+2025-09-11 01:54:22,871 - INFO - [__main__]    Closing profitable/breakeven position ORDIUSDT by market order
+2025-09-11 01:54:22,871 - WARNING - [__main__] ⏰ Bybit BOBAUSDT exceeded max duration
+2025-09-11 01:54:22,871 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.0888
+2025-09-11 01:54:22,871 - INFO - [__main__]    Closing profitable/breakeven position BOBAUSDT by market order
+2025-09-11 01:54:22,872 - WARNING - [__main__] ⏰ Bybit SUIUSDT exceeded max duration
+2025-09-11 01:54:22,872 - INFO - [__main__]    PnL: $-0.24, Breakeven: $3.6191
+2025-09-11 01:54:22,872 - INFO - [__main__]    Breakeven order already exists for SUIUSDT
+2025-09-11 01:54:22,872 - WARNING - [__main__] ⏰ Bybit SOSOUSDT exceeded max duration
+2025-09-11 01:54:22,872 - INFO - [__main__]    PnL: $0.01, Breakeven: $0.6131
+2025-09-11 01:54:22,872 - INFO - [__main__]    Closing profitable/breakeven position SOSOUSDT by market order
+2025-09-11 01:54:23,345 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:54:23,598 - INFO - [exchanges.bybit] Position close order created for BLURUSDT: 92882c68-e782-4f03-a325-74039d3a109a
+2025-09-11 01:54:23,598 - WARNING - [__main__] ⏰ Bybit 1000000BABYDOGEUSDT exceeded max duration
+2025-09-11 01:54:23,598 - INFO - [__main__]    PnL: $-1.39, Breakeven: $0.0012
+2025-09-11 01:54:23,598 - INFO - [__main__]    Breakeven order already exists for 1000000BABYDOGEUSDT
+2025-09-11 01:54:23,598 - WARNING - [__main__] ⏰ Bybit SHIB1000USDT exceeded max duration
+2025-09-11 01:54:23,598 - INFO - [__main__]    PnL: $20.60, Breakeven: $0.0058
+2025-09-11 01:54:23,598 - INFO - [__main__]    Closing profitable/breakeven position SHIB1000USDT by market order
+2025-09-11 01:54:23,606 - INFO - [exchanges.bybit] Position close order created for SOSOUSDT: 283288f8-c07c-4a19-93ce-5a9fe8ee26cf
+2025-09-11 01:54:23,606 - WARNING - [__main__] ⏰ Bybit COREUSDT exceeded max duration
+2025-09-11 01:54:23,606 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.4143
+2025-09-11 01:54:23,606 - INFO - [__main__]    Closing profitable/breakeven position COREUSDT by market order
+2025-09-11 01:54:24,100 - INFO - [exchanges.bybit] Position close order created for ORDIUSDT: ad70f21e-1c92-4792-8d31-6559df3d1590
+2025-09-11 01:54:24,101 - WARNING - [__main__] ⏰ Bybit DOGUSDT exceeded max duration
+2025-09-11 01:54:24,101 - INFO - [__main__]    PnL: $-0.10, Breakeven: $0.0022
+2025-09-11 01:54:24,101 - INFO - [__main__]    Breakeven order already exists for DOGUSDT
+2025-09-11 01:54:24,101 - WARNING - [__main__] ⏰ Bybit CELRUSDT exceeded max duration
+2025-09-11 01:54:24,101 - INFO - [__main__]    PnL: $-59.83, Breakeven: $0.0066
+2025-09-11 01:54:24,101 - INFO - [__main__]    Breakeven order already exists for CELRUSDT
+2025-09-11 01:54:24,102 - WARNING - [__main__] ⏰ Bybit BEAMUSDT exceeded max duration
+2025-09-11 01:54:24,102 - INFO - [__main__]    PnL: $0.83, Breakeven: $0.0072
+2025-09-11 01:54:24,102 - INFO - [__main__]    Closing profitable/breakeven position BEAMUSDT by market order
+2025-09-11 01:54:24,145 - INFO - [exchanges.bybit] Position close order created for COREUSDT: 16541d7e-1b65-4855-ad2b-fe2f0b539b4e
+2025-09-11 01:54:24,145 - WARNING - [__main__] ⏰ Bybit WAVESUSDT exceeded max duration
+2025-09-11 01:54:24,145 - INFO - [__main__]    PnL: $-0.44, Breakeven: $1.1360
+2025-09-11 01:54:24,146 - INFO - [__main__]    Setting breakeven limit order for WAVESUSDT
+2025-09-11 01:54:24,174 - WARNING - [exchanges.bybit] Attempt 1 to set TS for BAKEUSDT failed. Retrying...
+2025-09-11 01:54:24,412 - INFO - [exchanges.bybit] All orders cancelled for WAVESUSDT
+2025-09-11 01:54:24,439 - INFO - [exchanges.bybit] Position close order created for BOBAUSDT: b67f9a37-5adb-426b-9b36-b76976bb6691
+2025-09-11 01:54:24,439 - WARNING - [__main__] ⏰ Bybit RAYDIUMUSDT exceeded max duration
+2025-09-11 01:54:24,439 - INFO - [__main__]    PnL: $0.00, Breakeven: $3.1932
+2025-09-11 01:54:24,439 - INFO - [__main__]    Closing profitable/breakeven position RAYDIUMUSDT by market order
+2025-09-11 01:54:24,637 - INFO - [exchanges.bybit] Position close order created for BEAMUSDT: f7e6217f-6a6c-4c41-b0ec-58d614a40acd
+2025-09-11 01:54:24,638 - WARNING - [__main__] ⏰ Bybit TAIUSDT exceeded max duration
+2025-09-11 01:54:24,638 - INFO - [__main__]    PnL: $0.06, Breakeven: $0.0622
+2025-09-11 01:54:24,638 - INFO - [__main__]    Closing profitable/breakeven position TAIUSDT by market order
+2025-09-11 01:54:24,651 - INFO - [exchanges.bybit] Position close order created for SHIB1000USDT: 46fadd4a-7dfa-4892-8db6-b742c359fbe5
+2025-09-11 01:54:24,978 - INFO - [exchanges.bybit] Position close order created for RAYDIUMUSDT: 0a48278a-9066-465e-9c83-8e9fddc82564
+2025-09-11 01:54:25,028 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:54:25,274 - INFO - [exchanges.bybit] ✅ Trailing stop set for BAKEUSDT
+2025-09-11 01:54:25,274 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT missing STOP LOSS (backup)
+2025-09-11 01:54:25,342 - INFO - [exchanges.bybit] Position close order created for TAIUSDT: e5e20702-1bb6-4a88-acc1-4bb046131c1b
+2025-09-11 01:54:25,540 - INFO - [exchanges.bybit] ✅ Stop loss set for BAKEUSDT at 0.059624949999999996
+2025-09-11 01:54:25,540 - INFO - [__main__] ✅ Protected Bybit position: BAKEUSDT
+2025-09-11 01:54:28,148 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:54:32,282 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:54:35,783 - ERROR - [exchanges.binance] ❌ Failed to set Stop Loss for BIDUSDT after multiple attempts.
+2025-09-11 01:55:05,784 - INFO - [__main__] === Protection Check #3 ===
+2025-09-11 01:55:06,860 - INFO - [__main__] Found 19 Bybit positions
+2025-09-11 01:55:06,889 - INFO - [__main__] Found 8 Binance positions
+2025-09-11 01:55:07,636 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT missing TRAILING STOP
+2025-09-11 01:55:07,637 - WARNING - [__main__] ⏰ Bybit PENDLEUSDT exceeded max duration
+2025-09-11 01:55:07,637 - INFO - [__main__]    PnL: $-0.09, Breakeven: $5.4944
+2025-09-11 01:55:07,637 - INFO - [__main__]    Breakeven order already exists for PENDLEUSDT
+2025-09-11 01:55:07,638 - WARNING - [__main__] ⏰ Bybit INJUSDT exceeded max duration
+2025-09-11 01:55:07,638 - INFO - [__main__]    PnL: $-0.49, Breakeven: $14.3933
+2025-09-11 01:55:07,638 - INFO - [__main__]    Breakeven order already exists for INJUSDT
+2025-09-11 01:55:07,638 - WARNING - [__main__] ⏰ Bybit PRIMEUSDT exceeded max duration
+2025-09-11 01:55:07,638 - INFO - [__main__]    PnL: $-0.02, Breakeven: $1.9614
+2025-09-11 01:55:07,638 - INFO - [__main__]    Breakeven order already exists for PRIMEUSDT
+2025-09-11 01:55:07,638 - WARNING - [__main__] ⏰ Bybit BLURUSDT exceeded max duration
+2025-09-11 01:55:07,638 - INFO - [__main__]    PnL: $0.40, Breakeven: $0.0735
+2025-09-11 01:55:07,638 - INFO - [__main__]    Closing profitable/breakeven position BLURUSDT by market order
+2025-09-11 01:55:07,639 - WARNING - [__main__] ⏰ Bybit HMSTRUSDT exceeded max duration
+2025-09-11 01:55:07,639 - INFO - [__main__]    PnL: $-1.41, Breakeven: $0.0008
+2025-09-11 01:55:07,639 - INFO - [__main__]    Breakeven order already exists for HMSTRUSDT
+2025-09-11 01:55:07,639 - WARNING - [__main__] ⏰ Bybit ORDIUSDT exceeded max duration
+2025-09-11 01:55:07,639 - INFO - [__main__]    PnL: $0.00, Breakeven: $9.0408
+2025-09-11 01:55:07,639 - INFO - [__main__]    Closing profitable/breakeven position ORDIUSDT by market order
+2025-09-11 01:55:07,639 - WARNING - [__main__] ⏰ Bybit BOBAUSDT exceeded max duration
+2025-09-11 01:55:07,639 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.0888
+2025-09-11 01:55:07,639 - INFO - [__main__]    Closing profitable/breakeven position BOBAUSDT by market order
+2025-09-11 01:55:07,640 - WARNING - [__main__] ⏰ Bybit SUIUSDT exceeded max duration
+2025-09-11 01:55:07,640 - INFO - [__main__]    PnL: $-0.22, Breakeven: $3.6191
+2025-09-11 01:55:07,640 - INFO - [__main__]    Breakeven order already exists for SUIUSDT
+2025-09-11 01:55:07,640 - WARNING - [__main__] ⏰ Bybit SOSOUSDT exceeded max duration
+2025-09-11 01:55:07,640 - INFO - [__main__]    PnL: $0.01, Breakeven: $0.6131
+2025-09-11 01:55:07,640 - INFO - [__main__]    Closing profitable/breakeven position SOSOUSDT by market order
+2025-09-11 01:55:07,707 - WARNING - [__main__] ⚠️ Binance BIDUSDT missing STOP LOSS (backup)
+2025-09-11 01:55:08,702 - INFO - [exchanges.bybit] Position close order created for SOSOUSDT: 2a19d48b-295a-4bc0-9351-40ae24c64dc4
+2025-09-11 01:55:08,703 - WARNING - [__main__] ⏰ Bybit 1000000BABYDOGEUSDT exceeded max duration
+2025-09-11 01:55:08,703 - INFO - [__main__]    PnL: $-1.38, Breakeven: $0.0012
+2025-09-11 01:55:08,703 - INFO - [__main__]    Breakeven order already exists for 1000000BABYDOGEUSDT
+2025-09-11 01:55:08,703 - WARNING - [__main__] ⏰ Bybit SHIB1000USDT exceeded max duration
+2025-09-11 01:55:08,703 - INFO - [__main__]    PnL: $20.25, Breakeven: $0.0058
+2025-09-11 01:55:08,703 - INFO - [__main__]    Closing profitable/breakeven position SHIB1000USDT by market order
+2025-09-11 01:55:08,866 - INFO - [exchanges.bybit] Position close order created for ORDIUSDT: 71ccc2da-fe41-4329-87e3-b9b282231245
+2025-09-11 01:55:08,866 - WARNING - [__main__] ⏰ Bybit COREUSDT exceeded max duration
+2025-09-11 01:55:08,866 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.4143
+2025-09-11 01:55:08,866 - INFO - [__main__]    Closing profitable/breakeven position COREUSDT by market order
+2025-09-11 01:55:08,871 - INFO - [exchanges.bybit] Position close order created for BLURUSDT: 58cc0f2c-b9a5-460c-96ff-c12288458c15
+2025-09-11 01:55:08,871 - WARNING - [__main__] ⏰ Bybit DOGUSDT exceeded max duration
+2025-09-11 01:55:08,871 - INFO - [__main__]    PnL: $-0.10, Breakeven: $0.0022
+2025-09-11 01:55:08,871 - INFO - [__main__]    Breakeven order already exists for DOGUSDT
+2025-09-11 01:55:08,871 - WARNING - [__main__] ⏰ Bybit CELRUSDT exceeded max duration
+2025-09-11 01:55:08,871 - INFO - [__main__]    PnL: $-58.87, Breakeven: $0.0066
+2025-09-11 01:55:08,871 - INFO - [__main__]    Breakeven order already exists for CELRUSDT
+2025-09-11 01:55:08,871 - WARNING - [__main__] ⏰ Bybit BEAMUSDT exceeded max duration
+2025-09-11 01:55:08,872 - INFO - [__main__]    PnL: $0.83, Breakeven: $0.0072
+2025-09-11 01:55:08,872 - INFO - [__main__]    Closing profitable/breakeven position BEAMUSDT by market order
+2025-09-11 01:55:08,941 - INFO - [exchanges.bybit] ✅ Trailing stop set for BAKEUSDT
+2025-09-11 01:55:08,941 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT missing STOP LOSS (backup)
+2025-09-11 01:55:09,204 - INFO - [exchanges.bybit] Position close order created for BOBAUSDT: e9da5320-fefe-4027-aa41-cd725c1447de
+2025-09-11 01:55:09,204 - WARNING - [__main__] ⏰ Bybit WAVESUSDT exceeded max duration
+2025-09-11 01:55:09,204 - INFO - [__main__]    PnL: $-0.44, Breakeven: $1.1360
+2025-09-11 01:55:09,204 - INFO - [__main__]    Breakeven order already exists for WAVESUSDT
+2025-09-11 01:55:09,204 - WARNING - [__main__] ⏰ Bybit RAYDIUMUSDT exceeded max duration
+2025-09-11 01:55:09,204 - INFO - [__main__]    PnL: $0.00, Breakeven: $3.1932
+2025-09-11 01:55:09,204 - INFO - [__main__]    Closing profitable/breakeven position RAYDIUMUSDT by market order
+2025-09-11 01:55:09,336 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:55:09,407 - INFO - [exchanges.bybit] Position close order created for SHIB1000USDT: 540633cf-a8e2-485b-93dc-c454c5d6efd7
+2025-09-11 01:55:09,408 - WARNING - [__main__] ⏰ Bybit TAIUSDT exceeded max duration
+2025-09-11 01:55:09,408 - INFO - [__main__]    PnL: $0.08, Breakeven: $0.0622
+2025-09-11 01:55:09,408 - INFO - [__main__]    Closing profitable/breakeven position TAIUSDT by market order
+2025-09-11 01:55:09,545 - INFO - [exchanges.bybit] ✅ Stop loss set for BAKEUSDT at 0.059624949999999996
+2025-09-11 01:55:09,546 - INFO - [__main__] ✅ Protected Bybit position: BAKEUSDT
+2025-09-11 01:55:09,734 - INFO - [exchanges.bybit] Position close order created for COREUSDT: fb3f69bb-d8e8-4fa2-bb50-46245eee82bf
+2025-09-11 01:55:09,912 - INFO - [exchanges.bybit] Position close order created for RAYDIUMUSDT: ad7b8de5-2226-4b64-8ed7-f0a3f344c9db
+2025-09-11 01:55:09,912 - INFO - [exchanges.bybit] Position close order created for BEAMUSDT: 47a0a419-d249-4fe6-997a-449241e88354
+2025-09-11 01:55:10,449 - INFO - [exchanges.bybit] Position close order created for TAIUSDT: 61ffcef2-71b0-426f-809b-cb49f3202096
+2025-09-11 01:55:11,479 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:55:14,612 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:55:18,737 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:55:22,239 - ERROR - [exchanges.binance] ❌ Failed to set Stop Loss for BIDUSDT after multiple attempts.
+2025-09-11 01:55:52,241 - INFO - [__main__] === Protection Check #4 ===
+2025-09-11 01:55:53,207 - INFO - [__main__] Found 19 Bybit positions
+2025-09-11 01:55:53,351 - INFO - [__main__] Found 8 Binance positions
+2025-09-11 01:55:53,983 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT missing TRAILING STOP
+2025-09-11 01:55:53,984 - WARNING - [__main__] ⏰ Bybit PENDLEUSDT exceeded max duration
+2025-09-11 01:55:53,984 - INFO - [__main__]    PnL: $-0.09, Breakeven: $5.4944
+2025-09-11 01:55:53,984 - INFO - [__main__]    Breakeven order already exists for PENDLEUSDT
+2025-09-11 01:55:53,984 - WARNING - [__main__] ⏰ Bybit INJUSDT exceeded max duration
+2025-09-11 01:55:53,984 - INFO - [__main__]    PnL: $-0.49, Breakeven: $14.3933
+2025-09-11 01:55:53,984 - INFO - [__main__]    Breakeven order already exists for INJUSDT
+2025-09-11 01:55:53,984 - WARNING - [__main__] ⏰ Bybit PRIMEUSDT exceeded max duration
+2025-09-11 01:55:53,985 - INFO - [__main__]    PnL: $-0.02, Breakeven: $1.9614
+2025-09-11 01:55:53,985 - INFO - [__main__]    Breakeven order already exists for PRIMEUSDT
+2025-09-11 01:55:53,985 - WARNING - [__main__] ⏰ Bybit BLURUSDT exceeded max duration
+2025-09-11 01:55:53,985 - INFO - [__main__]    PnL: $0.40, Breakeven: $0.0735
+2025-09-11 01:55:53,985 - INFO - [__main__]    Closing profitable/breakeven position BLURUSDT by market order
+2025-09-11 01:55:53,985 - WARNING - [__main__] ⏰ Bybit HMSTRUSDT exceeded max duration
+2025-09-11 01:55:53,985 - INFO - [__main__]    PnL: $-1.42, Breakeven: $0.0008
+2025-09-11 01:55:53,985 - INFO - [__main__]    Breakeven order already exists for HMSTRUSDT
+2025-09-11 01:55:53,985 - WARNING - [__main__] ⏰ Bybit ORDIUSDT exceeded max duration
+2025-09-11 01:55:53,985 - INFO - [__main__]    PnL: $0.00, Breakeven: $9.0408
+2025-09-11 01:55:53,985 - INFO - [__main__]    Closing profitable/breakeven position ORDIUSDT by market order
+2025-09-11 01:55:53,986 - WARNING - [__main__] ⏰ Bybit BOBAUSDT exceeded max duration
+2025-09-11 01:55:53,986 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.0888
+2025-09-11 01:55:53,986 - INFO - [__main__]    Closing profitable/breakeven position BOBAUSDT by market order
+2025-09-11 01:55:53,986 - WARNING - [__main__] ⏰ Bybit SUIUSDT exceeded max duration
+2025-09-11 01:55:53,986 - INFO - [__main__]    PnL: $-0.21, Breakeven: $3.6191
+2025-09-11 01:55:53,986 - INFO - [__main__]    Breakeven order already exists for SUIUSDT
+2025-09-11 01:55:53,986 - WARNING - [__main__] ⏰ Bybit SOSOUSDT exceeded max duration
+2025-09-11 01:55:53,986 - INFO - [__main__]    PnL: $0.02, Breakeven: $0.6131
+2025-09-11 01:55:53,986 - INFO - [__main__]    Closing profitable/breakeven position SOSOUSDT by market order
+2025-09-11 01:55:54,165 - WARNING - [__main__] ⚠️ Binance BIDUSDT missing STOP LOSS (backup)
+2025-09-11 01:55:55,051 - INFO - [exchanges.bybit] Position close order created for ORDIUSDT: dd751f7b-a9d4-4187-8c53-a2663261c79a
+2025-09-11 01:55:55,051 - WARNING - [__main__] ⏰ Bybit 1000000BABYDOGEUSDT exceeded max duration
+2025-09-11 01:55:55,051 - INFO - [__main__]    PnL: $-1.39, Breakeven: $0.0012
+2025-09-11 01:55:55,052 - INFO - [__main__]    Breakeven order already exists for 1000000BABYDOGEUSDT
+2025-09-11 01:55:55,052 - WARNING - [__main__] ⏰ Bybit SHIB1000USDT exceeded max duration
+2025-09-11 01:55:55,052 - INFO - [__main__]    PnL: $20.25, Breakeven: $0.0058
+2025-09-11 01:55:55,052 - INFO - [__main__]    Closing profitable/breakeven position SHIB1000USDT by market order
+2025-09-11 01:55:55,219 - INFO - [exchanges.bybit] Position close order created for SOSOUSDT: 07f3be3e-8b17-42ff-af02-37a6739b09e0
+2025-09-11 01:55:55,220 - WARNING - [__main__] ⏰ Bybit COREUSDT exceeded max duration
+2025-09-11 01:55:55,220 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.4143
+2025-09-11 01:55:55,220 - INFO - [__main__]    Closing profitable/breakeven position COREUSDT by market order
+2025-09-11 01:55:55,291 - WARNING - [exchanges.bybit] Attempt 1 to set TS for BAKEUSDT failed. Retrying...
+2025-09-11 01:55:55,551 - INFO - [exchanges.bybit] Position close order created for BLURUSDT: 483a5136-8ec4-461b-ba34-a1e5589c04f5
+2025-09-11 01:55:55,552 - WARNING - [__main__] ⏰ Bybit DOGUSDT exceeded max duration
+2025-09-11 01:55:55,552 - INFO - [__main__]    PnL: $-0.10, Breakeven: $0.0022
+2025-09-11 01:55:55,552 - INFO - [__main__]    Breakeven order already exists for DOGUSDT
+2025-09-11 01:55:55,552 - WARNING - [__main__] ⏰ Bybit CELRUSDT exceeded max duration
+2025-09-11 01:55:55,552 - INFO - [__main__]    PnL: $-59.28, Breakeven: $0.0066
+2025-09-11 01:55:55,553 - INFO - [__main__]    Breakeven order already exists for CELRUSDT
+2025-09-11 01:55:55,553 - INFO - [exchanges.bybit] Position close order created for BOBAUSDT: 5ae9baa1-851c-43e3-b91d-3c4842b1076a
+2025-09-11 01:55:55,553 - WARNING - [__main__] ⏰ Bybit BEAMUSDT exceeded max duration
+2025-09-11 01:55:55,553 - INFO - [__main__]    PnL: $0.83, Breakeven: $0.0072
+2025-09-11 01:55:55,553 - INFO - [__main__]    Closing profitable/breakeven position BEAMUSDT by market order
+2025-09-11 01:55:55,554 - WARNING - [__main__] ⏰ Bybit WAVESUSDT exceeded max duration
+2025-09-11 01:55:55,554 - INFO - [__main__]    PnL: $-0.44, Breakeven: $1.1360
+2025-09-11 01:55:55,554 - INFO - [__main__]    Breakeven order already exists for WAVESUSDT
+2025-09-11 01:55:55,554 - WARNING - [__main__] ⏰ Bybit RAYDIUMUSDT exceeded max duration
+2025-09-11 01:55:55,555 - INFO - [__main__]    PnL: $0.00, Breakeven: $3.1932
+2025-09-11 01:55:55,555 - INFO - [__main__]    Closing profitable/breakeven position RAYDIUMUSDT by market order
+2025-09-11 01:55:55,586 - INFO - [exchanges.bybit] Position close order created for SHIB1000USDT: 85d03248-636b-4835-a06d-6a130436e26b
+2025-09-11 01:55:55,587 - WARNING - [__main__] ⏰ Bybit TAIUSDT exceeded max duration
+2025-09-11 01:55:55,587 - INFO - [__main__]    PnL: $0.08, Breakeven: $0.0622
+2025-09-11 01:55:55,587 - INFO - [__main__]    Closing profitable/breakeven position TAIUSDT by market order
+2025-09-11 01:55:55,803 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:55:56,124 - INFO - [exchanges.bybit] Position close order created for TAIUSDT: 323f6bd9-893f-4b88-b4d7-cb4064da88f4
+2025-09-11 01:55:56,254 - INFO - [exchanges.bybit] Position close order created for COREUSDT: cb381c62-3b8c-4d05-9fc2-c4cde5a44c94
+2025-09-11 01:55:56,261 - INFO - [exchanges.bybit] Position close order created for BEAMUSDT: 7512268f-b0cb-4639-b31e-9ad3fbc93a1d
+2025-09-11 01:55:56,394 - INFO - [exchanges.bybit] ✅ Trailing stop set for BAKEUSDT
+2025-09-11 01:55:56,394 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT missing STOP LOSS (backup)
+2025-09-11 01:55:56,596 - INFO - [exchanges.bybit] Position close order created for RAYDIUMUSDT: 25306e43-f381-4ffe-a1e5-f5eeb51526cf
+2025-09-11 01:55:56,659 - INFO - [exchanges.bybit] ✅ Stop loss set for BAKEUSDT at 0.059624949999999996
+2025-09-11 01:55:56,660 - INFO - [__main__] ✅ Protected Bybit position: BAKEUSDT
+2025-09-11 01:55:57,925 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:56:00,584 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:56:04,237 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:56:07,739 - ERROR - [exchanges.binance] ❌ Failed to set Stop Loss for BIDUSDT after multiple attempts.
+2025-09-11 01:56:37,741 - INFO - [__main__] === Protection Check #5 ===
+2025-09-11 01:56:38,805 - INFO - [__main__] Found 19 Bybit positions
+2025-09-11 01:56:38,857 - INFO - [__main__] Found 8 Binance positions
+2025-09-11 01:56:39,576 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT missing TRAILING STOP
+2025-09-11 01:56:39,577 - WARNING - [__main__] ⏰ Bybit PENDLEUSDT exceeded max duration
+2025-09-11 01:56:39,577 - INFO - [__main__]    PnL: $-0.09, Breakeven: $5.4944
+2025-09-11 01:56:39,578 - INFO - [__main__]    Breakeven order already exists for PENDLEUSDT
+2025-09-11 01:56:39,578 - WARNING - [__main__] ⏰ Bybit INJUSDT exceeded max duration
+2025-09-11 01:56:39,578 - INFO - [__main__]    PnL: $-0.49, Breakeven: $14.3933
+2025-09-11 01:56:39,578 - INFO - [__main__]    Breakeven order already exists for INJUSDT
+2025-09-11 01:56:39,578 - WARNING - [__main__] ⏰ Bybit PRIMEUSDT exceeded max duration
+2025-09-11 01:56:39,578 - INFO - [__main__]    PnL: $-0.02, Breakeven: $1.9614
+2025-09-11 01:56:39,578 - INFO - [__main__]    Breakeven order already exists for PRIMEUSDT
+2025-09-11 01:56:39,578 - WARNING - [__main__] ⏰ Bybit BLURUSDT exceeded max duration
+2025-09-11 01:56:39,578 - INFO - [__main__]    PnL: $0.40, Breakeven: $0.0735
+2025-09-11 01:56:39,578 - INFO - [__main__]    Closing profitable/breakeven position BLURUSDT by market order
+2025-09-11 01:56:39,579 - WARNING - [__main__] ⏰ Bybit HMSTRUSDT exceeded max duration
+2025-09-11 01:56:39,579 - INFO - [__main__]    PnL: $-1.42, Breakeven: $0.0008
+2025-09-11 01:56:39,579 - INFO - [__main__]    Breakeven order already exists for HMSTRUSDT
+2025-09-11 01:56:39,579 - WARNING - [__main__] ⏰ Bybit ORDIUSDT exceeded max duration
+2025-09-11 01:56:39,579 - INFO - [__main__]    PnL: $0.00, Breakeven: $9.0408
+2025-09-11 01:56:39,579 - INFO - [__main__]    Closing profitable/breakeven position ORDIUSDT by market order
+2025-09-11 01:56:39,579 - WARNING - [__main__] ⏰ Bybit BOBAUSDT exceeded max duration
+2025-09-11 01:56:39,579 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.0888
+2025-09-11 01:56:39,579 - INFO - [__main__]    Closing profitable/breakeven position BOBAUSDT by market order
+2025-09-11 01:56:39,579 - WARNING - [__main__] ⏰ Bybit SUIUSDT exceeded max duration
+2025-09-11 01:56:39,580 - INFO - [__main__]    PnL: $-0.20, Breakeven: $3.6191
+2025-09-11 01:56:39,580 - INFO - [__main__]    Breakeven order already exists for SUIUSDT
+2025-09-11 01:56:39,580 - WARNING - [__main__] ⏰ Bybit SOSOUSDT exceeded max duration
+2025-09-11 01:56:39,580 - INFO - [__main__]    PnL: $0.01, Breakeven: $0.6131
+2025-09-11 01:56:39,580 - INFO - [__main__]    Closing profitable/breakeven position SOSOUSDT by market order
+2025-09-11 01:56:39,660 - WARNING - [__main__] ⚠️ Binance BIDUSDT missing STOP LOSS (backup)
+2025-09-11 01:56:40,646 - INFO - [exchanges.bybit] Position close order created for BOBAUSDT: 05de2c28-8d45-4f0f-beed-a9f5cc94e325
+2025-09-11 01:56:40,646 - WARNING - [__main__] ⏰ Bybit 1000000BABYDOGEUSDT exceeded max duration
+2025-09-11 01:56:40,647 - INFO - [__main__]    PnL: $-1.39, Breakeven: $0.0012
+2025-09-11 01:56:40,647 - INFO - [__main__]    Breakeven order already exists for 1000000BABYDOGEUSDT
+2025-09-11 01:56:40,647 - WARNING - [__main__] ⏰ Bybit SHIB1000USDT exceeded max duration
+2025-09-11 01:56:40,647 - INFO - [__main__]    PnL: $20.25, Breakeven: $0.0058
+2025-09-11 01:56:40,647 - INFO - [__main__]    Closing profitable/breakeven position SHIB1000USDT by market order
+2025-09-11 01:56:40,821 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:56:41,146 - INFO - [exchanges.bybit] Position close order created for ORDIUSDT: bf57b007-b35b-4488-89ea-0e58239c9f0c
+2025-09-11 01:56:41,146 - WARNING - [__main__] ⏰ Bybit COREUSDT exceeded max duration
+2025-09-11 01:56:41,146 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.4143
+2025-09-11 01:56:41,146 - INFO - [__main__]    Closing profitable/breakeven position COREUSDT by market order
+2025-09-11 01:56:41,147 - INFO - [exchanges.bybit] Position close order created for BLURUSDT: eb133c69-49ec-4d3a-8664-a044e4e0c419
+2025-09-11 01:56:41,147 - INFO - [exchanges.bybit] Position close order created for SOSOUSDT: 89219949-ae6c-4024-b721-b65d38e911a7
+2025-09-11 01:56:41,148 - WARNING - [__main__] ⏰ Bybit DOGUSDT exceeded max duration
+2025-09-11 01:56:41,148 - INFO - [__main__]    PnL: $-0.10, Breakeven: $0.0022
+2025-09-11 01:56:41,148 - INFO - [__main__]    Breakeven order already exists for DOGUSDT
+2025-09-11 01:56:41,148 - WARNING - [__main__] ⏰ Bybit CELRUSDT exceeded max duration
+2025-09-11 01:56:41,148 - INFO - [__main__]    PnL: $-59.01, Breakeven: $0.0066
+2025-09-11 01:56:41,148 - INFO - [__main__]    Breakeven order already exists for CELRUSDT
+2025-09-11 01:56:41,148 - WARNING - [__main__] ⏰ Bybit BEAMUSDT exceeded max duration
+2025-09-11 01:56:41,148 - INFO - [__main__]    PnL: $0.84, Breakeven: $0.0072
+2025-09-11 01:56:41,149 - INFO - [__main__]    Closing profitable/breakeven position BEAMUSDT by market order
+2025-09-11 01:56:41,149 - WARNING - [__main__] ⏰ Bybit WAVESUSDT exceeded max duration
+2025-09-11 01:56:41,149 - INFO - [__main__]    PnL: $-0.44, Breakeven: $1.1360
+2025-09-11 01:56:41,149 - INFO - [__main__]    Breakeven order already exists for WAVESUSDT
+2025-09-11 01:56:41,149 - WARNING - [__main__] ⏰ Bybit RAYDIUMUSDT exceeded max duration
+2025-09-11 01:56:41,149 - INFO - [__main__]    PnL: $0.00, Breakeven: $3.1932
+2025-09-11 01:56:41,149 - INFO - [__main__]    Closing profitable/breakeven position RAYDIUMUSDT by market order
+2025-09-11 01:56:41,355 - INFO - [exchanges.bybit] Position close order created for SHIB1000USDT: 7f6ff140-777e-4491-a339-8200ece33389
+2025-09-11 01:56:41,355 - WARNING - [__main__] ⏰ Bybit TAIUSDT exceeded max duration
+2025-09-11 01:56:41,355 - INFO - [__main__]    PnL: $0.08, Breakeven: $0.0622
+2025-09-11 01:56:41,356 - INFO - [__main__]    Closing profitable/breakeven position TAIUSDT by market order
+2025-09-11 01:56:41,556 - INFO - [exchanges.bybit] ✅ Trailing stop set for BAKEUSDT
+2025-09-11 01:56:41,556 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT missing STOP LOSS (backup)
+2025-09-11 01:56:41,822 - INFO - [exchanges.bybit] ✅ Stop loss set for BAKEUSDT at 0.059624949999999996
+2025-09-11 01:56:41,823 - INFO - [__main__] ✅ Protected Bybit position: BAKEUSDT
+2025-09-11 01:56:41,894 - INFO - [exchanges.bybit] Position close order created for TAIUSDT: 0f8afa43-5796-4795-9dde-ca520bab98af
+2025-09-11 01:56:42,022 - INFO - [exchanges.bybit] Position close order created for BEAMUSDT: 7e093fce-1d3f-4a64-9541-2a2bd343b48f
+2025-09-11 01:56:42,185 - INFO - [exchanges.bybit] Position close order created for COREUSDT: 40186795-d5be-46de-9cf4-b25b0ab1b7b7
+2025-09-11 01:56:42,191 - INFO - [exchanges.bybit] Position close order created for RAYDIUMUSDT: ea427d9d-4f0a-4989-b73f-da0dae9c8205
+2025-09-11 01:56:42,949 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:56:45,151 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:56:48,808 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:56:52,310 - ERROR - [exchanges.binance] ❌ Failed to set Stop Loss for BIDUSDT after multiple attempts.
+2025-09-11 01:57:22,313 - INFO - [__main__] === Protection Check #6 ===
+2025-09-11 01:57:22,942 - INFO - [__main__] Found 8 Binance positions
+2025-09-11 01:57:23,302 - INFO - [__main__] Found 19 Bybit positions
+2025-09-11 01:57:23,741 - WARNING - [__main__] ⚠️ Binance BIDUSDT missing STOP LOSS (backup)
+2025-09-11 01:57:24,075 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT missing TRAILING STOP
+2025-09-11 01:57:24,076 - WARNING - [__main__] ⏰ Bybit PENDLEUSDT exceeded max duration
+2025-09-11 01:57:24,076 - INFO - [__main__]    PnL: $-0.09, Breakeven: $5.4944
+2025-09-11 01:57:24,076 - INFO - [__main__]    Breakeven order already exists for PENDLEUSDT
+2025-09-11 01:57:24,076 - WARNING - [__main__] ⏰ Bybit INJUSDT exceeded max duration
+2025-09-11 01:57:24,076 - INFO - [__main__]    PnL: $-0.49, Breakeven: $14.3933
+2025-09-11 01:57:24,076 - INFO - [__main__]    Breakeven order already exists for INJUSDT
+2025-09-11 01:57:24,076 - WARNING - [__main__] ⏰ Bybit PRIMEUSDT exceeded max duration
+2025-09-11 01:57:24,076 - INFO - [__main__]    PnL: $-0.02, Breakeven: $1.9614
+2025-09-11 01:57:24,076 - INFO - [__main__]    Breakeven order already exists for PRIMEUSDT
+2025-09-11 01:57:24,077 - WARNING - [__main__] ⏰ Bybit BLURUSDT exceeded max duration
+2025-09-11 01:57:24,077 - INFO - [__main__]    PnL: $0.40, Breakeven: $0.0735
+2025-09-11 01:57:24,077 - INFO - [__main__]    Closing profitable/breakeven position BLURUSDT by market order
+2025-09-11 01:57:24,077 - WARNING - [__main__] ⏰ Bybit HMSTRUSDT exceeded max duration
+2025-09-11 01:57:24,077 - INFO - [__main__]    PnL: $-1.41, Breakeven: $0.0008
+2025-09-11 01:57:24,077 - INFO - [__main__]    Breakeven order already exists for HMSTRUSDT
+2025-09-11 01:57:24,077 - WARNING - [__main__] ⏰ Bybit ORDIUSDT exceeded max duration
+2025-09-11 01:57:24,077 - INFO - [__main__]    PnL: $0.00, Breakeven: $9.0408
+2025-09-11 01:57:24,077 - INFO - [__main__]    Closing profitable/breakeven position ORDIUSDT by market order
+2025-09-11 01:57:24,078 - WARNING - [__main__] ⏰ Bybit BOBAUSDT exceeded max duration
+2025-09-11 01:57:24,078 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.0888
+2025-09-11 01:57:24,078 - INFO - [__main__]    Closing profitable/breakeven position BOBAUSDT by market order
+2025-09-11 01:57:24,078 - WARNING - [__main__] ⏰ Bybit SUIUSDT exceeded max duration
+2025-09-11 01:57:24,078 - INFO - [__main__]    PnL: $-0.20, Breakeven: $3.6191
+2025-09-11 01:57:24,078 - INFO - [__main__]    Breakeven order already exists for SUIUSDT
+2025-09-11 01:57:24,078 - WARNING - [__main__] ⏰ Bybit SOSOUSDT exceeded max duration
+2025-09-11 01:57:24,078 - INFO - [__main__]    PnL: $0.02, Breakeven: $0.6131
+2025-09-11 01:57:24,078 - INFO - [__main__]    Closing profitable/breakeven position SOSOUSDT by market order
+2025-09-11 01:57:24,805 - INFO - [exchanges.bybit] Position close order created for SOSOUSDT: 328693df-7057-4826-9fa0-23eac6b3831f
+2025-09-11 01:57:24,805 - WARNING - [__main__] ⏰ Bybit 1000000BABYDOGEUSDT exceeded max duration
+2025-09-11 01:57:24,805 - INFO - [__main__]    PnL: $-1.39, Breakeven: $0.0012
+2025-09-11 01:57:24,806 - INFO - [__main__]    Breakeven order already exists for 1000000BABYDOGEUSDT
+2025-09-11 01:57:24,806 - WARNING - [__main__] ⏰ Bybit SHIB1000USDT exceeded max duration
+2025-09-11 01:57:24,806 - INFO - [__main__]    PnL: $20.77, Breakeven: $0.0058
+2025-09-11 01:57:24,806 - INFO - [__main__]    Closing profitable/breakeven position SHIB1000USDT by market order
+2025-09-11 01:57:24,879 - INFO - [exchanges.bybit] ✅ Trailing stop set for BAKEUSDT
+2025-09-11 01:57:24,879 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT missing STOP LOSS (backup)
+2025-09-11 01:57:24,893 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:57:25,144 - INFO - [exchanges.bybit] ✅ Stop loss set for BAKEUSDT at 0.059624949999999996
+2025-09-11 01:57:25,144 - INFO - [__main__] ✅ Protected Bybit position: BAKEUSDT
+2025-09-11 01:57:25,145 - WARNING - [__main__] ⏰ Bybit COREUSDT exceeded max duration
+2025-09-11 01:57:25,145 - INFO - [__main__]    PnL: $0.00, Breakeven: $0.4143
+2025-09-11 01:57:25,145 - INFO - [__main__]    Closing profitable/breakeven position COREUSDT by market order
+2025-09-11 01:57:25,302 - INFO - [exchanges.bybit] Position close order created for ORDIUSDT: df16234c-e9b9-4157-8b9b-33095aa2f8fe
+2025-09-11 01:57:25,302 - WARNING - [__main__] ⏰ Bybit DOGUSDT exceeded max duration
+2025-09-11 01:57:25,302 - INFO - [__main__]    PnL: $-0.10, Breakeven: $0.0022
+2025-09-11 01:57:25,302 - INFO - [__main__]    Breakeven order already exists for DOGUSDT
+2025-09-11 01:57:25,303 - WARNING - [__main__] ⏰ Bybit CELRUSDT exceeded max duration
+2025-09-11 01:57:25,303 - INFO - [__main__]    PnL: $-59.70, Breakeven: $0.0066
+2025-09-11 01:57:25,303 - INFO - [__main__]    Breakeven order already exists for CELRUSDT
+2025-09-11 01:57:25,303 - WARNING - [__main__] ⏰ Bybit BEAMUSDT exceeded max duration
+2025-09-11 01:57:25,303 - INFO - [__main__]    PnL: $0.83, Breakeven: $0.0072
+2025-09-11 01:57:25,303 - INFO - [__main__]    Closing profitable/breakeven position BEAMUSDT by market order
+2025-09-11 01:57:25,312 - INFO - [exchanges.bybit] Position close order created for BLURUSDT: 1c1096c7-60d3-4ef0-a643-de00d50ff2e1
+2025-09-11 01:57:25,312 - WARNING - [__main__] ⏰ Bybit WAVESUSDT exceeded max duration
+2025-09-11 01:57:25,313 - INFO - [__main__]    PnL: $-0.46, Breakeven: $1.1360
+2025-09-11 01:57:25,313 - INFO - [__main__]    Breakeven order already exists for WAVESUSDT
+2025-09-11 01:57:25,313 - WARNING - [__main__] ⏰ Bybit RAYDIUMUSDT exceeded max duration
+2025-09-11 01:57:25,313 - INFO - [__main__]    PnL: $0.00, Breakeven: $3.1932
+2025-09-11 01:57:25,313 - INFO - [__main__]    Closing profitable/breakeven position RAYDIUMUSDT by market order
+2025-09-11 01:57:25,509 - INFO - [exchanges.bybit] Position close order created for SHIB1000USDT: 375839c9-d928-42fe-8e2b-77cfb94bb9ec
+2025-09-11 01:57:25,509 - WARNING - [__main__] ⏰ Bybit TAIUSDT exceeded max duration
+2025-09-11 01:57:25,509 - INFO - [__main__]    PnL: $0.08, Breakeven: $0.0622
+2025-09-11 01:57:25,509 - INFO - [__main__]    Closing profitable/breakeven position TAIUSDT by market order
+2025-09-11 01:57:25,644 - INFO - [exchanges.bybit] Position close order created for BOBAUSDT: cc034754-c815-48a6-8980-33d35cfe962c
+2025-09-11 01:57:26,009 - INFO - [exchanges.bybit] Position close order created for BEAMUSDT: 7b2c8b70-822d-462d-8825-504f05a071d4
+2025-09-11 01:57:26,366 - INFO - [exchanges.bybit] Position close order created for RAYDIUMUSDT: 8bd977e8-8af9-4c8e-82f7-802ee060b76b
+2025-09-11 01:57:26,377 - INFO - [exchanges.bybit] Position close order created for TAIUSDT: 50fc9a01-d844-4da9-843c-a0a09b46a704
+2025-09-11 01:57:26,563 - INFO - [exchanges.bybit] Position close order created for COREUSDT: 9b262d89-5e2c-4f6b-98be-c9dfa96ba2ff
+2025-09-11 01:57:27,019 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:57:29,667 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:57:33,786 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 01:57:37,288 - ERROR - [exchanges.binance] ❌ Failed to set Stop Loss for BIDUSDT after multiple attempts.
+2025-09-11 02:01:03,693 - INFO - [__main__] ============================================================
+2025-09-11 02:01:03,693 - INFO - [__main__] Protection Monitor Configuration
+2025-09-11 02:01:03,693 - INFO - [__main__] Check Interval: 30 seconds
+2025-09-11 02:01:03,693 - INFO - [__main__] ============================================================
+2025-09-11 02:01:03,693 - INFO - [__main__] 🚀 Starting Protection Monitor vtor
+2025-09-11 02:01:05,430 - INFO - [exchanges.binance] Binance testnet initialized
+2025-09-11 02:01:05,431 - INFO - [exchanges.binance] Loaded 531 active perpetual contracts
+2025-09-11 02:01:05,431 - INFO - [exchanges.binance] ✅ PUFFERUSDT found in exchange info
+2025-09-11 02:01:05,431 - INFO - [exchanges.binance] ✅ SKATEUSDT found in exchange info
+2025-09-11 02:01:06,253 - INFO - [__main__] ✅ Binance connected - Balance: $876.34
+2025-09-11 02:01:08,984 - INFO - [exchanges.bybit] Bybit testnet initialized
+2025-09-11 02:01:08,985 - INFO - [exchanges.bybit] Position mode: one-way
+2025-09-11 02:01:08,985 - INFO - [exchanges.bybit] Loaded 616 active symbols
+2025-09-11 02:01:09,587 - INFO - [__main__] ✅ Bybit connected - Balance: $9877.89
+2025-09-11 02:01:09,587 - INFO - [__main__] === Protection Check #1 ===
+2025-09-11 02:01:10,363 - INFO - [__main__] Found 19 Bybit positions to check
+2025-09-11 02:01:10,465 - INFO - [__main__] Found 8 Binance positions to check
+2025-09-11 02:01:10,798 - WARNING - [__main__] ⚠️ Binance BIDUSDT has Trailing Stop but is missing backup SL. Setting it now.
+2025-09-11 02:01:10,800 - WARNING - [__main__] ⏰ BinanceExchange BNBUSDT exceeded max duration
+2025-09-11 02:01:10,800 - INFO - [__main__]    PnL: $-0.57
+2025-09-11 02:01:10,800 - INFO - [__main__]    Setting breakeven limit order for BNBUSDT at $950.6294
+2025-09-11 02:01:10,800 - ERROR - [__main__] Failed to handle duration limit for BNBUSDT: 'BinanceExchange' object has no attribute 'cancel_all_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 113, in _handle_position_duration_limit
+    await exchange.cancel_all_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceExchange' object has no attribute 'cancel_all_orders'. Did you mean: 'cancel_all_open_orders'?
+2025-09-11 02:01:10,803 - WARNING - [__main__] ⏰ BinanceExchange LITUSDT exceeded max duration
+2025-09-11 02:01:10,803 - INFO - [__main__]    PnL: $1.09
+2025-09-11 02:01:10,803 - INFO - [__main__]    Closing profitable/breakeven position LITUSDT by market order
+2025-09-11 02:01:10,803 - WARNING - [__main__] ⏰ BinanceExchange BALUSDT exceeded max duration
+2025-09-11 02:01:10,803 - INFO - [__main__]    PnL: $1.10
+2025-09-11 02:01:10,803 - INFO - [__main__]    Closing profitable/breakeven position BALUSDT by market order
+2025-09-11 02:01:10,804 - WARNING - [__main__] ⏰ BinanceExchange BTCUSDT exceeded max duration
+2025-09-11 02:01:10,804 - INFO - [__main__]    PnL: $0.24
+2025-09-11 02:01:10,804 - INFO - [__main__]    Closing profitable/breakeven position BTCUSDT by market order
+2025-09-11 02:01:11,135 - WARNING - [__main__] ⚠️ BybitExchange BAKEUSDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:11,136 - WARNING - [__main__] ⚠️ BybitExchange PENDLEUSDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:11,137 - WARNING - [__main__] ⚠️ BybitExchange INJUSDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:11,137 - WARNING - [__main__] ⚠️ BybitExchange PRIMEUSDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:11,137 - WARNING - [__main__] ⚠️ BybitExchange BLURUSDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:11,965 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 02:01:12,137 - INFO - [exchanges.bybit] ✅ Trailing stop set for BLURUSDT
+2025-09-11 02:01:12,450 - WARNING - [exchanges.bybit] Attempt 1 to set TS for BAKEUSDT failed. Retrying...
+2025-09-11 02:01:12,641 - WARNING - [exchanges.bybit] Attempt 1 to set TS for PENDLEUSDT failed. Retrying...
+2025-09-11 02:01:12,736 - INFO - [exchanges.bybit] ✅ Stop loss set for BLURUSDT at 0.06865171115
+2025-09-11 02:01:12,737 - INFO - [__main__] ✅ Fully protected BybitExchange position with TS+SL: BLURUSDT
+2025-09-11 02:01:12,737 - WARNING - [__main__] ⏰ BybitExchange BLURUSDT exceeded max duration
+2025-09-11 02:01:12,737 - INFO - [__main__]    PnL: $0.40
+2025-09-11 02:01:12,737 - INFO - [__main__]    Closing profitable/breakeven position BLURUSDT by market order
+2025-09-11 02:01:12,985 - WARNING - [exchanges.bybit] Attempt 1 to set TS for PRIMEUSDT failed. Retrying...
+2025-09-11 02:01:12,995 - WARNING - [exchanges.bybit] Attempt 1 to set TS for INJUSDT failed. Retrying...
+2025-09-11 02:01:13,217 - INFO - [exchanges.bybit] ✅ Trailing stop set for BAKEUSDT
+2025-09-11 02:01:13,415 - INFO - [exchanges.bybit] ✅ Trailing stop set for PENDLEUSDT
+2025-09-11 02:01:13,463 - INFO - [exchanges.binance] Order 36442096 filled: 14.9 LITUSDT @ 0.669
+2025-09-11 02:01:13,464 - INFO - [exchanges.binance] Order 5645559256 filled: 0.001 BTCUSDT @ 113777.0
+2025-09-11 02:01:13,466 - INFO - [exchanges.binance] Order 55407270 filled: 9.0 BALUSDT @ 1.11
+2025-09-11 02:01:13,484 - INFO - [exchanges.bybit] ✅ Stop loss set for BAKEUSDT at 0.059624949999999996
+2025-09-11 02:01:13,484 - INFO - [__main__] ✅ Fully protected BybitExchange position with TS+SL: BAKEUSDT
+2025-09-11 02:01:13,485 - WARNING - [__main__] ⚠️ BybitExchange HMSTRUSDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:13,623 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 02:01:13,750 - INFO - [exchanges.bybit] ✅ Trailing stop set for PRIMEUSDT
+2025-09-11 02:01:13,762 - INFO - [exchanges.bybit] ✅ Trailing stop set for INJUSDT
+2025-09-11 02:01:14,019 - WARNING - [exchanges.bybit] Attempt 1 to set SL for PRIMEUSDT failed. Retrying...
+2025-09-11 02:01:14,019 - WARNING - [exchanges.bybit] Attempt 1 to set SL for PENDLEUSDT failed. Retrying...
+2025-09-11 02:01:14,029 - WARNING - [exchanges.bybit] Attempt 1 to set SL for INJUSDT failed. Retrying...
+2025-09-11 02:01:14,118 - INFO - [exchanges.bybit] Position close order created for BLURUSDT: e30e277a-af9a-4fb9-afe8-1f99d4ecad3c
+2025-09-11 02:01:14,118 - WARNING - [__main__] ⚠️ BybitExchange ORDIUSDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:14,292 - WARNING - [exchanges.bybit] Attempt 1 to set TS for HMSTRUSDT failed. Retrying...
+2025-09-11 02:01:14,786 - INFO - [exchanges.bybit] ✅ Stop loss set for PRIMEUSDT at 1.831665
+2025-09-11 02:01:14,787 - INFO - [__main__] ✅ Fully protected BybitExchange position with TS+SL: PRIMEUSDT
+2025-09-11 02:01:14,787 - WARNING - [__main__] ⏰ BybitExchange PRIMEUSDT exceeded max duration
+2025-09-11 02:01:14,787 - INFO - [__main__]    PnL: $-0.02
+2025-09-11 02:01:14,787 - INFO - [__main__]    Setting breakeven limit order for PRIMEUSDT at $1.9614
+2025-09-11 02:01:14,789 - INFO - [exchanges.bybit] ✅ Stop loss set for PENDLEUSDT at 5.131093
+2025-09-11 02:01:14,789 - INFO - [__main__] ✅ Fully protected BybitExchange position with TS+SL: PENDLEUSDT
+2025-09-11 02:01:14,789 - WARNING - [__main__] ⏰ BybitExchange PENDLEUSDT exceeded max duration
+2025-09-11 02:01:14,789 - INFO - [__main__]    PnL: $-0.09
+2025-09-11 02:01:14,789 - INFO - [__main__]    Setting breakeven limit order for PENDLEUSDT at $5.4944
+2025-09-11 02:01:14,795 - INFO - [exchanges.bybit] ✅ Stop loss set for INJUSDT at 13.44156
+2025-09-11 02:01:14,795 - INFO - [__main__] ✅ Fully protected BybitExchange position with TS+SL: INJUSDT
+2025-09-11 02:01:14,795 - WARNING - [__main__] ⏰ BybitExchange INJUSDT exceeded max duration
+2025-09-11 02:01:14,795 - INFO - [__main__]    PnL: $-0.47
+2025-09-11 02:01:14,795 - INFO - [__main__]    Setting breakeven limit order for INJUSDT at $14.3933
+2025-09-11 02:01:15,056 - INFO - [exchanges.bybit] ✅ Trailing stop set for HMSTRUSDT
+2025-09-11 02:01:15,322 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:72930 set for Buy position should lower than base_price:66280??MarkPrice
+2025-09-11 02:01:15,323 - WARNING - [exchanges.bybit] Attempt 1 to set SL for HMSTRUSDT failed. Retrying...
+2025-09-11 02:01:15,390 - INFO - [exchanges.bybit] All orders cancelled for PENDLEUSDT
+2025-09-11 02:01:15,391 - INFO - [exchanges.bybit] All orders cancelled for PRIMEUSDT
+2025-09-11 02:01:15,396 - INFO - [exchanges.bybit] All orders cancelled for INJUSDT
+2025-09-11 02:01:15,419 - INFO - [exchanges.bybit] ✅ Trailing stop set for ORDIUSDT
+2025-09-11 02:01:15,657 - WARNING - [__main__] ⚠️ BybitExchange BOBAUSDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:15,658 - WARNING - [__main__] ⚠️ BybitExchange SUIUSDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:15,661 - WARNING - [__main__] ⚠️ BybitExchange SOSOUSDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:15,685 - INFO - [exchanges.bybit] ✅ Stop loss set for ORDIUSDT at 8.44305
+2025-09-11 02:01:15,686 - INFO - [__main__] ✅ Fully protected BybitExchange position with TS+SL: ORDIUSDT
+2025-09-11 02:01:15,686 - WARNING - [__main__] ⏰ BybitExchange ORDIUSDT exceeded max duration
+2025-09-11 02:01:15,686 - INFO - [__main__]    PnL: $0.00
+2025-09-11 02:01:15,686 - INFO - [__main__]    Closing profitable/breakeven position ORDIUSDT by market order
+2025-09-11 02:01:15,807 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 02:01:16,089 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:72930 set for Buy position should lower than base_price:66280??MarkPrice
+2025-09-11 02:01:16,090 - WARNING - [exchanges.bybit] Attempt 2 to set SL for HMSTRUSDT failed. Retrying...
+2025-09-11 02:01:16,222 - INFO - [exchanges.bybit] Position close order created for ORDIUSDT: ba16b830-f67b-491a-af8f-5166d2d5a4b8
+2025-09-11 02:01:16,222 - WARNING - [__main__] ⚠️ BybitExchange 1000000BABYDOGEUSDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:16,630 - WARNING - [exchanges.bybit] Attempt 1 to set TS for SUIUSDT failed. Retrying...
+2025-09-11 02:01:16,633 - WARNING - [exchanges.bybit] Attempt 1 to set TS for SOSOUSDT failed. Retrying...
+2025-09-11 02:01:16,965 - WARNING - [exchanges.bybit] Attempt 1 to set TS for BOBAUSDT failed. Retrying...
+2025-09-11 02:01:17,356 - WARNING - [exchanges.bybit] Attempt 1 to set TS for 1000000BABYDOGEUSDT failed. Retrying...
+2025-09-11 02:01:17,399 - INFO - [exchanges.bybit] ✅ Trailing stop set for SUIUSDT
+2025-09-11 02:01:17,666 - WARNING - [exchanges.bybit] Attempt 1 to set SL for SUIUSDT failed. Retrying...
+2025-09-11 02:01:17,734 - INFO - [exchanges.bybit] ✅ Trailing stop set for BOBAUSDT
+2025-09-11 02:01:17,737 - INFO - [exchanges.bybit] ✅ Trailing stop set for SOSOUSDT
+2025-09-11 02:01:17,858 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:72930 set for Buy position should lower than base_price:66280??MarkPrice
+2025-09-11 02:01:17,858 - WARNING - [exchanges.bybit] Attempt 3 to set SL for HMSTRUSDT failed. Retrying...
+2025-09-11 02:01:17,999 - WARNING - [exchanges.bybit] Attempt 1 to set SL for BOBAUSDT failed. Retrying...
+2025-09-11 02:01:18,002 - WARNING - [exchanges.bybit] Attempt 1 to set SL for SOSOUSDT failed. Retrying...
+2025-09-11 02:01:18,435 - INFO - [exchanges.bybit] ✅ Stop loss set for SUIUSDT at 3.379838
+2025-09-11 02:01:18,435 - INFO - [__main__] ✅ Fully protected BybitExchange position with TS+SL: SUIUSDT
+2025-09-11 02:01:18,435 - WARNING - [__main__] ⏰ BybitExchange SUIUSDT exceeded max duration
+2025-09-11 02:01:18,435 - INFO - [__main__]    PnL: $-0.16
+2025-09-11 02:01:18,435 - INFO - [__main__]    Setting breakeven limit order for SUIUSDT at $3.6191
+2025-09-11 02:01:18,455 - INFO - [exchanges.bybit] ✅ Trailing stop set for 1000000BABYDOGEUSDT
+2025-09-11 02:01:18,702 - INFO - [exchanges.bybit] All orders cancelled for SUIUSDT
+2025-09-11 02:01:18,719 - WARNING - [exchanges.bybit] Attempt 1 to set SL for 1000000BABYDOGEUSDT failed. Retrying...
+2025-09-11 02:01:18,765 - INFO - [exchanges.bybit] ✅ Stop loss set for BOBAUSDT at 0.08293450000000001
+2025-09-11 02:01:18,765 - INFO - [__main__] ✅ Fully protected BybitExchange position with TS+SL: BOBAUSDT
+2025-09-11 02:01:18,765 - WARNING - [__main__] ⏰ BybitExchange BOBAUSDT exceeded max duration
+2025-09-11 02:01:18,766 - INFO - [__main__]    PnL: $0.00
+2025-09-11 02:01:18,766 - INFO - [__main__]    Closing profitable/breakeven position BOBAUSDT by market order
+2025-09-11 02:01:18,768 - INFO - [exchanges.bybit] ✅ Stop loss set for SOSOUSDT at 0.572594
+2025-09-11 02:01:18,769 - INFO - [__main__] ✅ Fully protected BybitExchange position with TS+SL: SOSOUSDT
+2025-09-11 02:01:18,769 - WARNING - [__main__] ⏰ BybitExchange SOSOUSDT exceeded max duration
+2025-09-11 02:01:18,769 - INFO - [__main__]    PnL: $0.01
+2025-09-11 02:01:18,769 - INFO - [__main__]    Closing profitable/breakeven position SOSOUSDT by market order
+2025-09-11 02:01:18,967 - WARNING - [__main__] ⚠️ BybitExchange SHIB1000USDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:19,307 - INFO - [exchanges.bybit] Position close order created for SOSOUSDT: a37a8621-8be9-4803-b938-cda3ce895de9
+2025-09-11 02:01:19,307 - WARNING - [__main__] ⚠️ BybitExchange COREUSDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:19,466 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 02:01:19,484 - INFO - [exchanges.bybit] ✅ Stop loss set for 1000000BABYDOGEUSDT at 0.0011349497500000002
+2025-09-11 02:01:19,485 - INFO - [__main__] ✅ Fully protected BybitExchange position with TS+SL: 1000000BABYDOGEUSDT
+2025-09-11 02:01:19,485 - WARNING - [__main__] ⏰ BybitExchange 1000000BABYDOGEUSDT exceeded max duration
+2025-09-11 02:01:19,485 - INFO - [__main__]    PnL: $-1.38
+2025-09-11 02:01:19,485 - INFO - [__main__]    Setting breakeven limit order for 1000000BABYDOGEUSDT at $0.0012
+2025-09-11 02:01:19,751 - INFO - [exchanges.bybit] All orders cancelled for 1000000BABYDOGEUSDT
+2025-09-11 02:01:19,776 - WARNING - [exchanges.bybit] Attempt 1 to set TS for SHIB1000USDT failed. Retrying...
+2025-09-11 02:01:20,019 - WARNING - [__main__] ⚠️ BybitExchange DOGUSDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:20,138 - INFO - [exchanges.bybit] Position close order created for BOBAUSDT: e9743d7e-daf2-4b39-85cb-66a36a06e0b6
+2025-09-11 02:01:20,138 - WARNING - [__main__] ⚠️ BybitExchange CELRUSDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:20,445 - WARNING - [exchanges.bybit] Attempt 1 to set TS for COREUSDT failed. Retrying...
+2025-09-11 02:01:20,542 - INFO - [exchanges.bybit] ✅ Trailing stop set for SHIB1000USDT
+2025-09-11 02:01:20,623 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:72930 set for Buy position should lower than base_price:66280??MarkPrice
+2025-09-11 02:01:20,623 - WARNING - [exchanges.bybit] Attempt 4 to set SL for HMSTRUSDT failed. Retrying...
+2025-09-11 02:01:21,104 - WARNING - [exchanges.bybit] Attempt 1 to set TS for CELRUSDT failed. Retrying...
+2025-09-11 02:01:21,147 - WARNING - [exchanges.bybit] Attempt 1 to set SL for SHIB1000USDT failed. Retrying...
+2025-09-11 02:01:21,211 - INFO - [exchanges.bybit] ✅ Trailing stop set for COREUSDT
+2025-09-11 02:01:21,328 - WARNING - [exchanges.bybit] Attempt 1 to set TS for DOGUSDT failed. Retrying...
+2025-09-11 02:01:21,481 - WARNING - [exchanges.bybit] Attempt 1 to set SL for COREUSDT failed. Retrying...
+2025-09-11 02:01:21,870 - INFO - [exchanges.bybit] ✅ Trailing stop set for CELRUSDT
+2025-09-11 02:01:21,913 - INFO - [exchanges.bybit] ✅ Stop loss set for SHIB1000USDT at 0.005392425500000001
+2025-09-11 02:01:21,913 - INFO - [__main__] ✅ Fully protected BybitExchange position with TS+SL: SHIB1000USDT
+2025-09-11 02:01:21,913 - WARNING - [__main__] ⏰ BybitExchange SHIB1000USDT exceeded max duration
+2025-09-11 02:01:21,913 - INFO - [__main__]    PnL: $20.25
+2025-09-11 02:01:21,913 - INFO - [__main__]    Closing profitable/breakeven position SHIB1000USDT by market order
+2025-09-11 02:01:22,097 - INFO - [exchanges.bybit] ✅ Trailing stop set for DOGUSDT
+2025-09-11 02:01:22,134 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:614100 set for Buy position should lower than base_price:613700??MarkPrice
+2025-09-11 02:01:22,135 - WARNING - [exchanges.bybit] Attempt 1 to set SL for CELRUSDT failed. Retrying...
+2025-09-11 02:01:22,247 - INFO - [exchanges.bybit] ✅ Stop loss set for COREUSDT at 0.386903
+2025-09-11 02:01:22,247 - INFO - [__main__] ✅ Fully protected BybitExchange position with TS+SL: COREUSDT
+2025-09-11 02:01:22,247 - WARNING - [__main__] ⏰ BybitExchange COREUSDT exceeded max duration
+2025-09-11 02:01:22,247 - INFO - [__main__]    PnL: $0.00
+2025-09-11 02:01:22,247 - INFO - [__main__]    Closing profitable/breakeven position COREUSDT by market order
+2025-09-11 02:01:22,363 - WARNING - [exchanges.bybit] Attempt 1 to set SL for DOGUSDT failed. Retrying...
+2025-09-11 02:01:22,787 - INFO - [exchanges.bybit] Position close order created for SHIB1000USDT: 4b7eeac4-ae5b-44ed-b9d2-982a50f864cf
+2025-09-11 02:01:22,787 - WARNING - [__main__] ⚠️ BybitExchange BEAMUSDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:22,904 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:614100 set for Buy position should lower than base_price:613700??MarkPrice
+2025-09-11 02:01:22,904 - WARNING - [exchanges.bybit] Attempt 2 to set SL for CELRUSDT failed. Retrying...
+2025-09-11 02:01:22,967 - ERROR - [exchanges.binance] ❌ Failed to set Stop Loss for BIDUSDT after multiple attempts.
+2025-09-11 02:01:23,131 - INFO - [exchanges.bybit] ✅ Stop loss set for DOGUSDT at 0.00206712605
+2025-09-11 02:01:23,131 - INFO - [__main__] ✅ Fully protected BybitExchange position with TS+SL: DOGUSDT
+2025-09-11 02:01:23,131 - WARNING - [__main__] ⏰ BybitExchange DOGUSDT exceeded max duration
+2025-09-11 02:01:23,131 - INFO - [__main__]    PnL: $0.06
+2025-09-11 02:01:23,131 - INFO - [__main__]    Closing profitable/breakeven position DOGUSDT by market order
+2025-09-11 02:01:23,289 - INFO - [exchanges.bybit] Position close order created for COREUSDT: 2a29bb32-db38-41fd-861a-0241942d729d
+2025-09-11 02:01:23,289 - WARNING - [__main__] ⚠️ BybitExchange WAVESUSDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:23,771 - WARNING - [exchanges.bybit] Attempt 1 to set TS for BEAMUSDT failed. Retrying...
+2025-09-11 02:01:24,091 - WARNING - [exchanges.bybit] Attempt 1 to set TS for WAVESUSDT failed. Retrying...
+2025-09-11 02:01:24,125 - ERROR - [exchanges.bybit] ❌ Failed to set stop loss for HMSTRUSDT after multiple attempts.
+2025-09-11 02:01:24,125 - ERROR - [__main__] ❌ Failed to apply full trailing protection for HMSTRUSDT.
+2025-09-11 02:01:24,125 - WARNING - [__main__] ⚠️ BybitExchange RAYDIUMUSDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:24,170 - INFO - [exchanges.bybit] Position close order created for DOGUSDT: 9e5bd49e-26fb-4392-a6e9-94a6c68ce011
+2025-09-11 02:01:24,171 - WARNING - [__main__] ⚠️ BybitExchange TAIUSDT is missing Trailing Stop protection. Applying now.
+2025-09-11 02:01:24,537 - INFO - [exchanges.bybit] ✅ Trailing stop set for BEAMUSDT
+2025-09-11 02:01:24,804 - WARNING - [exchanges.bybit] Attempt 1 to set SL for BEAMUSDT failed. Retrying...
+2025-09-11 02:01:24,863 - INFO - [exchanges.bybit] ✅ Trailing stop set for WAVESUSDT
+2025-09-11 02:01:24,966 - WARNING - [exchanges.bybit] Attempt 1 to set TS for TAIUSDT failed. Retrying...
+2025-09-11 02:01:25,004 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:614100 set for Buy position should lower than base_price:613700??MarkPrice
+2025-09-11 02:01:25,005 - WARNING - [exchanges.bybit] Attempt 3 to set SL for CELRUSDT failed. Retrying...
+2025-09-11 02:01:25,128 - WARNING - [exchanges.bybit] Attempt 1 to set SL for WAVESUSDT failed. Retrying...
+2025-09-11 02:01:25,432 - WARNING - [exchanges.bybit] Attempt 1 to set TS for RAYDIUMUSDT failed. Retrying...
+2025-09-11 02:01:25,573 - INFO - [exchanges.bybit] ✅ Stop loss set for BEAMUSDT at 0.006689925
+2025-09-11 02:01:25,574 - INFO - [__main__] ✅ Fully protected BybitExchange position with TS+SL: BEAMUSDT
+2025-09-11 02:01:25,574 - WARNING - [__main__] ⏰ BybitExchange BEAMUSDT exceeded max duration
+2025-09-11 02:01:25,574 - INFO - [__main__]    PnL: $0.83
+2025-09-11 02:01:25,574 - INFO - [__main__]    Closing profitable/breakeven position BEAMUSDT by market order
+2025-09-11 02:01:25,732 - INFO - [exchanges.bybit] ✅ Trailing stop set for TAIUSDT
+2025-09-11 02:01:25,897 - INFO - [exchanges.bybit] ✅ Stop loss set for WAVESUSDT at 1.0608582182000001
+2025-09-11 02:01:25,897 - INFO - [__main__] ✅ Fully protected BybitExchange position with TS+SL: WAVESUSDT
+2025-09-11 02:01:25,897 - WARNING - [__main__] ⏰ BybitExchange WAVESUSDT exceeded max duration
+2025-09-11 02:01:25,897 - INFO - [__main__]    PnL: $-0.47
+2025-09-11 02:01:25,897 - INFO - [__main__]    Setting breakeven limit order for WAVESUSDT at $1.1360
+2025-09-11 02:01:26,116 - INFO - [exchanges.bybit] Position close order created for BEAMUSDT: 781c050f-8cbe-4861-bc8c-3cb2f12317b1
+2025-09-11 02:01:26,163 - INFO - [exchanges.bybit] All orders cancelled for WAVESUSDT
+2025-09-11 02:01:26,196 - INFO - [exchanges.bybit] ✅ Trailing stop set for RAYDIUMUSDT
+2025-09-11 02:01:26,339 - WARNING - [exchanges.bybit] Attempt 1 to set SL for TAIUSDT failed. Retrying...
+2025-09-11 02:01:26,459 - WARNING - [exchanges.bybit] Attempt 1 to set SL for RAYDIUMUSDT failed. Retrying...
+2025-09-11 02:01:27,107 - INFO - [exchanges.bybit] ✅ Stop loss set for TAIUSDT at 0.05804796965
+2025-09-11 02:01:27,108 - INFO - [__main__] ✅ Fully protected BybitExchange position with TS+SL: TAIUSDT
+2025-09-11 02:01:27,108 - WARNING - [__main__] ⏰ BybitExchange TAIUSDT exceeded max duration
+2025-09-11 02:01:27,108 - INFO - [__main__]    PnL: $0.08
+2025-09-11 02:01:27,108 - INFO - [__main__]    Closing profitable/breakeven position TAIUSDT by market order
+2025-09-11 02:01:27,227 - INFO - [exchanges.bybit] ✅ Stop loss set for RAYDIUMUSDT at 2.982089
+2025-09-11 02:01:27,228 - INFO - [__main__] ✅ Fully protected BybitExchange position with TS+SL: RAYDIUMUSDT
+2025-09-11 02:01:27,228 - WARNING - [__main__] ⏰ BybitExchange RAYDIUMUSDT exceeded max duration
+2025-09-11 02:01:27,228 - INFO - [__main__]    PnL: $0.00
+2025-09-11 02:01:27,228 - INFO - [__main__]    Closing profitable/breakeven position RAYDIUMUSDT by market order
+2025-09-11 02:01:27,769 - ERROR - [exchanges.bybit] Bybit: Parameter error - StopLoss:614100 set for Buy position should lower than base_price:613700??MarkPrice
+2025-09-11 02:01:27,769 - WARNING - [exchanges.bybit] Attempt 4 to set SL for CELRUSDT failed. Retrying...
+2025-09-11 02:01:27,771 - INFO - [exchanges.bybit] Position close order created for RAYDIUMUSDT: a363fe1b-fe50-4301-b54c-4981fdd798b2
+2025-09-11 02:01:27,811 - INFO - [exchanges.bybit] Position close order created for TAIUSDT: 4a89a0a6-ae68-48aa-991e-9905ffd2ba42
+2025-09-11 02:01:31,271 - ERROR - [exchanges.bybit] ❌ Failed to set stop loss for CELRUSDT after multiple attempts.
+2025-09-11 02:01:31,272 - ERROR - [__main__] ❌ Failed to apply full trailing protection for CELRUSDT.
+2025-09-11 02:01:45,254 - INFO - [__main__] 🧹 Cleaning up...
+2025-09-11 02:01:45,255 - INFO - [__main__] ============================================================
+2025-09-11 02:01:45,255 - INFO - [__main__] Performance Statistics
+2025-09-11 02:01:45,255 - INFO - [__main__] ============================================================
+2025-09-11 02:01:45,255 - INFO - [__main__] Uptime: 0.01 hours
+2025-09-11 02:01:45,255 - INFO - [__main__] Checks performed: 1
+2025-09-11 02:01:45,255 - INFO - [__main__] Positions protected: 17
+2025-09-11 02:01:45,256 - INFO - [__main__] Positions closed: 13
+2025-09-11 02:01:45,256 - INFO - [__main__] Errors encountered: 1
+2025-09-11 02:01:45,256 - INFO - [__main__] ============================================================
+2025-09-11 02:01:45,256 - INFO - [__main__] Binance connection closed
+2025-09-11 02:01:45,257 - INFO - [__main__] Bybit connection closed
+2025-09-11 02:01:45,257 - INFO - [__main__] ✅ Cleanup complete
+2025-09-11 02:04:30,576 - INFO - [__main__] ============================================================
+2025-09-11 02:04:30,576 - INFO - [__main__] Protection Monitor Configuration
+2025-09-11 02:04:30,576 - INFO - [__main__] ============================================================
+2025-09-11 02:04:30,576 - INFO - [__main__] Mode: TESTNET
+2025-09-11 02:04:30,576 - INFO - [__main__] Stop Loss Type: TRAILING
+2025-09-11 02:04:30,576 - INFO - [__main__] Stop Loss: 6.5%
+2025-09-11 02:04:30,576 - INFO - [__main__] Take Profit: 3.0%
+2025-09-11 02:04:30,576 - INFO - [__main__] Trailing Activation: 3.5%
+2025-09-11 02:04:30,576 - INFO - [__main__] Trailing Callback: 0.5%
+2025-09-11 02:04:30,577 - INFO - [__main__] Max Position Duration: 1 hours
+2025-09-11 02:04:30,577 - INFO - [__main__] Taker Fee: 0.06%
+2025-09-11 02:04:30,577 - INFO - [__main__] Check Interval: 30 seconds
+2025-09-11 02:04:30,577 - INFO - [__main__] ============================================================
+2025-09-11 02:04:30,577 - INFO - [__main__] 🚀 Starting Protection Monitor v2.3
+2025-09-11 02:04:32,770 - INFO - [exchanges.binance] Binance testnet initialized
+2025-09-11 02:04:32,770 - INFO - [exchanges.binance] Loaded 531 active perpetual contracts
+2025-09-11 02:04:32,770 - INFO - [exchanges.binance] ✅ PUFFERUSDT found in exchange info
+2025-09-11 02:04:32,770 - INFO - [exchanges.binance] ✅ SKATEUSDT found in exchange info
+2025-09-11 02:04:33,119 - INFO - [__main__] ✅ Binance connected - Balance: $889.81
+2025-09-11 02:04:35,179 - INFO - [exchanges.bybit] Bybit testnet initialized
+2025-09-11 02:04:35,179 - INFO - [exchanges.bybit] Position mode: one-way
+2025-09-11 02:04:35,179 - INFO - [exchanges.bybit] Loaded 616 active symbols
+2025-09-11 02:04:35,446 - INFO - [__main__] ✅ Bybit connected - Balance: $9877.84
+2025-09-11 02:04:35,447 - INFO - [__main__] === Protection Check #1 ===
+2025-09-11 02:04:35,717 - INFO - [__main__] Found 18 Bybit positions to check
+2025-09-11 02:04:35,801 - INFO - [__main__] Found 5 Binance positions to check
+2025-09-11 02:04:35,986 - WARNING - [__main__] ⚠️ Bybit RAYDIUMUSDT protection is incomplete. Applying now.
+2025-09-11 02:04:35,986 - ERROR - [__main__] Critical error in _process_single_position for RAYDIUMUSDT: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 145, in _process_single_position
+    await self._apply_protection(exchange_name, exchange, pos)
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 185, in _apply_protection
+    await exchange.cancel_all_open_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'. Did you mean: 'cancel_all_orders'?
+2025-09-11 02:04:35,990 - WARNING - [__main__] ⚠️ Bybit TAIUSDT protection is incomplete. Applying now.
+2025-09-11 02:04:35,990 - ERROR - [__main__] Critical error in _process_single_position for TAIUSDT: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 145, in _process_single_position
+    await self._apply_protection(exchange_name, exchange, pos)
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 185, in _apply_protection
+    await exchange.cancel_all_open_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'. Did you mean: 'cancel_all_orders'?
+2025-09-11 02:04:35,991 - WARNING - [__main__] ⚠️ Bybit WAVESUSDT protection is incomplete. Applying now.
+2025-09-11 02:04:35,991 - ERROR - [__main__] Critical error in _process_single_position for WAVESUSDT: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 145, in _process_single_position
+    await self._apply_protection(exchange_name, exchange, pos)
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 185, in _apply_protection
+    await exchange.cancel_all_open_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'. Did you mean: 'cancel_all_orders'?
+2025-09-11 02:04:35,993 - WARNING - [__main__] ⚠️ Bybit DOGUSDT protection is incomplete. Applying now.
+2025-09-11 02:04:35,993 - ERROR - [__main__] Critical error in _process_single_position for DOGUSDT: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 145, in _process_single_position
+    await self._apply_protection(exchange_name, exchange, pos)
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 185, in _apply_protection
+    await exchange.cancel_all_open_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'. Did you mean: 'cancel_all_orders'?
+2025-09-11 02:04:35,994 - WARNING - [__main__] ⚠️ Bybit COREUSDT protection is incomplete. Applying now.
+2025-09-11 02:04:35,994 - ERROR - [__main__] Critical error in _process_single_position for COREUSDT: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 145, in _process_single_position
+    await self._apply_protection(exchange_name, exchange, pos)
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 185, in _apply_protection
+    await exchange.cancel_all_open_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'. Did you mean: 'cancel_all_orders'?
+2025-09-11 02:04:35,995 - WARNING - [__main__] ⚠️ Bybit SHIB1000USDT protection is incomplete. Applying now.
+2025-09-11 02:04:35,995 - ERROR - [__main__] Critical error in _process_single_position for SHIB1000USDT: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 145, in _process_single_position
+    await self._apply_protection(exchange_name, exchange, pos)
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 185, in _apply_protection
+    await exchange.cancel_all_open_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'. Did you mean: 'cancel_all_orders'?
+2025-09-11 02:04:35,997 - WARNING - [__main__] ⚠️ Bybit CELRUSDT protection is incomplete. Applying now.
+2025-09-11 02:04:35,997 - ERROR - [__main__] Critical error in _process_single_position for CELRUSDT: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 145, in _process_single_position
+    await self._apply_protection(exchange_name, exchange, pos)
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 185, in _apply_protection
+    await exchange.cancel_all_open_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'. Did you mean: 'cancel_all_orders'?
+2025-09-11 02:04:35,998 - WARNING - [__main__] ⚠️ Bybit 1000000BABYDOGEUSDT protection is incomplete. Applying now.
+2025-09-11 02:04:35,998 - ERROR - [__main__] Critical error in _process_single_position for 1000000BABYDOGEUSDT: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 145, in _process_single_position
+    await self._apply_protection(exchange_name, exchange, pos)
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 185, in _apply_protection
+    await exchange.cancel_all_open_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'. Did you mean: 'cancel_all_orders'?
+2025-09-11 02:04:35,999 - WARNING - [__main__] ⚠️ Bybit SOSOUSDT protection is incomplete. Applying now.
+2025-09-11 02:04:35,999 - ERROR - [__main__] Critical error in _process_single_position for SOSOUSDT: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 145, in _process_single_position
+    await self._apply_protection(exchange_name, exchange, pos)
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 185, in _apply_protection
+    await exchange.cancel_all_open_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'. Did you mean: 'cancel_all_orders'?
+2025-09-11 02:04:36,001 - WARNING - [__main__] ⚠️ Bybit BOBAUSDT protection is incomplete. Applying now.
+2025-09-11 02:04:36,001 - ERROR - [__main__] Critical error in _process_single_position for BOBAUSDT: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 145, in _process_single_position
+    await self._apply_protection(exchange_name, exchange, pos)
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 185, in _apply_protection
+    await exchange.cancel_all_open_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'. Did you mean: 'cancel_all_orders'?
+2025-09-11 02:04:36,002 - WARNING - [__main__] ⚠️ Bybit SUIUSDT protection is incomplete. Applying now.
+2025-09-11 02:04:36,002 - ERROR - [__main__] Critical error in _process_single_position for SUIUSDT: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 145, in _process_single_position
+    await self._apply_protection(exchange_name, exchange, pos)
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 185, in _apply_protection
+    await exchange.cancel_all_open_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'. Did you mean: 'cancel_all_orders'?
+2025-09-11 02:04:36,003 - WARNING - [__main__] ⚠️ Bybit HMSTRUSDT protection is incomplete. Applying now.
+2025-09-11 02:04:36,003 - ERROR - [__main__] Critical error in _process_single_position for HMSTRUSDT: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 145, in _process_single_position
+    await self._apply_protection(exchange_name, exchange, pos)
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 185, in _apply_protection
+    await exchange.cancel_all_open_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'. Did you mean: 'cancel_all_orders'?
+2025-09-11 02:04:36,005 - WARNING - [__main__] ⚠️ Bybit INJUSDT protection is incomplete. Applying now.
+2025-09-11 02:04:36,005 - ERROR - [__main__] Critical error in _process_single_position for INJUSDT: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 145, in _process_single_position
+    await self._apply_protection(exchange_name, exchange, pos)
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 185, in _apply_protection
+    await exchange.cancel_all_open_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'. Did you mean: 'cancel_all_orders'?
+2025-09-11 02:04:36,006 - WARNING - [__main__] ⚠️ Bybit PENDLEUSDT protection is incomplete. Applying now.
+2025-09-11 02:04:36,006 - ERROR - [__main__] Critical error in _process_single_position for PENDLEUSDT: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 145, in _process_single_position
+    await self._apply_protection(exchange_name, exchange, pos)
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 185, in _apply_protection
+    await exchange.cancel_all_open_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'. Did you mean: 'cancel_all_orders'?
+2025-09-11 02:04:36,007 - WARNING - [__main__] ⚠️ Bybit PRIMEUSDT protection is incomplete. Applying now.
+2025-09-11 02:04:36,007 - ERROR - [__main__] Critical error in _process_single_position for PRIMEUSDT: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 145, in _process_single_position
+    await self._apply_protection(exchange_name, exchange, pos)
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 185, in _apply_protection
+    await exchange.cancel_all_open_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'. Did you mean: 'cancel_all_orders'?
+2025-09-11 02:04:36,008 - WARNING - [__main__] ⚠️ Bybit BAKEUSDT protection is incomplete. Applying now.
+2025-09-11 02:04:36,008 - ERROR - [__main__] Critical error in _process_single_position for BAKEUSDT: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 145, in _process_single_position
+    await self._apply_protection(exchange_name, exchange, pos)
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 185, in _apply_protection
+    await exchange.cancel_all_open_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'. Did you mean: 'cancel_all_orders'?
+2025-09-11 02:04:36,009 - WARNING - [__main__] ⚠️ Bybit BLURUSDT protection is incomplete. Applying now.
+2025-09-11 02:04:36,009 - ERROR - [__main__] Critical error in _process_single_position for BLURUSDT: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 145, in _process_single_position
+    await self._apply_protection(exchange_name, exchange, pos)
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 185, in _apply_protection
+    await exchange.cancel_all_open_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'. Did you mean: 'cancel_all_orders'?
+2025-09-11 02:04:36,010 - WARNING - [__main__] ⚠️ Bybit ORDIUSDT protection is incomplete. Applying now.
+2025-09-11 02:04:36,010 - ERROR - [__main__] Critical error in _process_single_position for ORDIUSDT: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 145, in _process_single_position
+    await self._apply_protection(exchange_name, exchange, pos)
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 185, in _apply_protection
+    await exchange.cancel_all_open_orders(symbol)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'. Did you mean: 'cancel_all_orders'?
+2025-09-11 02:04:36,135 - WARNING - [__main__] ⚠️ Binance BIDUSDT protection is incomplete. Applying now.
+2025-09-11 02:04:36,136 - WARNING - [__main__] ⏰ BinanceExchange BNBUSDT exceeded max duration
+2025-09-11 02:04:36,136 - INFO - [__main__]    PnL: $-0.56
+2025-09-11 02:04:36,136 - INFO - [__main__]    Setting breakeven limit order for BNBUSDT at $950.6294
+2025-09-11 02:04:36,137 - WARNING - [__main__] ⏰ BinanceExchange TSTUSDT exceeded max duration
+2025-09-11 02:04:36,137 - INFO - [__main__]    PnL: $-0.06
+2025-09-11 02:04:36,137 - INFO - [__main__]    Setting breakeven limit order for TSTUSDT at $0.0282
+2025-09-11 02:04:36,137 - WARNING - [__main__] ⏰ BinanceExchange QUSDT exceeded max duration
+2025-09-11 02:04:36,137 - INFO - [__main__]    PnL: $-0.06
+2025-09-11 02:04:36,137 - INFO - [__main__]    Setting breakeven limit order for QUSDT at $0.0162
+2025-09-11 02:04:36,137 - WARNING - [__main__] ⏰ BinanceExchange BROCCOLIF3BUSDT exceeded max duration
+2025-09-11 02:04:36,137 - INFO - [__main__]    PnL: $-0.07
+2025-09-11 02:04:36,138 - INFO - [__main__]    Setting breakeven limit order for BROCCOLIF3BUSDT at $0.0108
+2025-09-11 02:04:36,663 - INFO - [exchanges.binance] Cancelled all orders for TSTUSDT
+2025-09-11 02:04:36,935 - INFO - [exchanges.binance] Cancelled all orders for BIDUSDT
+2025-09-11 02:04:37,127 - INFO - [exchanges.binance] Cancelled all orders for QUSDT
+2025-09-11 02:04:37,129 - INFO - [exchanges.binance] Cancelled all orders for BROCCOLIF3BUSDT
+2025-09-11 02:04:37,135 - INFO - [exchanges.binance] Cancelled all orders for BNBUSDT
+2025-09-11 02:04:38,437 - INFO - [exchanges.binance] ✅ Trailing stop set for BIDUSDT: activation=0.12810195, callback=0.5%
+2025-09-11 02:04:39,597 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 02:04:41,734 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 02:04:44,865 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 02:04:48,543 - ERROR - [exchanges.binance] HTTP Error 400: {"code":-2021,"msg":"Order would immediately trigger."}
+2025-09-11 02:04:52,044 - ERROR - [exchanges.binance] ❌ Failed to set Stop Loss for BIDUSDT after multiple attempts.
+2025-09-11 02:04:57,621 - INFO - [__main__] 🧹 Cleaning up...
+2025-09-11 02:04:57,621 - INFO - [__main__] ============================================================
+2025-09-11 02:04:57,621 - INFO - [__main__] Performance Statistics
+2025-09-11 02:04:57,622 - INFO - [__main__] ============================================================
+2025-09-11 02:04:57,622 - INFO - [__main__] Uptime: 0.01 hours
+2025-09-11 02:04:57,622 - INFO - [__main__] Checks performed: 1
+2025-09-11 02:04:57,622 - INFO - [__main__] Positions protected: 0
+2025-09-11 02:04:57,622 - INFO - [__main__] Positions closed: 0
+2025-09-11 02:04:57,622 - INFO - [__main__] Errors encountered: 18
+2025-09-11 02:04:57,622 - INFO - [__main__] ============================================================
+2025-09-11 02:04:57,622 - INFO - [__main__] Binance connection closed
+2025-09-11 02:04:57,622 - INFO - [__main__] Bybit connection closed
+2025-09-11 02:04:57,623 - INFO - [__main__] ✅ Cleanup complete

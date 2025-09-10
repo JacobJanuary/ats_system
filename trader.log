@@ -5366,3 +5366,372 @@
 2025-09-11 00:14:34,001 - INFO - [__main__] 📊 Batch results: 0 success, 5 failed
 2025-09-11 00:14:42,124 - DEBUG - [__main__] Health check - Binance: $877.17
 2025-09-11 00:14:42,543 - DEBUG - [__main__] Health check - Bybit: $9883.08
+2025-09-11 00:22:12,088 - INFO - [__main__] ============================================================
+2025-09-11 00:22:12,092 - INFO - [__main__] Trading System Configuration
+2025-09-11 00:22:12,093 - INFO - [__main__] ============================================================
+2025-09-11 00:22:12,093 - INFO - [__main__] Mode: TESTNET
+2025-09-11 00:22:12,093 - INFO - [__main__] Position Size: $20.0 USD
+2025-09-11 00:22:12,093 - INFO - [__main__] Leverage: 10x
+2025-09-11 00:22:12,093 - INFO - [__main__] Min Scores: Week=50.0%, Month=50.0%
+2025-09-11 00:22:12,093 - INFO - [__main__] Max Concurrent Orders: 10
+2025-09-11 00:22:12,093 - INFO - [__main__] Signal Window: 14 minutes
+2025-09-11 00:22:12,093 - INFO - [__main__] Spread Limit: 100.0%
+2025-09-11 00:22:12,093 - INFO - [__main__] Initial Stop Loss: 6.5%
+2025-09-11 00:22:12,093 - INFO - [__main__] ============================================================
+2025-09-11 00:22:12,093 - INFO - [__main__] 🚀 Starting Production Trading System v4.0
+2025-09-11 00:22:13,252 - INFO - [__main__] ✅ Database connected
+2025-09-11 00:22:13,252 - ERROR - [__main__] ❌ Binance initialization failed: Can't instantiate abstract class BinanceExchange without an implementation for abstract methods 'close', 'initialize'
+2025-09-11 00:22:13,252 - ERROR - [__main__] ❌ Bybit initialization failed: Can't instantiate abstract class BybitExchange without an implementation for abstract method 'initialize'
+2025-09-11 00:22:13,252 - ERROR - [__main__] Exchange init error: Can't instantiate abstract class BinanceExchange without an implementation for abstract methods 'close', 'initialize'
+2025-09-11 00:22:13,252 - ERROR - [__main__] Exchange init error: Can't instantiate abstract class BybitExchange without an implementation for abstract method 'initialize'
+2025-09-11 00:22:13,253 - ERROR - [__main__] Initialization attempt 1 failed: No exchanges available!
+2025-09-11 00:22:19,422 - INFO - [__main__] ✅ Database connected
+2025-09-11 00:22:19,422 - ERROR - [__main__] ❌ Binance initialization failed: Can't instantiate abstract class BinanceExchange without an implementation for abstract methods 'close', 'initialize'
+2025-09-11 00:22:19,422 - ERROR - [__main__] ❌ Bybit initialization failed: Can't instantiate abstract class BybitExchange without an implementation for abstract method 'initialize'
+2025-09-11 00:22:19,423 - ERROR - [__main__] Exchange init error: Can't instantiate abstract class BinanceExchange without an implementation for abstract methods 'close', 'initialize'
+2025-09-11 00:22:19,423 - ERROR - [__main__] Exchange init error: Can't instantiate abstract class BybitExchange without an implementation for abstract method 'initialize'
+2025-09-11 00:22:19,423 - ERROR - [__main__] Initialization attempt 2 failed: No exchanges available!
+2025-09-11 00:28:17,249 - INFO - [__main__] ============================================================
+2025-09-11 00:28:17,249 - INFO - [__main__] Trading System Configuration
+2025-09-11 00:28:17,249 - INFO - [__main__] ============================================================
+2025-09-11 00:28:17,249 - INFO - [__main__] Mode: TESTNET
+2025-09-11 00:28:17,249 - INFO - [__main__] Position Size: $20.0 USD
+2025-09-11 00:28:17,249 - INFO - [__main__] Leverage: 10x
+2025-09-11 00:28:17,249 - INFO - [__main__] Min Scores: Week=50.0%, Month=50.0%
+2025-09-11 00:28:17,249 - INFO - [__main__] Max Concurrent Orders: 10
+2025-09-11 00:28:17,249 - INFO - [__main__] Signal Window: 14 minutes
+2025-09-11 00:28:17,249 - INFO - [__main__] Spread Limit: 100.0%
+2025-09-11 00:28:17,249 - INFO - [__main__] Initial Stop Loss: 6.5%
+2025-09-11 00:28:17,249 - INFO - [__main__] ============================================================
+2025-09-11 00:28:17,249 - INFO - [__main__] 🚀 Starting Production Trading System v4.0
+2025-09-11 00:28:18,422 - INFO - [__main__] ✅ Database connected
+2025-09-11 00:28:19,709 - INFO - [__main__] ✅ Binance connected - Balance: $947.30
+2025-09-11 00:28:19,994 - INFO - [__main__] ✅ Bybit connected - Balance: $9883.40
+2025-09-11 00:28:20,824 - INFO - [__main__] 📈 Found 10 new signals to process
+2025-09-11 00:28:20,825 - INFO - [__main__]    Distribution: Binance=7, Bybit=3
+2025-09-11 00:28:20,825 - INFO - [__main__]    Newest signal age: 28.3 minutes
+2025-09-11 00:28:20,903 - INFO - [__main__] ⚡ Processing 10 signals concurrently
+2025-09-11 00:28:20,903 - INFO - [__main__] 🎯 Processing signal #7812615: HFTUSDT on Binance
+2025-09-11 00:28:20,903 - INFO - [__main__]    Scores: Week=92.6%, Month=69.7%
+2025-09-11 00:28:20,904 - INFO - [__main__] 🎯 Processing signal #7812640: BSWUSDT on Binance
+2025-09-11 00:28:20,904 - INFO - [__main__]    Scores: Week=92.6%, Month=69.7%
+2025-09-11 00:28:20,905 - INFO - [__main__] 🎯 Processing signal #7812675: SOONUSDT on Binance
+2025-09-11 00:28:20,905 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:28:20,905 - INFO - [__main__] 🎯 Processing signal #7812620: BIGTIMEUSDT on Binance
+2025-09-11 00:28:20,906 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:28:20,906 - INFO - [__main__] 🎯 Processing signal #7812642: REIUSDT on Binance
+2025-09-11 00:28:20,906 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:28:20,906 - INFO - [__main__] 🎯 Processing signal #7812682: 1000BTTUSDT on Bybit
+2025-09-11 00:28:20,906 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:28:20,907 - INFO - [__main__] 🎯 Processing signal #7812657: MELANIAUSDT on Binance
+2025-09-11 00:28:20,907 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:28:20,907 - INFO - [__main__] 🎯 Processing signal #7812637: MEWUSDT on Binance
+2025-09-11 00:28:20,907 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:28:20,907 - INFO - [__main__] 🎯 Processing signal #7812691: L3USDT on Bybit
+2025-09-11 00:28:20,908 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:28:20,908 - INFO - [__main__] 🎯 Processing signal #7812685: AUDIOUSDT on Bybit
+2025-09-11 00:28:20,908 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:28:21,153 - INFO - [__main__] ✅ 1000BTTUSDT spread OK: 8.324%
+2025-09-11 00:28:21,219 - WARNING - [__main__] ❌ HFTUSDT spread too high: 274.131% > 100.0%
+2025-09-11 00:28:21,328 - WARNING - [__main__] ❌ AUDIOUSDT spread too high: 171.800% > 100.0%
+2025-09-11 00:28:21,395 - INFO - [__main__] ✅ BSWUSDT spread OK: 31.657%
+2025-09-11 00:28:21,401 - INFO - [__main__] ✅ BIGTIMEUSDT spread OK: 1.701%
+2025-09-11 00:28:21,404 - INFO - [__main__] ✅ MEWUSDT spread OK: 3.067%
+2025-09-11 00:28:21,405 - WARNING - [__main__] ❌ MELANIAUSDT spread too high: 3720.850% > 100.0%
+2025-09-11 00:28:21,412 - INFO - [__main__] ✅ REIUSDT spread OK: 0.827%
+2025-09-11 00:28:21,645 - INFO - [__main__] ✅ L3USDT spread OK: 8.324%
+2025-09-11 00:28:21,717 - WARNING - [__main__] ⚠️ SOONUSDT has only price data: $0.3571
+2025-09-11 00:28:21,717 - INFO - [__main__]    Allowing trade on testnet
+2025-09-11 00:28:21,905 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:28:21,905 - INFO - [__main__]    $20.00 = 31836.994588 1000BTTUSDT @ $0.0006
+2025-09-11 00:28:22,353 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:28:22,353 - INFO - [__main__]    $20.00 = 885.935770 BSWUSDT @ $0.0226
+2025-09-11 00:28:22,362 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:28:22,362 - INFO - [__main__]    $20.00 = 6787.714237 MEWUSDT @ $0.0029
+2025-09-11 00:28:22,366 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:28:22,367 - INFO - [__main__]    $20.00 = 367.174592 BIGTIMEUSDT @ $0.0545
+2025-09-11 00:28:22,372 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:28:22,372 - INFO - [__main__]    $20.00 = 1176.470588 REIUSDT @ $0.0170
+2025-09-11 00:28:22,396 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:28:22,397 - INFO - [__main__]    $20.00 = 532.765051 L3USDT @ $0.0375
+2025-09-11 00:28:22,991 - WARNING - [__main__] Order attempt 1 failed: No execution
+2025-09-11 00:28:23,328 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:28:23,328 - INFO - [__main__]    $20.00 = 56.006721 SOONUSDT @ $0.3571
+2025-09-11 00:28:23,817 - INFO - [__main__] ✅ Order filled: 1176.000000 @ $0.0173
+2025-09-11 00:28:23,818 - INFO - [__main__] ✅ Order filled: 367.000000 @ $0.0550
+2025-09-11 00:28:23,825 - INFO - [__main__] ✅ Order filled: 6787.000000 @ $0.0030
+2025-09-11 00:28:23,974 - INFO - [__main__] 📝 Trade logged to database - Order ID: 14232406
+2025-09-11 00:28:23,975 - INFO - [__main__] 📝 Trade logged to database - Order ID: 4184081
+2025-09-11 00:28:23,980 - INFO - [__main__] 📝 Trade logged to database - Order ID: 10277556
+2025-09-11 00:28:24,216 - INFO - [__main__] Signal #7812620 deactivated in database.
+2025-09-11 00:28:24,217 - INFO - [__main__] Signal #7812637 deactivated in database.
+2025-09-11 00:28:24,217 - INFO - [__main__] Signal #7812642 deactivated in database.
+2025-09-11 00:28:24,417 - WARNING - [__main__] Order attempt 1 failed: No execution
+2025-09-11 00:28:24,965 - INFO - [__main__] 🛡️ Initial Stop Loss set for REIUSDT at $0.0162
+2025-09-11 00:28:24,966 - INFO - [__main__] ✅ Signal #7812642 processed successfully
+2025-09-11 00:28:24,969 - INFO - [__main__] 🛡️ Initial Stop Loss set for BIGTIMEUSDT at $0.0514
+2025-09-11 00:28:24,969 - INFO - [__main__] ✅ Signal #7812620 processed successfully
+2025-09-11 00:28:25,405 - INFO - [__main__] 🛡️ Initial Stop Loss set for MEWUSDT at $0.0028
+2025-09-11 00:28:25,405 - INFO - [__main__] ✅ Signal #7812637 processed successfully
+2025-09-11 00:28:25,452 - INFO - [__main__] 📝 Order attempt 2/3:
+2025-09-11 00:28:25,453 - INFO - [__main__]    $20.00 = 885.935770 BSWUSDT @ $0.0226
+2025-09-11 00:28:26,119 - WARNING - [__main__] Order attempt 2 failed: No execution
+2025-09-11 00:28:27,059 - INFO - [__main__] 📝 Order attempt 2/3:
+2025-09-11 00:28:27,059 - INFO - [__main__]    $20.00 = 56.006721 SOONUSDT @ $0.3571
+2025-09-11 00:28:27,727 - WARNING - [__main__] Order attempt 2 failed: No execution
+2025-09-11 00:28:29,084 - INFO - [__main__] 📝 Order attempt 3/3:
+2025-09-11 00:28:29,085 - INFO - [__main__]    $20.00 = 885.935770 BSWUSDT @ $0.0226
+2025-09-11 00:28:30,183 - WARNING - [__main__] Order attempt 3 failed: No execution
+2025-09-11 00:28:30,340 - ERROR - [__main__] ❌ Signal #7812640 failed: Failed after 3 attempts
+2025-09-11 00:28:31,343 - INFO - [__main__] 📝 Order attempt 3/3:
+2025-09-11 00:28:31,343 - INFO - [__main__]    $20.00 = 56.006721 SOONUSDT @ $0.3571
+2025-09-11 00:28:31,991 - WARNING - [__main__] Order attempt 3 failed: No execution
+2025-09-11 00:28:32,148 - ERROR - [__main__] ❌ Signal #7812675 failed: Failed after 3 attempts
+2025-09-11 00:28:33,662 - WARNING - [__main__] Order attempt 1 failed: No execution
+2025-09-11 00:28:34,157 - WARNING - [__main__] Order attempt 1 failed: No execution
+2025-09-11 00:28:35,404 - INFO - [__main__] 📝 Order attempt 2/3:
+2025-09-11 00:28:35,404 - INFO - [__main__]    $20.00 = 31836.994588 1000BTTUSDT @ $0.0006
+2025-09-11 00:28:35,899 - INFO - [__main__] 📝 Order attempt 2/3:
+2025-09-11 00:28:35,899 - INFO - [__main__]    $20.00 = 532.765051 L3USDT @ $0.0375
+2025-09-11 00:28:47,154 - WARNING - [__main__] Order attempt 2 failed: No execution
+2025-09-11 00:28:47,969 - WARNING - [__main__] Order attempt 2 failed: No execution
+2025-09-11 00:28:49,897 - INFO - [__main__] 📝 Order attempt 3/3:
+2025-09-11 00:28:49,897 - INFO - [__main__]    $20.00 = 31836.994588 1000BTTUSDT @ $0.0006
+2025-09-11 00:28:50,711 - INFO - [__main__] 📝 Order attempt 3/3:
+2025-09-11 00:28:50,712 - INFO - [__main__]    $20.00 = 532.765051 L3USDT @ $0.0375
+2025-09-11 00:29:01,651 - WARNING - [__main__] Order attempt 3 failed: No execution
+2025-09-11 00:29:01,809 - ERROR - [__main__] ❌ Signal #7812682 failed: Failed after 3 attempts
+2025-09-11 00:29:02,479 - WARNING - [__main__] Order attempt 3 failed: No execution
+2025-09-11 00:29:02,637 - ERROR - [__main__] ❌ Signal #7812691 failed: Failed after 3 attempts
+2025-09-11 00:29:02,638 - INFO - [__main__] 📊 Batch results: 3 success, 7 failed
+2025-09-11 00:29:20,830 - DEBUG - [__main__] Health check - Binance: $940.22
+2025-09-11 00:29:21,247 - DEBUG - [__main__] Health check - Bybit: $9883.40
+2025-09-11 00:29:33,420 - DEBUG - [__main__] Skipping BSWUSDT - in cooldown
+2025-09-11 00:29:33,420 - DEBUG - [__main__] Skipping SOONUSDT - in cooldown
+2025-09-11 00:29:33,420 - DEBUG - [__main__] Skipping 1000BTTUSDT - in cooldown
+2025-09-11 00:29:33,420 - DEBUG - [__main__] Skipping L3USDT - in cooldown
+2025-09-11 00:29:33,421 - INFO - [__main__] 📈 Found 6 new signals to process
+2025-09-11 00:29:33,421 - INFO - [__main__]    Distribution: Binance=5, Bybit=1
+2025-09-11 00:29:33,421 - INFO - [__main__]    Newest signal age: 29.6 minutes
+2025-09-11 00:29:33,499 - INFO - [__main__] ⚡ Processing 6 signals concurrently
+2025-09-11 00:29:33,499 - INFO - [__main__] 🎯 Processing signal #7812615: HFTUSDT on Binance
+2025-09-11 00:29:33,499 - INFO - [__main__]    Scores: Week=92.6%, Month=69.7%
+2025-09-11 00:29:33,500 - INFO - [__main__] 🎯 Processing signal #7812685: AUDIOUSDT on Bybit
+2025-09-11 00:29:33,500 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:29:33,500 - INFO - [__main__] 🎯 Processing signal #7812657: MELANIAUSDT on Binance
+2025-09-11 00:29:33,500 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:29:33,500 - INFO - [__main__] 🎯 Processing signal #7812619: ARKUSDT on Binance
+2025-09-11 00:29:33,500 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:29:33,500 - INFO - [__main__] 🎯 Processing signal #7812594: ALPHAUSDT on Binance
+2025-09-11 00:29:33,500 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:29:33,501 - INFO - [__main__] 🎯 Processing signal #7812639: SUNUSDT on Binance
+2025-09-11 00:29:33,501 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:29:33,744 - WARNING - [__main__] ❌ AUDIOUSDT spread too high: 171.800% > 100.0%
+2025-09-11 00:29:33,813 - WARNING - [__main__] ❌ HFTUSDT spread too high: 274.131% > 100.0%
+2025-09-11 00:29:33,986 - INFO - [__main__] ✅ ALPHAUSDT spread OK: 29.294%
+2025-09-11 00:29:33,990 - INFO - [__main__] ✅ SUNUSDT spread OK: 0.939%
+2025-09-11 00:29:33,991 - WARNING - [__main__] ❌ MELANIAUSDT spread too high: 3720.850% > 100.0%
+2025-09-11 00:29:33,993 - INFO - [__main__] ✅ ARKUSDT spread OK: 0.443%
+2025-09-11 00:29:34,940 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:29:34,940 - INFO - [__main__]    $20.00 = 1089.621357 ALPHAUSDT @ $0.0184
+2025-09-11 00:29:34,951 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:29:34,951 - INFO - [__main__]    $20.00 = 44.179368 ARKUSDT @ $0.4527
+2025-09-11 00:29:34,960 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:29:34,960 - INFO - [__main__]    $20.00 = 973.472864 SUNUSDT @ $0.0205
+2025-09-11 00:29:35,596 - WARNING - [__main__] Order attempt 1 failed: No execution
+2025-09-11 00:29:36,414 - INFO - [__main__] ✅ Order filled: 44.000000 @ $0.4537
+2025-09-11 00:29:36,415 - INFO - [__main__] ✅ Order filled: 973.000000 @ $0.0206
+2025-09-11 00:29:36,494 - INFO - [__main__] 📝 Trade logged to database - Order ID: 11117644
+2025-09-11 00:29:36,494 - INFO - [__main__] 📝 Trade logged to database - Order ID: 3552046
+2025-09-11 00:29:36,652 - INFO - [__main__] Signal #7812619 deactivated in database.
+2025-09-11 00:29:36,658 - INFO - [__main__] Signal #7812639 deactivated in database.
+2025-09-11 00:29:37,373 - INFO - [__main__] 🛡️ Initial Stop Loss set for ARKUSDT at $0.4242
+2025-09-11 00:29:37,373 - INFO - [__main__] ✅ Signal #7812619 processed successfully
+2025-09-11 00:29:37,559 - INFO - [__main__] 📝 Order attempt 2/3:
+2025-09-11 00:29:37,559 - INFO - [__main__]    $20.00 = 1089.621357 ALPHAUSDT @ $0.0184
+2025-09-11 00:29:37,842 - INFO - [__main__] 🛡️ Initial Stop Loss set for SUNUSDT at $0.0193
+2025-09-11 00:29:37,842 - INFO - [__main__] ✅ Signal #7812639 processed successfully
+2025-09-11 00:29:38,196 - WARNING - [__main__] Order attempt 2 failed: No execution
+2025-09-11 00:29:41,164 - INFO - [__main__] 📝 Order attempt 3/3:
+2025-09-11 00:29:41,164 - INFO - [__main__]    $20.00 = 1089.621357 ALPHAUSDT @ $0.0184
+2025-09-11 00:29:41,800 - WARNING - [__main__] Order attempt 3 failed: No execution
+2025-09-11 00:29:41,957 - ERROR - [__main__] ❌ Signal #7812594 failed: Failed after 3 attempts
+2025-09-11 00:29:41,957 - INFO - [__main__] 📊 Batch results: 2 success, 4 failed
+2025-09-11 00:30:12,153 - DEBUG - [__main__] Skipping BSWUSDT - in cooldown
+2025-09-11 00:30:12,154 - DEBUG - [__main__] Skipping 1000BTTUSDT - in cooldown
+2025-09-11 00:30:12,154 - DEBUG - [__main__] Skipping L3USDT - in cooldown
+2025-09-11 00:30:12,154 - DEBUG - [__main__] Skipping ALPHAUSDT - in cooldown
+2025-09-11 00:30:12,154 - INFO - [__main__] 📈 Found 6 new signals to process
+2025-09-11 00:30:12,154 - INFO - [__main__]    Distribution: Binance=5, Bybit=1
+2025-09-11 00:30:12,155 - INFO - [__main__]    Newest signal age: 30.2 minutes
+2025-09-11 00:30:12,233 - INFO - [__main__] ⚡ Processing 6 signals concurrently
+2025-09-11 00:30:12,233 - INFO - [__main__] 🎯 Processing signal #7812615: HFTUSDT on Binance
+2025-09-11 00:30:12,233 - INFO - [__main__]    Scores: Week=92.6%, Month=69.7%
+2025-09-11 00:30:12,234 - INFO - [__main__] 🎯 Processing signal #7812685: AUDIOUSDT on Bybit
+2025-09-11 00:30:12,234 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:30:12,235 - INFO - [__main__] 🎯 Processing signal #7812657: MELANIAUSDT on Binance
+2025-09-11 00:30:12,235 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:30:12,235 - INFO - [__main__] 🎯 Processing signal #7812625: NTRNUSDT on Binance
+2025-09-11 00:30:12,235 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:30:12,235 - INFO - [__main__] 🎯 Processing signal #7812646: SANTOSUSDT on Binance
+2025-09-11 00:30:12,235 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:30:12,236 - INFO - [__main__] 🎯 Processing signal #7812636: ZKUSDT on Binance
+2025-09-11 00:30:12,236 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:30:12,723 - INFO - [__main__] ✅ SANTOSUSDT spread OK: 0.220%
+2025-09-11 00:30:12,727 - INFO - [__main__] ✅ ZKUSDT spread OK: 2.736%
+2025-09-11 00:30:12,729 - WARNING - [__main__] ❌ MELANIAUSDT spread too high: 3720.850% > 100.0%
+2025-09-11 00:30:12,730 - WARNING - [__main__] ❌ HFTUSDT spread too high: 274.131% > 100.0%
+2025-09-11 00:30:12,733 - INFO - [__main__] ✅ NTRNUSDT spread OK: 2.920%
+2025-09-11 00:30:12,771 - WARNING - [__main__] ❌ AUDIOUSDT spread too high: 171.800% > 100.0%
+2025-09-11 00:30:13,674 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:30:13,675 - INFO - [__main__]    $20.00 = 11.001100 SANTOSUSDT @ $1.8180
+2025-09-11 00:30:13,679 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:30:13,679 - INFO - [__main__]    $20.00 = 325.150382 ZKUSDT @ $0.0615
+2025-09-11 00:30:13,687 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:30:13,688 - INFO - [__main__]    $20.00 = 203.386383 NTRNUSDT @ $0.0983
+2025-09-11 00:30:15,116 - INFO - [__main__] ✅ Order filled: 325.000000 @ $0.0623
+2025-09-11 00:30:15,125 - INFO - [__main__] ✅ Order filled: 11.000000 @ $1.8200
+2025-09-11 00:30:15,142 - INFO - [__main__] ✅ Order filled: 203.000000 @ $0.0998
+2025-09-11 00:30:15,196 - INFO - [__main__] 📝 Trade logged to database - Order ID: 11228111
+2025-09-11 00:30:15,203 - INFO - [__main__] 📝 Trade logged to database - Order ID: 3922612
+2025-09-11 00:30:15,226 - INFO - [__main__] 📝 Trade logged to database - Order ID: 6521512
+2025-09-11 00:30:15,357 - INFO - [__main__] Signal #7812636 deactivated in database.
+2025-09-11 00:30:15,365 - INFO - [__main__] Signal #7812646 deactivated in database.
+2025-09-11 00:30:15,387 - INFO - [__main__] Signal #7812625 deactivated in database.
+2025-09-11 00:30:16,084 - INFO - [__main__] 🛡️ Initial Stop Loss set for ZKUSDT at $0.0583
+2025-09-11 00:30:16,084 - INFO - [__main__] ✅ Signal #7812636 processed successfully
+2025-09-11 00:30:16,102 - INFO - [__main__] 🛡️ Initial Stop Loss set for SANTOSUSDT at $1.7017
+2025-09-11 00:30:16,102 - INFO - [__main__] ✅ Signal #7812646 processed successfully
+2025-09-11 00:30:16,135 - INFO - [__main__] 🛡️ Initial Stop Loss set for NTRNUSDT at $0.0933
+2025-09-11 00:30:16,135 - INFO - [__main__] ✅ Signal #7812625 processed successfully
+2025-09-11 00:30:16,136 - INFO - [__main__] 📊 Batch results: 3 success, 3 failed
+2025-09-11 00:30:21,740 - DEBUG - [__main__] Health check - Binance: $928.67
+2025-09-11 00:30:21,990 - DEBUG - [__main__] Health check - Bybit: $9883.40
+2025-09-11 00:30:46,355 - DEBUG - [__main__] Skipping BSWUSDT - in cooldown
+2025-09-11 00:30:46,356 - DEBUG - [__main__] Skipping 1000BTTUSDT - in cooldown
+2025-09-11 00:30:46,356 - DEBUG - [__main__] Skipping L3USDT - in cooldown
+2025-09-11 00:30:46,356 - DEBUG - [__main__] Skipping ALPHAUSDT - in cooldown
+2025-09-11 00:30:46,356 - DEBUG - [__main__] Skipping SOONUSDT - in cooldown
+2025-09-11 00:30:46,356 - INFO - [__main__] 📈 Found 5 new signals to process
+2025-09-11 00:30:46,356 - INFO - [__main__]    Distribution: Binance=4, Bybit=1
+2025-09-11 00:30:46,356 - INFO - [__main__]    Newest signal age: 30.8 minutes
+2025-09-11 00:30:46,433 - INFO - [__main__] ⚡ Processing 5 signals concurrently
+2025-09-11 00:30:46,434 - INFO - [__main__] 🎯 Processing signal #7812615: HFTUSDT on Binance
+2025-09-11 00:30:46,434 - INFO - [__main__]    Scores: Week=92.6%, Month=69.7%
+2025-09-11 00:30:46,434 - INFO - [__main__] 🎯 Processing signal #7812657: MELANIAUSDT on Binance
+2025-09-11 00:30:46,434 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:30:46,435 - INFO - [__main__] 🎯 Processing signal #7812634: BOMEUSDT on Binance
+2025-09-11 00:30:46,435 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:30:46,435 - INFO - [__main__] 🎯 Processing signal #7812699: TSTBSCUSDT on Bybit
+2025-09-11 00:30:46,435 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:30:46,435 - INFO - [__main__] 🎯 Processing signal #7812616: XVSUSDT on Binance
+2025-09-11 00:30:46,435 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:30:46,855 - INFO - [__main__] ⚠️ TSTBSCUSDT using synthetic spread
+2025-09-11 00:30:47,034 - INFO - [__main__] ✅ XVSUSDT spread OK: 0.786%
+2025-09-11 00:30:47,036 - WARNING - [__main__] ❌ HFTUSDT spread too high: 274.131% > 100.0%
+2025-09-11 00:30:47,036 - WARNING - [__main__] ❌ MELANIAUSDT spread too high: 3720.850% > 100.0%
+2025-09-11 00:30:47,047 - INFO - [__main__] ✅ BOMEUSDT spread OK: 1.535%
+2025-09-11 00:30:47,916 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:30:47,917 - INFO - [__main__]    $20.00 = 40.526849 TSTBSCUSDT @ $0.4935
+2025-09-11 00:30:48,010 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:30:48,010 - INFO - [__main__]    $20.00 = 9830.425166 BOMEUSDT @ $0.0020
+2025-09-11 00:30:48,441 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:30:48,441 - INFO - [__main__]    $20.00 = 3.132832 XVSUSDT @ $6.3840
+2025-09-11 00:30:49,922 - WARNING - [__main__] Order attempt 1 failed: No execution
+2025-09-11 00:30:50,339 - INFO - [__main__] ✅ Order filled: 3.100000 @ $6.4090
+2025-09-11 00:30:50,420 - INFO - [__main__] 📝 Trade logged to database - Order ID: 9443903
+2025-09-11 00:30:50,575 - INFO - [__main__] Signal #7812616 deactivated in database.
+2025-09-11 00:30:51,322 - INFO - [__main__] 🛡️ Initial Stop Loss set for XVSUSDT at $5.9924
+2025-09-11 00:30:51,322 - INFO - [__main__] ✅ Signal #7812616 processed successfully
+2025-09-11 00:30:52,517 - INFO - [__main__] 📝 Order attempt 2/3:
+2025-09-11 00:30:52,518 - INFO - [__main__]    $20.00 = 9866.798224 BOMEUSDT @ $0.0020
+2025-09-11 00:30:53,160 - WARNING - [__main__] Order attempt 2 failed: No execution
+2025-09-11 00:30:56,767 - INFO - [__main__] 📝 Order attempt 3/3:
+2025-09-11 00:30:56,767 - INFO - [__main__]    $20.00 = 9756.097561 BOMEUSDT @ $0.0021
+2025-09-11 00:30:57,396 - WARNING - [__main__] Order attempt 3 failed: No execution
+2025-09-11 00:30:57,552 - ERROR - [__main__] ❌ Signal #7812634 failed: Failed after 3 attempts
+2025-09-11 00:30:59,699 - WARNING - [__main__] Order attempt 1 failed: No execution
+2025-09-11 00:31:01,447 - INFO - [__main__] 📝 Order attempt 2/3:
+2025-09-11 00:31:01,448 - INFO - [__main__]    $20.00 = 40.526849 TSTBSCUSDT @ $0.4935
+2025-09-11 00:31:13,225 - WARNING - [__main__] Order attempt 2 failed: No execution
+2025-09-11 00:31:15,976 - INFO - [__main__] 📝 Order attempt 3/3:
+2025-09-11 00:31:15,976 - INFO - [__main__]    $20.00 = 40.526849 TSTBSCUSDT @ $0.4935
+2025-09-11 00:31:22,758 - DEBUG - [__main__] Health check - Binance: $925.99
+2025-09-11 00:31:23,008 - DEBUG - [__main__] Health check - Bybit: $9883.40
+2025-09-11 00:31:27,743 - WARNING - [__main__] Order attempt 3 failed: No execution
+2025-09-11 00:31:27,899 - ERROR - [__main__] ❌ Signal #7812699 failed: Failed after 3 attempts
+2025-09-11 00:31:27,900 - INFO - [__main__] 📊 Batch results: 1 success, 4 failed
+2025-09-11 00:31:58,161 - DEBUG - [__main__] Skipping BSWUSDT - in cooldown
+2025-09-11 00:31:58,162 - DEBUG - [__main__] Skipping 1000BTTUSDT - in cooldown
+2025-09-11 00:31:58,162 - DEBUG - [__main__] Skipping L3USDT - in cooldown
+2025-09-11 00:31:58,162 - DEBUG - [__main__] Skipping ALPHAUSDT - in cooldown
+2025-09-11 00:31:58,162 - DEBUG - [__main__] Skipping SOONUSDT - in cooldown
+2025-09-11 00:31:58,162 - DEBUG - [__main__] Skipping TSTBSCUSDT - in cooldown
+2025-09-11 00:31:58,162 - INFO - [__main__] 📈 Found 4 new signals to process
+2025-09-11 00:31:58,162 - INFO - [__main__]    Distribution: Binance=4, Bybit=0
+2025-09-11 00:31:58,162 - INFO - [__main__]    Newest signal age: 32.0 minutes
+2025-09-11 00:31:58,240 - INFO - [__main__] ⚡ Processing 4 signals concurrently
+2025-09-11 00:31:58,240 - INFO - [__main__] 🎯 Processing signal #7812615: HFTUSDT on Binance
+2025-09-11 00:31:58,240 - INFO - [__main__]    Scores: Week=92.6%, Month=69.7%
+2025-09-11 00:31:58,241 - INFO - [__main__] 🎯 Processing signal #7812657: MELANIAUSDT on Binance
+2025-09-11 00:31:58,241 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:31:58,241 - INFO - [__main__] 🎯 Processing signal #7812673: B2USDT on Binance
+2025-09-11 00:31:58,241 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:31:58,241 - INFO - [__main__] 🎯 Processing signal #7812628: NFPUSDT on Binance
+2025-09-11 00:31:58,241 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:31:58,839 - INFO - [__main__] ✅ B2USDT spread OK: 50.662%
+2025-09-11 00:31:58,841 - WARNING - [__main__] ❌ HFTUSDT spread too high: 274.131% > 100.0%
+2025-09-11 00:31:58,841 - WARNING - [__main__] ❌ MELANIAUSDT spread too high: 3720.850% > 100.0%
+2025-09-11 00:31:58,848 - INFO - [__main__] ✅ NFPUSDT spread OK: 2.831%
+2025-09-11 00:31:59,800 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:31:59,800 - INFO - [__main__]    $20.00 = 35.803795 B2USDT @ $0.5586
+2025-09-11 00:31:59,805 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:31:59,805 - INFO - [__main__]    $20.00 = 286.266371 NFPUSDT @ $0.0699
+2025-09-11 00:32:00,511 - WARNING - [__main__] Order attempt 1 failed: No execution
+2025-09-11 00:32:01,290 - INFO - [__main__] ✅ Order filled: 286.200000 @ $0.0708
+2025-09-11 00:32:01,368 - INFO - [__main__] 📝 Trade logged to database - Order ID: 29217882
+2025-09-11 00:32:01,527 - INFO - [__main__] Signal #7812628 deactivated in database.
+2025-09-11 00:32:02,258 - INFO - [__main__] 🛡️ Initial Stop Loss set for NFPUSDT at $0.0662
+2025-09-11 00:32:02,258 - INFO - [__main__] ✅ Signal #7812628 processed successfully
+2025-09-11 00:32:02,464 - INFO - [__main__] 📝 Order attempt 2/3:
+2025-09-11 00:32:02,464 - INFO - [__main__]    $20.00 = 35.803795 B2USDT @ $0.5586
+2025-09-11 00:32:03,092 - WARNING - [__main__] Order attempt 2 failed: No execution
+2025-09-11 00:32:06,523 - INFO - [__main__] 📝 Order attempt 3/3:
+2025-09-11 00:32:06,524 - INFO - [__main__]    $20.00 = 35.803795 B2USDT @ $0.5586
+2025-09-11 00:32:08,058 - WARNING - [__main__] Order attempt 3 failed: No execution
+2025-09-11 00:32:08,216 - ERROR - [__main__] ❌ Signal #7812673 failed: Failed after 3 attempts
+2025-09-11 00:32:08,217 - INFO - [__main__] 📊 Batch results: 1 success, 3 failed
+2025-09-11 00:32:23,668 - DEBUG - [__main__] Health check - Binance: $923.60
+2025-09-11 00:32:24,561 - DEBUG - [__main__] Health check - Bybit: $9883.40
+2025-09-11 00:32:38,445 - DEBUG - [__main__] Skipping BSWUSDT - in cooldown
+2025-09-11 00:32:38,446 - DEBUG - [__main__] Skipping 1000BTTUSDT - in cooldown
+2025-09-11 00:32:38,447 - DEBUG - [__main__] Skipping L3USDT - in cooldown
+2025-09-11 00:32:38,447 - DEBUG - [__main__] Skipping ALPHAUSDT - in cooldown
+2025-09-11 00:32:38,447 - DEBUG - [__main__] Skipping SOONUSDT - in cooldown
+2025-09-11 00:32:38,447 - DEBUG - [__main__] Skipping B2USDT - in cooldown
+2025-09-11 00:32:38,447 - DEBUG - [__main__] Skipping TSTBSCUSDT - in cooldown
+2025-09-11 00:32:38,447 - INFO - [__main__] 📈 Found 3 new signals to process
+2025-09-11 00:32:38,447 - INFO - [__main__]    Distribution: Binance=3, Bybit=0
+2025-09-11 00:32:38,447 - INFO - [__main__]    Newest signal age: 32.6 minutes
+2025-09-11 00:32:38,524 - INFO - [__main__] ⚡ Processing 3 signals concurrently
+2025-09-11 00:32:38,525 - INFO - [__main__] 🎯 Processing signal #7812615: HFTUSDT on Binance
+2025-09-11 00:32:38,525 - INFO - [__main__]    Scores: Week=92.6%, Month=69.7%
+2025-09-11 00:32:38,526 - INFO - [__main__] 🎯 Processing signal #7812657: MELANIAUSDT on Binance
+2025-09-11 00:32:38,526 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:32:38,526 - INFO - [__main__] 🎯 Processing signal #7812704: OXTUSDT on Binance
+2025-09-11 00:32:38,526 - INFO - [__main__]    Scores: Week=62.3%, Month=61.2%
+2025-09-11 00:32:38,838 - WARNING - [__main__] ❌ HFTUSDT spread too high: 274.131% > 100.0%
+2025-09-11 00:32:39,607 - INFO - [__main__] ✅ OXTUSDT spread OK: 1.123%
+2025-09-11 00:32:39,621 - WARNING - [__main__] ❌ MELANIAUSDT spread too high: 3720.850% > 100.0%
+2025-09-11 00:32:41,559 - INFO - [__main__] 📝 Order attempt 1/3:
+2025-09-11 00:32:41,559 - INFO - [__main__]    $20.00 = 372.231528 OXTUSDT @ $0.0537
+2025-09-11 00:32:44,481 - INFO - [__main__] ✅ Order filled: 372.000000 @ $0.0540
+2025-09-11 00:32:44,563 - INFO - [__main__] 📝 Trade logged to database - Order ID: 7333102
+2025-09-11 00:32:44,722 - INFO - [__main__] Signal #7812704 deactivated in database.
+2025-09-11 00:32:45,492 - INFO - [__main__] 🛡️ Initial Stop Loss set for OXTUSDT at $0.0505
+2025-09-11 00:32:45,493 - INFO - [__main__] ✅ Signal #7812704 processed successfully
+2025-09-11 00:32:45,493 - INFO - [__main__] 📊 Batch results: 1 success, 2 failed
+2025-09-11 00:33:25,839 - DEBUG - [__main__] Health check - Binance: $921.33
+2025-09-11 00:33:26,631 - DEBUG - [__main__] Health check - Bybit: $9883.40
+2025-09-11 00:34:28,289 - DEBUG - [__main__] Health check - Binance: $921.18
+2025-09-11 00:34:29,189 - DEBUG - [__main__] Health check - Bybit: $9883.40
