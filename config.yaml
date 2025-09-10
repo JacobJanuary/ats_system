@@ -1,0 +1,50 @@
+# Trading System Configuration
+
+database:
+  host: ${DB_HOST}
+  port: ${DB_PORT}
+  name: ${DB_NAME}
+  user: ${DB_USER}
+  password: ${DB_PASSWORD}
+
+trading:
+  # Signal thresholds (0-100 scale, will be converted to 0-1)
+  min_score_week: 70    # Minimum weekly score
+  min_score_month: 80   # Minimum monthly score
+  
+  # Position sizing
+  position_size_pct: 2  # Percent of balance per position
+  leverage: 10          # Leverage to use
+  
+  # Spread limits
+  spread_limit:
+    mainnet: 0.5        # Max spread 0.5% for mainnet
+    testnet: 100        # Max spread 100% for testnet (basically no limit)
+  
+  # Protection settings
+  use_trailing_stop: false  # If true use trailing stop, if false use fixed SL/TP
+  sl_percent: 2             # Stop loss percent
+  tp_percent: 3             # Take profit percent
+  trailing_activation: 1.5  # Trailing stop activation percent
+  trailing_callback: 0.5    # Trailing stop callback rate
+  
+  # Monitoring
+  check_interval: 30        # Check for new signals every N seconds
+
+exchanges:
+  binance:
+    enabled: ${BINANCE_ENABLED}
+    api_key: ${BINANCE_API_KEY}
+    api_secret: ${BINANCE_API_SECRET}
+    testnet: ${BINANCE_TESTNET}
+  
+  bybit:
+    enabled: ${BYBIT_ENABLED}
+    api_key: ${BYBIT_API_KEY}
+    api_secret: ${BYBIT_API_SECRET}
+    testnet: ${BYBIT_TESTNET}
+
+logging:
+  level: INFO
+  trader_log: trader.log
+  protection_log: protection.log

@@ -1,0 +1,113 @@
+2025-09-10 14:58:26,560 - INFO - [__main__] 🚀 Trader Configuration:
+2025-09-10 14:58:26,560 - INFO - [__main__]   - Mode: TESTNET
+2025-09-10 14:58:26,560 - INFO - [__main__]   - Position Size: $20.0 USD (fixed)
+2025-09-10 14:58:26,560 - INFO - [__main__]   - Leverage: 10x
+2025-09-10 14:58:26,560 - INFO - [__main__]   - Min Scores: Week=50.0%, Month=50.0%
+2025-09-10 14:58:26,560 - INFO - [__main__]   - Max Concurrent Orders: 10
+2025-09-10 14:58:26,560 - INFO - [__main__]   - Signal Window: 14 minutes
+2025-09-10 14:58:26,560 - INFO - [__main__] 🚀 Starting Production Trading System
+2025-09-10 14:58:27,672 - INFO - [__main__] ✅ Database connected
+2025-09-10 14:58:28,354 - INFO - [__main__] ✅ Bybit connected - Balance: $9847.66
+2025-09-10 14:58:28,920 - INFO - [__main__] ✅ Binance connected - Balance: $11973.61
+2025-09-10 14:58:30,189 - INFO - [__main__] 📈 Found 10 new signals to process
+2025-09-10 14:58:30,189 - INFO - [__main__]    Distribution: Binance=9, Bybit=1
+2025-09-10 14:58:30,189 - INFO - [__main__]    Newest signal age: 28.5 minutes
+2025-09-10 14:58:30,275 - INFO - [__main__] ⚡ Processing 10 signals concurrently
+2025-09-10 14:58:30,275 - INFO - [__main__] 🎯 Processing signal #7755602: BNBUSDT on Binance
+2025-09-10 14:58:30,275 - INFO - [__main__]    Scores: Week=77.0%, Month=51.8%
+2025-09-10 14:58:30,276 - INFO - [__main__] 🎯 Processing signal #7755601: ZECUSDT on Binance
+2025-09-10 14:58:30,276 - INFO - [__main__]    Scores: Week=77.0%, Month=51.8%
+2025-09-10 14:58:30,277 - INFO - [__main__] 🎯 Processing signal #7755644: SYNUSDT on Binance
+2025-09-10 14:58:30,277 - INFO - [__main__]    Scores: Week=77.0%, Month=51.8%
+2025-09-10 14:58:30,277 - INFO - [__main__] 🎯 Processing signal #7755697: 1000000CHEEMSUSDT on Bybit
+2025-09-10 14:58:30,277 - INFO - [__main__]    Scores: Week=77.0%, Month=51.8%
+2025-09-10 14:58:30,277 - INFO - [__main__] 🎯 Processing signal #7755725: COSUSDT on Binance
+2025-09-10 14:58:30,277 - INFO - [__main__]    Scores: Week=75.2%, Month=50.6%
+2025-09-10 14:58:30,277 - INFO - [__main__] 🎯 Processing signal #7755605: SUSHIUSDT on Binance
+2025-09-10 14:58:30,277 - INFO - [__main__]    Scores: Week=75.2%, Month=50.6%
+2025-09-10 14:58:30,277 - INFO - [__main__] 🎯 Processing signal #7755621: MAGICUSDT on Binance
+2025-09-10 14:58:30,278 - INFO - [__main__]    Scores: Week=75.2%, Month=50.6%
+2025-09-10 14:58:30,278 - INFO - [__main__] 🎯 Processing signal #7755646: FIOUSDT on Binance
+2025-09-10 14:58:30,278 - INFO - [__main__]    Scores: Week=75.2%, Month=50.6%
+2025-09-10 14:58:30,278 - INFO - [__main__] 🎯 Processing signal #7755647: CATIUSDT on Binance
+2025-09-10 14:58:30,278 - INFO - [__main__]    Scores: Week=75.2%, Month=50.6%
+2025-09-10 14:58:30,278 - INFO - [__main__] 🎯 Processing signal #7755651: HIPPOUSDT on Binance
+2025-09-10 14:58:30,278 - INFO - [__main__]    Scores: Week=75.2%, Month=50.6%
+2025-09-10 14:58:30,519 - INFO - [__main__] ⚠️ 1000000CHEEMSUSDT using price without orderbook (testnet)
+2025-09-10 14:58:30,584 - INFO - [__main__] ✅ BNBUSDT spread OK: 1.762%
+2025-09-10 14:58:30,746 - INFO - [__main__] ✅ ZECUSDT spread OK: 0.605%
+2025-09-10 14:58:30,748 - INFO - [__main__] ✅ SYNUSDT spread OK: 0.552%
+2025-09-10 14:58:30,749 - INFO - [__main__] ✅ MAGICUSDT spread OK: 0.047%
+2025-09-10 14:58:30,750 - INFO - [__main__] ✅ COSUSDT spread OK: 0.849%
+2025-09-10 14:58:30,759 - INFO - [__main__] ✅ CATIUSDT spread OK: 0.910%
+2025-09-10 14:58:30,784 - INFO - [__main__] ✅ FIOUSDT spread OK: 1.314%
+2025-09-10 14:58:30,786 - INFO - [__main__] ✅ SUSHIUSDT spread OK: 0.970%
+2025-09-10 14:58:30,793 - INFO - [__main__] ✅ HIPPOUSDT spread OK: 0.411%
+2025-09-10 14:58:31,010 - INFO - [__main__] Order attempt 1: $20.00 = 13.520822 1000000CHEEMSUSDT @ $1.4792
+2025-09-10 14:58:31,212 - INFO - [__main__] Order attempt 1: $20.00 = 0.022416 BNBUSDT @ $892.2000
+2025-09-10 14:58:31,376 - INFO - [__main__] Order attempt 1: $20.00 = 93.786635 MAGICUSDT @ $0.2132
+2025-09-10 14:58:31,379 - INFO - [__main__] Order attempt 1: $20.00 = 157.170923 SYNUSDT @ $0.1273
+2025-09-10 14:58:31,380 - INFO - [__main__] Order attempt 1: $20.00 = 0.415671 ZECUSDT @ $48.1150
+2025-09-10 14:58:31,386 - INFO - [__main__] Order attempt 1: $20.00 = 5828.354947 COSUSDT @ $0.0034
+2025-09-10 14:58:31,392 - INFO - [__main__] Order attempt 1: $20.00 = 218.352530 CATIUSDT @ $0.0916
+2025-09-10 14:58:31,439 - INFO - [__main__] Order attempt 1: $20.00 = 966.884216 FIOUSDT @ $0.0207
+2025-09-10 14:58:31,445 - INFO - [__main__] Order attempt 1: $20.00 = 25.061086 SUSHIUSDT @ $0.7980
+2025-09-10 14:58:31,839 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:31,907 - INFO - [__main__] Order attempt 1: $20.00 = 10251.153255 HIPPOUSDT @ $0.0020
+2025-09-10 14:58:31,908 - INFO - [__main__] Trade logged to database - Order ID: 42511745-4937-457f-88f1-b7ddda4bc4d8
+2025-09-10 14:58:31,983 - INFO - [__main__] ✅ Signal #7755697 processed successfully
+2025-09-10 14:58:31,989 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:31,994 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:32,005 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:32,016 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:32,079 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:32,090 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:32,449 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:32,463 - INFO - [__main__] Order attempt 2: $20.00 = 0.022416 BNBUSDT @ $892.2050
+2025-09-10 14:58:32,636 - INFO - [__main__] Order attempt 2: $20.00 = 157.170923 SYNUSDT @ $0.1273
+2025-09-10 14:58:32,658 - INFO - [__main__] Order attempt 2: $20.00 = 218.352530 CATIUSDT @ $0.0916
+2025-09-10 14:58:32,662 - INFO - [__main__] Order attempt 2: $20.00 = 5828.354947 COSUSDT @ $0.0034
+2025-09-10 14:58:32,735 - INFO - [__main__] Order attempt 2: $20.00 = 966.884216 FIOUSDT @ $0.0207
+2025-09-10 14:58:32,750 - INFO - [__main__] Order attempt 2: $20.00 = 25.061086 SUSHIUSDT @ $0.7980
+2025-09-10 14:58:32,993 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:33,068 - INFO - [__main__] Order attempt 2: $20.00 = 93.786635 MAGICUSDT @ $0.2132
+2025-09-10 14:58:33,085 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:33,259 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:33,284 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:33,380 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:33,399 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:33,520 - INFO - [__main__] Order attempt 2: $20.00 = 0.415671 ZECUSDT @ $48.1150
+2025-09-10 14:58:33,654 - INFO - [__main__] Order attempt 2: $20.00 = 10251.153255 HIPPOUSDT @ $0.0020
+2025-09-10 14:58:33,692 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:33,753 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:33,888 - INFO - [__main__] Order attempt 3: $20.00 = 157.170923 SYNUSDT @ $0.1273
+2025-09-10 14:58:33,907 - INFO - [__main__] Order attempt 3: $20.00 = 218.352530 CATIUSDT @ $0.0916
+2025-09-10 14:58:34,043 - INFO - [__main__] Order attempt 3: $20.00 = 966.884216 FIOUSDT @ $0.0207
+2025-09-10 14:58:34,139 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:34,158 - INFO - [__main__] Order attempt 3: $20.00 = 0.023745 BNBUSDT @ $842.3000
+2025-09-10 14:58:34,296 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:34,323 - INFO - [__main__] Order attempt 3: $20.00 = 93.786635 MAGICUSDT @ $0.2132
+2025-09-10 14:58:34,387 - INFO - [__main__] Order attempt 3: $20.00 = 5828.354947 COSUSDT @ $0.0034
+2025-09-10 14:58:34,509 - INFO - [__main__] Order attempt 3: $20.00 = 25.061086 SUSHIUSDT @ $0.7980
+2025-09-10 14:58:34,510 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:34,739 - ERROR - [__main__] ❌ Signal #7755644 failed: Failed after 3 attempts
+2025-09-10 14:58:34,773 - INFO - [__main__] Order attempt 3: $20.00 = 0.415671 ZECUSDT @ $48.1150
+2025-09-10 14:58:34,781 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:34,931 - ERROR - [__main__] ❌ Signal #7755602 failed: Failed after 3 attempts
+2025-09-10 14:58:34,936 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:34,949 - INFO - [__main__] Order attempt 3: $20.00 = 10251.153255 HIPPOUSDT @ $0.0020
+2025-09-10 14:58:34,969 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:35,014 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:35,089 - ERROR - [__main__] ❌ Signal #7755621 failed: Failed after 3 attempts
+2025-09-10 14:58:35,137 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:35,205 - ERROR - [__main__] ❌ Signal #7755647 failed: Failed after 3 attempts
+2025-09-10 14:58:35,289 - ERROR - [__main__] ❌ Signal #7755646 failed: Failed after 3 attempts
+2025-09-10 14:58:35,387 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:35,538 - ERROR - [__main__] ❌ Signal #7755601 failed: Failed after 3 attempts
+2025-09-10 14:58:35,592 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:35,607 - WARNING - [__main__] Order created but no execution quantity
+2025-09-10 14:58:35,743 - ERROR - [__main__] ❌ Signal #7755651 failed: Failed after 3 attempts
+2025-09-10 14:58:35,757 - ERROR - [__main__] ❌ Signal #7755605 failed: Failed after 3 attempts
+2025-09-10 14:58:35,805 - ERROR - [__main__] ❌ Signal #7755725 failed: Failed after 3 attempts
+2025-09-10 14:58:35,805 - INFO - [__main__] 📊 Batch results: 1 success, 9 failed
+2025-09-10 14:58:39,117 - INFO - [__main__] Received signal 2
