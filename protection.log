@@ -3387,3 +3387,215 @@ AttributeError: 'BybitExchange' object has no attribute 'cancel_all_open_orders'
 2025-09-11 02:29:16,141 - INFO - [__main__] Binance connection closed
 2025-09-11 02:29:16,142 - INFO - [__main__] Bybit connection closed
 2025-09-11 02:29:16,142 - INFO - [__main__] ✅ Cleanup complete
+2025-09-11 02:31:02,992 - INFO - [__main__] ============================================================
+2025-09-11 02:31:02,993 - INFO - [__main__] Protection Monitor Configuration
+2025-09-11 02:31:02,993 - INFO - [__main__] ============================================================
+2025-09-11 02:31:02,993 - INFO - [__main__] Mode: TESTNET
+2025-09-11 02:31:02,993 - INFO - [__main__] Stop Loss Type: TRAILING
+2025-09-11 02:31:02,993 - INFO - [__main__] Check Interval: 30 seconds
+2025-09-11 02:31:02,993 - INFO - [__main__] ============================================================
+2025-09-11 02:31:02,993 - INFO - [__main__] 🚀 Starting Protection Monitor v2.6
+2025-09-11 02:31:05,221 - INFO - [exchanges.binance] Binance testnet initialized
+2025-09-11 02:31:05,222 - INFO - [exchanges.binance] Loaded 531 active perpetual contracts
+2025-09-11 02:31:05,222 - INFO - [exchanges.binance] ✅ PUFFERUSDT found in exchange info
+2025-09-11 02:31:05,222 - INFO - [exchanges.binance] ✅ SKATEUSDT found in exchange info
+2025-09-11 02:31:05,590 - INFO - [__main__] ✅ Binance connected - Balance: $890.53
+2025-09-11 02:31:08,659 - INFO - [exchanges.bybit] Bybit testnet initialized
+2025-09-11 02:31:08,659 - INFO - [exchanges.bybit] Position mode: one-way
+2025-09-11 02:31:08,659 - INFO - [exchanges.bybit] Loaded 616 active symbols
+2025-09-11 02:31:08,926 - INFO - [__main__] ✅ Bybit connected - Balance: $9877.84
+2025-09-11 02:31:08,927 - INFO - [__main__] === Protection Check #1 ===
+2025-09-11 02:31:09,538 - INFO - [__main__] Found 18 Bybit positions to check
+2025-09-11 02:31:09,755 - INFO - [__main__] Found 4 Binance positions to check
+2025-09-11 02:31:10,102 - WARNING - [__main__] ⏰ BinanceExchange BIDUSDT exceeded max duration.
+2025-09-11 02:31:10,102 - ERROR - [__main__] Failed to handle duration limit for BIDUSDT: 'BinanceExchange' object has no attribute 'symbol_info'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 109, in _handle_position_duration_limit
+    tick_size = float(exchange.symbol_info.get(symbol, {}).get('tick_size', 0.0001))
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceExchange' object has no attribute 'symbol_info'
+2025-09-11 02:31:10,104 - WARNING - [__main__] ⏰ BinanceExchange BNBUSDT exceeded max duration.
+2025-09-11 02:31:10,104 - ERROR - [__main__] Failed to handle duration limit for BNBUSDT: 'BinanceExchange' object has no attribute 'symbol_info'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 109, in _handle_position_duration_limit
+    tick_size = float(exchange.symbol_info.get(symbol, {}).get('tick_size', 0.0001))
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceExchange' object has no attribute 'symbol_info'
+2025-09-11 02:31:10,105 - WARNING - [__main__] ⏰ BinanceExchange TSTUSDT exceeded max duration.
+2025-09-11 02:31:10,106 - ERROR - [__main__] Failed to handle duration limit for TSTUSDT: 'BinanceExchange' object has no attribute 'symbol_info'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 109, in _handle_position_duration_limit
+    tick_size = float(exchange.symbol_info.get(symbol, {}).get('tick_size', 0.0001))
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceExchange' object has no attribute 'symbol_info'
+2025-09-11 02:31:10,107 - WARNING - [__main__] ⏰ BinanceExchange BROCCOLIF3BUSDT exceeded max duration.
+2025-09-11 02:31:10,107 - ERROR - [__main__] Failed to handle duration limit for BROCCOLIF3BUSDT: 'BinanceExchange' object has no attribute 'symbol_info'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 109, in _handle_position_duration_limit
+    tick_size = float(exchange.symbol_info.get(symbol, {}).get('tick_size', 0.0001))
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceExchange' object has no attribute 'symbol_info'
+2025-09-11 02:31:10,144 - WARNING - [__main__] ⏰ BybitExchange RAYDIUMUSDT exceeded max duration.
+2025-09-11 02:31:10,145 - INFO - [__main__]    Entering close-only mode for RAYDIUMUSDT.
+2025-09-11 02:31:10,145 - INFO - [__main__]    Cancelling all existing protection orders for RAYDIUMUSDT.
+2025-09-11 02:31:10,145 - WARNING - [__main__] ⏰ BybitExchange TAIUSDT exceeded max duration.
+2025-09-11 02:31:10,145 - INFO - [__main__]    Entering close-only mode for TAIUSDT.
+2025-09-11 02:31:10,145 - INFO - [__main__]    Cancelling all existing protection orders for TAIUSDT.
+2025-09-11 02:31:10,145 - WARNING - [__main__] ⏰ BybitExchange COREUSDT exceeded max duration.
+2025-09-11 02:31:10,145 - INFO - [__main__]    Entering close-only mode for COREUSDT.
+2025-09-11 02:31:10,145 - INFO - [__main__]    Cancelling all existing protection orders for COREUSDT.
+2025-09-11 02:31:10,145 - WARNING - [__main__] ⏰ BybitExchange DOGUSDT exceeded max duration.
+2025-09-11 02:31:10,145 - WARNING - [__main__] ⏰ BybitExchange WAVESUSDT exceeded max duration.
+2025-09-11 02:31:10,145 - WARNING - [__main__] ⏰ BybitExchange SHIB1000USDT exceeded max duration.
+2025-09-11 02:31:10,145 - INFO - [__main__]    Entering close-only mode for SHIB1000USDT.
+2025-09-11 02:31:10,145 - INFO - [__main__]    Cancelling all existing protection orders for SHIB1000USDT.
+2025-09-11 02:31:10,145 - WARNING - [__main__] ⏰ BybitExchange SUIUSDT exceeded max duration.
+2025-09-11 02:31:10,146 - WARNING - [__main__] ⏰ BybitExchange CELRUSDT exceeded max duration.
+2025-09-11 02:31:10,146 - WARNING - [__main__] ⏰ BybitExchange 1000000BABYDOGEUSDT exceeded max duration.
+2025-09-11 02:31:10,146 - WARNING - [__main__] ⏰ BybitExchange BOBAUSDT exceeded max duration.
+2025-09-11 02:31:10,146 - INFO - [__main__]    Entering close-only mode for BOBAUSDT.
+2025-09-11 02:31:10,146 - INFO - [__main__]    Cancelling all existing protection orders for BOBAUSDT.
+2025-09-11 02:31:10,413 - INFO - [exchanges.bybit] All orders cancelled for RAYDIUMUSDT
+2025-09-11 02:31:10,602 - INFO - [exchanges.bybit] All orders cancelled for BOBAUSDT
+2025-09-11 02:31:10,603 - INFO - [exchanges.bybit] All orders cancelled for SHIB1000USDT
+2025-09-11 02:31:10,915 - INFO - [__main__]    Position is profitable/breakeven. Closing RAYDIUMUSDT by market order.
+2025-09-11 02:31:10,939 - INFO - [exchanges.bybit] All orders cancelled for TAIUSDT
+2025-09-11 02:31:10,940 - INFO - [exchanges.bybit] All orders cancelled for COREUSDT
+2025-09-11 02:31:11,104 - INFO - [__main__]    Position is profitable/breakeven. Closing BOBAUSDT by market order.
+2025-09-11 02:31:11,105 - INFO - [__main__]    Position is profitable/breakeven. Closing SHIB1000USDT by market order.
+2025-09-11 02:31:11,441 - INFO - [__main__]    Position is profitable/breakeven. Closing TAIUSDT by market order.
+2025-09-11 02:31:11,442 - INFO - [__main__]    Position is profitable/breakeven. Closing COREUSDT by market order.
+2025-09-11 02:31:11,643 - INFO - [exchanges.bybit] Position close order created for SHIB1000USDT: bfdebdf6-d088-4c6d-984e-36e451c5bfa7
+2025-09-11 02:31:11,644 - WARNING - [__main__] ⏰ BybitExchange SOSOUSDT exceeded max duration.
+2025-09-11 02:31:11,645 - INFO - [__main__]    Entering close-only mode for SOSOUSDT.
+2025-09-11 02:31:11,645 - INFO - [__main__]    Cancelling all existing protection orders for SOSOUSDT.
+2025-09-11 02:31:11,646 - INFO - [exchanges.bybit] Position close order created for BOBAUSDT: bb9630f3-852a-4b46-bdc0-a277e7344048
+2025-09-11 02:31:11,647 - WARNING - [__main__] ⏰ BybitExchange INJUSDT exceeded max duration.
+2025-09-11 02:31:11,647 - WARNING - [__main__] ⏰ BybitExchange HMSTRUSDT exceeded max duration.
+2025-09-11 02:31:11,647 - WARNING - [__main__] ⏰ BybitExchange PRIMEUSDT exceeded max duration.
+2025-09-11 02:31:11,647 - WARNING - [__main__] ⏰ BybitExchange BLURUSDT exceeded max duration.
+2025-09-11 02:31:11,647 - INFO - [__main__]    Entering close-only mode for BLURUSDT.
+2025-09-11 02:31:11,647 - INFO - [__main__]    Cancelling all existing protection orders for BLURUSDT.
+2025-09-11 02:31:11,785 - INFO - [exchanges.bybit] Position close order created for RAYDIUMUSDT: b6d72f4c-31fa-4ff5-ae23-81aadd67a11e
+2025-09-11 02:31:11,785 - WARNING - [__main__] ⏰ BybitExchange BAKEUSDT exceeded max duration.
+2025-09-11 02:31:11,786 - INFO - [__main__]    Entering close-only mode for BAKEUSDT.
+2025-09-11 02:31:11,786 - INFO - [__main__]    Cancelling all existing protection orders for BAKEUSDT.
+2025-09-11 02:31:11,915 - INFO - [exchanges.bybit] All orders cancelled for SOSOUSDT
+2025-09-11 02:31:11,915 - INFO - [exchanges.bybit] All orders cancelled for BLURUSDT
+2025-09-11 02:31:11,976 - INFO - [exchanges.bybit] Position close order created for TAIUSDT: f3739a86-c928-44c0-b445-9281c79883c0
+2025-09-11 02:31:11,976 - WARNING - [__main__] ⏰ BybitExchange PENDLEUSDT exceeded max duration.
+2025-09-11 02:31:11,976 - WARNING - [__main__] ⏰ BybitExchange ORDIUSDT exceeded max duration.
+2025-09-11 02:31:11,976 - INFO - [__main__]    Entering close-only mode for ORDIUSDT.
+2025-09-11 02:31:11,976 - INFO - [__main__]    Cancelling all existing protection orders for ORDIUSDT.
+2025-09-11 02:31:11,977 - INFO - [exchanges.bybit] Position close order created for COREUSDT: faddba99-4349-4d45-b336-0b0f88a75bf1
+2025-09-11 02:31:12,388 - INFO - [exchanges.bybit] All orders cancelled for BAKEUSDT
+2025-09-11 02:31:12,416 - INFO - [__main__]    Position is profitable/breakeven. Closing SOSOUSDT by market order.
+2025-09-11 02:31:12,417 - INFO - [__main__]    Position is profitable/breakeven. Closing BLURUSDT by market order.
+2025-09-11 02:31:12,578 - INFO - [exchanges.bybit] All orders cancelled for ORDIUSDT
+2025-09-11 02:31:12,889 - INFO - [__main__]    Position is profitable/breakeven. Closing BAKEUSDT by market order.
+2025-09-11 02:31:12,952 - INFO - [exchanges.bybit] Position close order created for SOSOUSDT: 633c7010-8133-4476-9856-b962cec81f88
+2025-09-11 02:31:13,080 - INFO - [__main__]    Position is profitable/breakeven. Closing ORDIUSDT by market order.
+2025-09-11 02:31:13,286 - INFO - [exchanges.bybit] Position close order created for BLURUSDT: 21be4524-0afd-46ef-9a56-1cd49ea14b05
+2025-09-11 02:31:13,423 - INFO - [exchanges.bybit] Position close order created for BAKEUSDT: f2c39c52-5ae1-4b2a-b580-480529b34268
+2025-09-11 02:31:13,951 - INFO - [exchanges.bybit] Position close order created for ORDIUSDT: a289563b-2407-482b-aaa2-113eac6bfc0f
+2025-09-11 02:31:43,953 - INFO - [__main__] === Protection Check #2 ===
+2025-09-11 02:31:44,759 - INFO - [__main__] Found 18 Bybit positions to check
+2025-09-11 02:31:44,986 - INFO - [__main__] Found 4 Binance positions to check
+2025-09-11 02:31:45,364 - WARNING - [__main__] ⏰ BybitExchange RAYDIUMUSDT exceeded max duration.
+2025-09-11 02:31:45,364 - INFO - [__main__]    Entering close-only mode for RAYDIUMUSDT.
+2025-09-11 02:31:45,364 - INFO - [__main__]    Cancelling all existing protection orders for RAYDIUMUSDT.
+2025-09-11 02:31:45,365 - WARNING - [__main__] ⏰ BybitExchange TAIUSDT exceeded max duration.
+2025-09-11 02:31:45,365 - INFO - [__main__]    Entering close-only mode for TAIUSDT.
+2025-09-11 02:31:45,365 - INFO - [__main__]    Cancelling all existing protection orders for TAIUSDT.
+2025-09-11 02:31:45,365 - WARNING - [__main__] ⏰ BybitExchange COREUSDT exceeded max duration.
+2025-09-11 02:31:45,365 - INFO - [__main__]    Entering close-only mode for COREUSDT.
+2025-09-11 02:31:45,365 - INFO - [__main__]    Cancelling all existing protection orders for COREUSDT.
+2025-09-11 02:31:45,365 - WARNING - [__main__] ⏰ BybitExchange DOGUSDT exceeded max duration.
+2025-09-11 02:31:45,365 - WARNING - [__main__] ⏰ BybitExchange WAVESUSDT exceeded max duration.
+2025-09-11 02:31:45,365 - WARNING - [__main__] ⏰ BybitExchange SHIB1000USDT exceeded max duration.
+2025-09-11 02:31:45,366 - INFO - [__main__]    Entering close-only mode for SHIB1000USDT.
+2025-09-11 02:31:45,366 - INFO - [__main__]    Cancelling all existing protection orders for SHIB1000USDT.
+2025-09-11 02:31:45,366 - WARNING - [__main__] ⏰ BybitExchange SUIUSDT exceeded max duration.
+2025-09-11 02:31:45,366 - WARNING - [__main__] ⏰ BybitExchange CELRUSDT exceeded max duration.
+2025-09-11 02:31:45,366 - WARNING - [__main__] ⏰ BybitExchange 1000000BABYDOGEUSDT exceeded max duration.
+2025-09-11 02:31:45,366 - WARNING - [__main__] ⏰ BybitExchange BOBAUSDT exceeded max duration.
+2025-09-11 02:31:45,366 - INFO - [__main__]    Entering close-only mode for BOBAUSDT.
+2025-09-11 02:31:45,366 - INFO - [__main__]    Cancelling all existing protection orders for BOBAUSDT.
+2025-09-11 02:31:45,635 - INFO - [exchanges.bybit] All orders cancelled for RAYDIUMUSDT
+2025-09-11 02:31:45,796 - WARNING - [__main__] ⏰ BinanceExchange BIDUSDT exceeded max duration.
+2025-09-11 02:31:45,796 - ERROR - [__main__] Failed to handle duration limit for BIDUSDT: 'BinanceExchange' object has no attribute 'symbol_info'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 109, in _handle_position_duration_limit
+    tick_size = float(exchange.symbol_info.get(symbol, {}).get('tick_size', 0.0001))
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceExchange' object has no attribute 'symbol_info'
+2025-09-11 02:31:45,799 - WARNING - [__main__] ⏰ BinanceExchange BNBUSDT exceeded max duration.
+2025-09-11 02:31:45,799 - ERROR - [__main__] Failed to handle duration limit for BNBUSDT: 'BinanceExchange' object has no attribute 'symbol_info'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 109, in _handle_position_duration_limit
+    tick_size = float(exchange.symbol_info.get(symbol, {}).get('tick_size', 0.0001))
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceExchange' object has no attribute 'symbol_info'
+2025-09-11 02:31:45,800 - WARNING - [__main__] ⏰ BinanceExchange TSTUSDT exceeded max duration.
+2025-09-11 02:31:45,801 - ERROR - [__main__] Failed to handle duration limit for TSTUSDT: 'BinanceExchange' object has no attribute 'symbol_info'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 109, in _handle_position_duration_limit
+    tick_size = float(exchange.symbol_info.get(symbol, {}).get('tick_size', 0.0001))
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceExchange' object has no attribute 'symbol_info'
+2025-09-11 02:31:45,802 - WARNING - [__main__] ⏰ BinanceExchange BROCCOLIF3BUSDT exceeded max duration.
+2025-09-11 02:31:45,802 - ERROR - [__main__] Failed to handle duration limit for BROCCOLIF3BUSDT: 'BinanceExchange' object has no attribute 'symbol_info'
+Traceback (most recent call last):
+  File "/Users/evgeniyyanvarskiy/PycharmProjects/ats_system/protection_monitor.py", line 109, in _handle_position_duration_limit
+    tick_size = float(exchange.symbol_info.get(symbol, {}).get('tick_size', 0.0001))
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceExchange' object has no attribute 'symbol_info'
+2025-09-11 02:31:45,839 - INFO - [exchanges.bybit] All orders cancelled for SHIB1000USDT
+2025-09-11 02:31:46,137 - INFO - [__main__]    Position is profitable/breakeven. Closing RAYDIUMUSDT by market order.
+2025-09-11 02:31:46,172 - INFO - [exchanges.bybit] All orders cancelled for TAIUSDT
+2025-09-11 02:31:46,174 - INFO - [exchanges.bybit] All orders cancelled for BOBAUSDT
+2025-09-11 02:31:46,176 - INFO - [exchanges.bybit] All orders cancelled for COREUSDT
+2025-09-11 02:31:46,340 - INFO - [__main__]    Position is profitable/breakeven. Closing SHIB1000USDT by market order.
+2025-09-11 02:31:46,674 - INFO - [__main__]    Position is profitable/breakeven. Closing TAIUSDT by market order.
+2025-09-11 02:31:46,675 - INFO - [__main__]    Position is profitable/breakeven. Closing BOBAUSDT by market order.
+2025-09-11 02:31:46,676 - INFO - [__main__]    Position is profitable/breakeven. Closing COREUSDT by market order.
+2025-09-11 02:31:47,011 - INFO - [exchanges.bybit] Position close order created for RAYDIUMUSDT: 73383f99-0b79-4a32-9281-7f3bf107fc76
+2025-09-11 02:31:47,012 - WARNING - [__main__] ⏰ BybitExchange SOSOUSDT exceeded max duration.
+2025-09-11 02:31:47,012 - INFO - [__main__]    Entering close-only mode for SOSOUSDT.
+2025-09-11 02:31:47,012 - INFO - [__main__]    Cancelling all existing protection orders for SOSOUSDT.
+2025-09-11 02:31:47,216 - INFO - [exchanges.bybit] Position close order created for SHIB1000USDT: 5870a051-d2e1-4285-9500-6003724d9c4a
+2025-09-11 02:31:47,217 - WARNING - [__main__] ⏰ BybitExchange INJUSDT exceeded max duration.
+2025-09-11 02:31:47,217 - WARNING - [__main__] ⏰ BybitExchange HMSTRUSDT exceeded max duration.
+2025-09-11 02:31:47,217 - WARNING - [__main__] ⏰ BybitExchange PRIMEUSDT exceeded max duration.
+2025-09-11 02:31:47,217 - WARNING - [__main__] ⏰ BybitExchange BLURUSDT exceeded max duration.
+2025-09-11 02:31:47,218 - INFO - [__main__]    Entering close-only mode for BLURUSDT.
+2025-09-11 02:31:47,218 - INFO - [__main__]    Cancelling all existing protection orders for BLURUSDT.
+2025-09-11 02:31:47,553 - INFO - [exchanges.bybit] Position close order created for BOBAUSDT: 85ba8772-075f-41ed-963a-2633bcfe50d1
+2025-09-11 02:31:47,553 - WARNING - [__main__] ⏰ BybitExchange BAKEUSDT exceeded max duration.
+2025-09-11 02:31:47,554 - INFO - [__main__]    Entering close-only mode for BAKEUSDT.
+2025-09-11 02:31:47,554 - INFO - [__main__]    Cancelling all existing protection orders for BAKEUSDT.
+2025-09-11 02:31:47,555 - INFO - [exchanges.bybit] Position close order created for TAIUSDT: 7385921d-d49f-4c1d-9b63-713051e66f97
+2025-09-11 02:31:47,555 - INFO - [exchanges.bybit] Position close order created for COREUSDT: ad416582-d82a-4628-ab08-deba196cb5f0
+2025-09-11 02:31:47,555 - WARNING - [__main__] ⏰ BybitExchange PENDLEUSDT exceeded max duration.
+2025-09-11 02:31:47,556 - WARNING - [__main__] ⏰ BybitExchange ORDIUSDT exceeded max duration.
+2025-09-11 02:31:47,556 - INFO - [__main__]    Entering close-only mode for ORDIUSDT.
+2025-09-11 02:31:47,556 - INFO - [__main__]    Cancelling all existing protection orders for ORDIUSDT.
+2025-09-11 02:31:47,614 - INFO - [exchanges.bybit] All orders cancelled for SOSOUSDT
+2025-09-11 02:31:47,820 - INFO - [exchanges.bybit] All orders cancelled for BLURUSDT
+2025-09-11 02:31:47,820 - INFO - [exchanges.bybit] All orders cancelled for ORDIUSDT
+2025-09-11 02:31:48,116 - INFO - [__main__]    Position is profitable/breakeven. Closing SOSOUSDT by market order.
+2025-09-11 02:31:48,154 - INFO - [exchanges.bybit] All orders cancelled for BAKEUSDT
+2025-09-11 02:31:48,321 - INFO - [__main__]    Position is profitable/breakeven. Closing BLURUSDT by market order.
+2025-09-11 02:31:48,323 - INFO - [__main__]    Position is profitable/breakeven. Closing ORDIUSDT by market order.
+2025-09-11 02:31:48,655 - INFO - [__main__]    Position is profitable/breakeven. Closing BAKEUSDT by market order.
+2025-09-11 02:31:48,990 - INFO - [exchanges.bybit] Position close order created for SOSOUSDT: abc17d00-8115-4403-b6fd-fe0aaa1f9f5b
+2025-09-11 02:31:49,195 - INFO - [exchanges.bybit] Position close order created for BAKEUSDT: 8dd05ef3-9243-4c1a-bd26-124513fdbce6
+2025-09-11 02:31:49,196 - INFO - [exchanges.bybit] Position close order created for ORDIUSDT: 5fb70147-e4b6-4747-a0f2-23480db48908
+2025-09-11 02:31:49,197 - INFO - [exchanges.bybit] Position close order created for BLURUSDT: 1425dd87-bd54-4371-ab6d-83b4cb90b43c
+2025-09-11 02:31:53,701 - INFO - [__main__] 🧹 Cleaning up...
+2025-09-11 02:31:53,701 - INFO - [__main__] ============================================================
+2025-09-11 02:31:53,701 - INFO - [__main__] Performance Statistics
+2025-09-11 02:31:53,701 - INFO - [__main__] ============================================================
+2025-09-11 02:31:53,702 - INFO - [__main__] Binance connection closed
+2025-09-11 02:31:53,702 - INFO - [__main__] Bybit connection closed
+2025-09-11 02:31:53,702 - INFO - [__main__] ✅ Cleanup complete
