@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Main Trading Script - FIXED VERSION 3.0
-Исправлены проблемы с Bybit и обработкой пустых значений
+Main Trading Script - PRODUCTION READY v4.0
+- Добавлена деактивация сигналов (is_active=false)
+- Добавлена установка первичного SL после открытия позиции
 """
 
 import asyncio
@@ -109,6 +110,10 @@ class MainTrader:
         self.max_daily_loss_usd = float(os.getenv('MAX_DAILY_LOSS_USD', '5000'))
         self.min_balance_reserve = float(os.getenv('MIN_BALANCE_RESERVE', '100'))
 
+        # <<< ИЗМЕНЕНИЕ: Параметр для первичного SL из protection_monitor >>>
+        self.initial_sl_percent = float(os.getenv('STOP_LOSS_PERCENT', '2.0'))
+        # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
+
         self.testnet = os.getenv('TESTNET', 'false').lower() == 'true'
         self.spread_limit = 100.0 if self.testnet else 0.5
 
@@ -142,6 +147,9 @@ class MainTrader:
         logger.info(f"Max Concurrent Orders: {self.max_concurrent_orders}")
         logger.info(f"Signal Window: {self.signal_time_window} minutes")
         logger.info(f"Spread Limit: {self.spread_limit}%")
+        # <<< ИЗМЕНЕНИЕ: Логирование параметра SL >>>
+        logger.info(f"Initial Stop Loss: {self.initial_sl_percent}%")
+        # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
         logger.info("=" * 60)
 
     async def initialize(self):
@@ -236,6 +244,7 @@ class MainTrader:
     async def get_unprocessed_signals(self) -> List[Signal]:
         time_threshold = datetime.now(timezone.utc) - timedelta(minutes=self.signal_time_window)
 
+        # <<< ИЗМЕНЕНИЕ: Запрос теперь фильтрует по sh.is_active = true >>>
         query = """
             SELECT 
                 sh.id,
@@ -252,12 +261,8 @@ class MainTrader:
                 END as exchange_name
             FROM fas.scoring_history sh
             JOIN public.trading_pairs tp ON sh.trading_pair_id = tp.id
-            WHERE sh.id NOT IN (
-                SELECT signal_id FROM monitoring.trades 
-                WHERE signal_id IS NOT NULL
-                UNION
-                SELECT unnest($1::int[])
-            )
+            WHERE sh.id NOT IN (SELECT unnest($1::int[]))
+            AND sh.is_active = true
             AND sh.score_week >= $2
             AND sh.score_month >= $3
             AND sh.created_at > $4
@@ -268,9 +273,11 @@ class MainTrader:
                 sh.created_at DESC
             LIMIT $5
         """
+        # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
 
         try:
             async with self.db_pool.acquire() as conn:
+                # <<< ИЗМЕНЕНИЕ: Убрана проверка по таблице monitoring.trades, т.к. is_active надежнее >>>
                 rows = await conn.fetch(
                     query,
                     list(self.processing_signals),
@@ -279,6 +286,7 @@ class MainTrader:
                     time_threshold,
                     self.max_concurrent_orders
                 )
+                # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
 
                 signals = []
                 for row in rows:
@@ -353,12 +361,10 @@ class MainTrader:
                     return True
                 return False
 
-            # ВАЖНО: Проверяем, что значения не пустые строки
             bid = ticker.get('bid', 0)
             ask = ticker.get('ask', 0)
             price = ticker.get('price', 0)
 
-            # Конвертируем в float с проверкой
             try:
                 bid = float(bid) if bid and bid != '' else 0
                 ask = float(ask) if ask and ask != '' else 0
@@ -418,7 +424,6 @@ class MainTrader:
 
             price = ticker.get('price', 0)
 
-            # Проверка и конвертация цены
             try:
                 price = float(price) if price and price != '' else 0
             except (ValueError, TypeError):
@@ -431,7 +436,6 @@ class MainTrader:
 
             quantity = position_size_usd / price
 
-            # Минимальные размеры ордеров для бирж
             if exchange == self.binance:
                 min_notional = 5.0
                 if self.testnet:
@@ -456,64 +460,38 @@ class MainTrader:
 
         for attempt in range(self.order_retry_max):
             try:
-                # Получаем баланс с проверкой
                 balance = await exchange.get_balance()
-
-                # ВАЖНО: Проверяем, что баланс не пустая строка
                 try:
                     balance = float(balance) if balance and balance != '' else 0
                 except (ValueError, TypeError) as e:
                     logger.error(f"Invalid balance value: {balance}")
-                    return OrderResult(
-                        success=False,
-                        error_message=f"Invalid balance: {balance}"
-                    )
+                    return OrderResult(success=False, error_message=f"Invalid balance: {balance}")
 
                 if balance <= self.min_balance_reserve:
-                    return OrderResult(
-                        success=False,
-                        error_message=f"Insufficient balance: ${balance:.2f}"
-                    )
+                    return OrderResult(success=False, error_message=f"Insufficient balance: ${balance:.2f}")
 
-                valid, adjusted_size = await self._validate_order_size(
-                    exchange,
-                    signal.symbol,
-                    self.position_size_usd
-                )
-
+                valid, adjusted_size = await self._validate_order_size(exchange, signal.symbol, self.position_size_usd)
                 if not valid:
-                    return OrderResult(
-                        success=False,
-                        error_message="Invalid order size"
-                    )
+                    return OrderResult(success=False, error_message="Invalid order size")
 
                 position_size_usd = adjusted_size
-
                 max_available = balance - self.min_balance_reserve
                 if position_size_usd > max_available:
                     if max_available < 10:
-                        return OrderResult(
-                            success=False,
-                            error_message=f"Insufficient available balance: ${max_available:.2f}"
-                        )
+                        return OrderResult(success=False,
+                                           error_message=f"Insufficient available balance: ${max_available:.2f}")
                     position_size_usd = max_available
                     logger.warning(f"Adjusted position to available balance: ${position_size_usd:.2f}")
 
-                # Получаем текущую цену с проверкой
                 ticker = await exchange.get_ticker(signal.symbol)
                 if not ticker:
                     logger.error(f"No ticker for {signal.symbol}")
                     if attempt < self.order_retry_max - 1:
                         await asyncio.sleep(self.order_retry_delay * (attempt + 1))
                         continue
-                    return OrderResult(
-                        success=False,
-                        error_message="No ticker data"
-                    )
+                    return OrderResult(success=False, error_message="No ticker data")
 
                 price = ticker.get('price', 0)
-
-                # ВАЖНО: Проверяем и конвертируем цену
                 try:
                     price = float(price) if price and price != '' else 0
                 except (ValueError, TypeError) as e:
@@ -521,20 +499,14 @@ class MainTrader:
                     if attempt < self.order_retry_max - 1:
                         await asyncio.sleep(self.order_retry_delay * (attempt + 1))
                         continue
-                    return OrderResult(
-                        success=False,
-                        error_message=f"Invalid price: {price}"
-                    )
+                    return OrderResult(success=False, error_message=f"Invalid price: {price}")
 
                 if price <= 0:
                     logger.error(f"Invalid price for {signal.symbol}: {price}")
                     if attempt < self.order_retry_max - 1:
                         await asyncio.sleep(self.order_retry_delay * (attempt + 1))
                         continue
-                    return OrderResult(
-                        success=False,
-                        error_message=f"Invalid price: {price}"
-                    )
+                    return OrderResult(success=False, error_message=f"Invalid price: {price}")
 
                 quantity = position_size_usd / price
 
@@ -545,7 +517,6 @@ class MainTrader:
                 if not leverage_set:
                     logger.warning(f"Could not set leverage for {signal.symbol}, continuing anyway")
 
-                # Создаем market ордер
                 order = await exchange.create_market_order(signal.symbol, 'BUY', quantity)
 
                 if order and order.get('quantity', 0) > 0:
@@ -569,33 +540,21 @@ class MainTrader:
                     )
                 else:
                     logger.warning(f"Order attempt {attempt + 1} failed: No execution")
-
                     if attempt < self.order_retry_max - 1:
                         await asyncio.sleep(self.order_retry_delay * (attempt + 1))
 
             except Exception as e:
                 error_msg = str(e)
                 logger.error(f"Order attempt {attempt + 1} error: {error_msg}")
-
                 error_lower = error_msg.lower()
-
                 if 'insufficient' in error_lower or 'balance' in error_lower:
-                    return OrderResult(
-                        success=False,
-                        error_message="Insufficient balance",
-                        retry_count=attempt + 1
-                    )
+                    return OrderResult(success=False, error_message="Insufficient balance", retry_count=attempt + 1)
                 elif 'invalid symbol' in error_lower:
                     self.failed_symbols[signal.symbol] = datetime.now(timezone.utc)
-                    return OrderResult(
-                        success=False,
-                        error_message=f"Invalid symbol: {signal.symbol}",
-                        retry_count=attempt + 1
-                    )
+                    return OrderResult(success=False, error_message=f"Invalid symbol: {signal.symbol}",
+                                       retry_count=attempt + 1)
                 elif 'unable to fill' in error_lower or '-2020' in error_msg:
-                    # Специфичная ошибка Binance о недостаточной ликвидности
                     logger.warning(f"{signal.symbol}: No liquidity on {signal.exchange_name}")
-                    # На testnet это нормально, продолжаем попытки
                     if self.testnet and attempt < self.order_retry_max - 1:
                         await asyncio.sleep(self.order_retry_delay * (attempt + 1))
                         continue
@@ -607,12 +566,47 @@ class MainTrader:
 
         self.daily_stats['failed_trades'] += 1
         self.failed_symbols[signal.symbol] = datetime.now(timezone.utc)
+        return OrderResult(success=False, error_message=f"Failed after {self.order_retry_max} attempts",
+                           retry_count=self.order_retry_max)
 
-        return OrderResult(
-            success=False,
-            error_message=f"Failed after {self.order_retry_max} attempts",
-            retry_count=self.order_retry_max
-        )
+    # <<< ИЗМЕНЕНИЕ: Новый метод для установки первичного стоп-лосса >>>
+    async def _set_initial_protection(self, exchange, order_result: OrderResult):
+        """Sets an initial stop-loss immediately after opening a position."""
+        try:
+            entry_price = order_result.price
+            side = order_result.side.upper()
+
+            # Используем тот же процент, что и в protection_monitor
+            sl_price = entry_price * (1 - self.initial_sl_percent / 100) if side == 'BUY' \
+                else entry_price * (1 + self.initial_sl_percent / 100)
+
+            # Убеждаемся, что в коннекторе есть метод set_stop_loss
+            if hasattr(exchange, 'set_stop_loss'):
+                success = await exchange.set_stop_loss(order_result.symbol, sl_price)
+                if success:
+                    logger.info(f"🛡️ Initial Stop Loss set for {order_result.symbol} at ${sl_price:.4f}")
+                else:
+                    logger.warning(f"⚠️ Failed to set initial SL for {order_result.symbol}")
+            else:
+                logger.error(f"Exchange {exchange} does not support set_stop_loss method.")
+
+        except Exception as e:
+            logger.error(f"Error setting initial protection for {order_result.symbol}: {e}")
+
+    # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
+
+    # <<< ИЗМЕНЕНИЕ: Новый метод для деактивации сигнала в БД >>>
+    async def _deactivate_signal_in_db(self, signal_id: int):
+        """Updates the signal in the database to set is_active = false."""
+        query = "UPDATE fas.scoring_history SET is_active = false WHERE id = $1"
+        try:
+            async with self.db_pool.acquire() as conn:
+                await conn.execute(query, signal_id)
+                logger.info(f"Signal #{signal_id} deactivated in database.")
+        except Exception as e:
+            logger.error(f"Failed to deactivate signal #{signal_id}: {e}")
+
+    # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
 
     async def process_signal(self, signal: Signal) -> bool:
         self.processing_signals.add(signal.id)
@@ -639,6 +633,12 @@ class MainTrader:
 
             if order_result.success:
                 await self._log_successful_trade(signal, order_result)
+
+                # <<< ИЗМЕНЕНИЕ: Вызов деактивации сигнала и установки защиты >>>
+                await self._deactivate_signal_in_db(signal.id)
+                await self._set_initial_protection(exchange, order_result)
+                # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
+
                 self.daily_stats['trades_count'] += 1
                 logger.info(f"✅ Signal #{signal.id} processed successfully")
                 return True
@@ -785,7 +785,6 @@ class MainTrader:
                 for name, check in checks:
                     try:
                         balance = await check
-                        # ВАЖНО: Проверяем, что баланс не пустая строка
                         try:
                             balance = float(balance) if balance and balance != '' else 0
                         except (ValueError, TypeError):
@@ -811,7 +810,7 @@ class MainTrader:
                 logger.error(f"Health check error: {e}")
 
     async def run(self):
-        logger.info("🚀 Starting Production Trading System v3.0")
+        logger.info("🚀 Starting Production Trading System v4.0")
 
         try:
             await self.initialize()
