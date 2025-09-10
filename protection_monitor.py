@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/-bin/env python3
 """
 Protection Monitor - PRODUCTION READY v2.6 (Final)
 - Добавлена проверка на уже существующий ордер закрытия по таймауту.
@@ -33,7 +33,6 @@ logger = logging.getLogger(__name__)
 
 class ProtectionMonitor:
     def __init__(self):
-        # Configuration
         self.stop_loss_type = os.getenv('STOP_LOSS_TYPE', 'fixed').lower()
         self.sl_percent = float(os.getenv('STOP_LOSS_PERCENT', '2'))
         self.tp_percent = float(os.getenv('TAKE_PROFIT_PERCENT', '3'))
@@ -63,7 +62,14 @@ class ProtectionMonitor:
         logger.info("=" * 60)
         logger.info(f"Mode: {'TESTNET' if self.testnet else 'PRODUCTION'}")
         logger.info(f"Stop Loss Type: {self.stop_loss_type.upper()}")
-        # ... (rest of the method is unchanged)
+        logger.info(f"Stop Loss: {self.sl_percent}%")
+        logger.info(f"Take Profit: {self.tp_percent}%")
+        if self.stop_loss_type == 'trailing':
+            logger.info(f"Trailing Activation: {self.trailing_activation}%")
+            logger.info(f"Trailing Callback: {self.trailing_callback}%")
+        if self.max_position_duration_hours > 0:
+            logger.info(f"Max Position Duration: {self.max_position_duration_hours} hours")
+            logger.info(f"Taker Fee: {self.taker_fee_percent}%")
         logger.info(f"Check Interval: {self.check_interval} seconds")
         logger.info("=" * 60)
 
@@ -108,9 +114,10 @@ class ProtectionMonitor:
             breakeven_price = self._calculate_breakeven_price(position['entry_price'], side)
             tick_size = float(exchange.symbol_info.get(symbol, {}).get('tick_size', 0.0001))
 
-            # Ищем лимитный ордер reduce-only на закрытие
             is_close_order_placed = any(
-                o.get('reduceOnly', False) and abs(float(o.get('price', 0)) - breakeven_price) < tick_size
+                o.get('reduceOnly', False) and
+                o.get('type' if isinstance(exchange, BinanceExchange) else 'orderType', '').upper() == 'LIMIT' and
+                abs(float(o.get('price', 0)) - breakeven_price) < tick_size
                 for o in open_orders
             )
 
@@ -123,7 +130,7 @@ class ProtectionMonitor:
             logger.info(f"   Cancelling all existing protection orders for {symbol}.")
             await exchange.cancel_all_open_orders(symbol)
 
-            await asyncio.sleep(0.5)  # Небольшая пауза после отмены
+            await asyncio.sleep(0.5)
 
             if pnl >= 0:
                 logger.info(f"   Position is profitable/breakeven. Closing {symbol} by market order.")
@@ -147,7 +154,6 @@ class ProtectionMonitor:
         symbol = pos['symbol']
 
         try:
-            # 1. ПРИОРИТЕТ №1: Проверка на таймаут
             if self.max_position_duration_hours > 0:
                 update_time = pos.get('updateTime', 0) if exchange_name == 'Binance' else pos.get('created_time', 0)
                 if update_time > 0:
@@ -156,7 +162,6 @@ class ProtectionMonitor:
                         await self._handle_position_duration_limit(exchange, pos, orders_by_symbol.get(symbol, []))
                         return
 
-            # 2. ПРИОРИТЕТ №2: Установка защиты (срабатывает, только если позиция не просрочена)
             protection_is_incomplete = self._is_protection_incomplete(exchange_name, pos,
                                                                       orders_by_symbol.get(symbol, []))
             if protection_is_incomplete:
@@ -187,7 +192,7 @@ class ProtectionMonitor:
 
         if self.stop_loss_type == 'trailing':
             await exchange.cancel_all_open_orders(symbol)
-            await asyncio.sleep(0.5)  # Пауза после отмены
+            await asyncio.sleep(0.5)
             ts_success = await self._set_trailing_stop(exchange, pos)
             if ts_success:
                 sl_success = await self._set_backup_sl(exchange, pos)
@@ -289,7 +294,12 @@ class ProtectionMonitor:
         hours = uptime.total_seconds() / 3600
         logger.info("=" * 60)
         logger.info("Performance Statistics")
-        # ... (rest of the method is unchanged)
+        logger.info("=" * 60)
+        logger.info(f"Uptime: {hours:.2f} hours")
+        logger.info(f"Checks performed: {self.stats['checks']}")
+        logger.info(f"Positions protected: {self.stats['positions_protected']}")
+        logger.info(f"Positions closed: {self.stats['positions_closed']}")
+        logger.info(f"Errors encountered: {self.stats['errors']}")
         logger.info("=" * 60)
 
     async def cleanup(self):
