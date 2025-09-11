@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Binance Exchange Implementation - PRODUCTION READY v2.2 (Final)
-- Унифицировано имя exchange_info -> symbol_info для совместимости с монитором.
+Binance Exchange Implementation - PRODUCTION READY
+Fixed all critical issues with order execution and leverage
 """
 
 import asyncio
@@ -11,6 +11,10 @@ from decimal import Decimal, ROUND_DOWN, ROUND_UP
 import hmac
 import hashlib
 import time
+try:
+    from ..api_error_handler import get_error_handler
+except ImportError:
+    from api_error_handler import get_error_handler
 import aiohttp
 import json
 from urllib.parse import urlencode
@@ -35,34 +39,35 @@ class BinanceExchange(BaseExchange):
             self.ws_url = "wss://fstream.binance.com"
 
         self.session = None
-        # <<< ИЗМЕНЕНИЕ: Переменная переименована для совместимости с protection_monitor >>>
-        self.symbol_info = {}
-        # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
+        self.exchange_info = {}
+        self.symbol_info = {}  # Alias for compatibility with protection_monitor
         self.symbol_leverage_limits = {}  # Store max leverage per symbol
         self.last_error = None
 
     async def initialize(self):
         """Initialize connection and load exchange info"""
         self.session = aiohttp.ClientSession()
+        
+        # Advanced error handling
+        self.error_handler = get_error_handler("Binance")
         await self._make_request("GET", "/fapi/v1/ping")
 
         # Load exchange info including leverage limits
-        exchange_info_data = await self._make_request("GET", "/fapi/v1/exchangeInfo")
-        if exchange_info_data:
-            for symbol_info_item in exchange_info_data.get('symbols', []):
+        exchange_info = await self._make_request("GET", "/fapi/v1/exchangeInfo")
+        if exchange_info:
+            for symbol_info in exchange_info.get('symbols', []):
                 # Only process active PERPETUAL contracts
-                if (symbol_info_item.get('status') == 'TRADING' and
-                        symbol_info_item.get('contractType') == 'PERPETUAL'):
+                if (symbol_info.get('status') == 'TRADING' and
+                        symbol_info.get('contractType') == 'PERPETUAL'):
 
-                    symbol = symbol_info_item['symbol']
-                    # <<< ИЗМЕНЕНИЕ: Запись в унифицированную переменную >>>
-                    self.symbol_info[symbol] = symbol_info_item
-                    # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
+                    symbol = symbol_info['symbol']
+                    self.exchange_info[symbol] = symbol_info
+                    self.symbol_info[symbol] = symbol_info  # Also set for compatibility
 
                     # Try to extract max leverage
                     # First check for LEVERAGE_BRACKET filter
                     leverage_bracket = next(
-                        (f for f in symbol_info_item.get('filters', [])
+                        (f for f in symbol_info.get('filters', [])
                          if f['filterType'] == 'LEVERAGE_BRACKET'),
                         None
                     )
@@ -77,7 +82,7 @@ class BinanceExchange(BaseExchange):
                     # Fallback: check MAX_LEVERAGE filter
                     if symbol not in self.symbol_leverage_limits:
                         max_leverage_filter = next(
-                            (f for f in symbol_info_item.get('filters', [])
+                            (f for f in symbol_info.get('filters', [])
                              if f['filterType'] == 'MAX_LEVERAGE'),
                             None
                         )
@@ -91,22 +96,20 @@ class BinanceExchange(BaseExchange):
 
         # Log summary
         logger.info(f"Binance {'testnet' if self.testnet else 'mainnet'} initialized")
-        # <<< ИЗМЕНЕНИЕ: Использование унифицированной переменной >>>
-        logger.info(f"Loaded {len(self.symbol_info)} active perpetual contracts")
+        logger.info(f"Loaded {len(self.exchange_info)} active perpetual contracts")
 
         # On testnet, log some example pairs for debugging
-        if self.testnet and self.symbol_info:
-            sample_symbols = list(self.symbol_info.keys())[:5]
+        if self.testnet and self.exchange_info:
+            sample_symbols = list(self.exchange_info.keys())[:5]
             logger.debug(f"Sample symbols: {sample_symbols}")
 
             # Check for specific problematic pairs
             for problem_symbol in ['PUFFERUSDT', 'SKATEUSDT']:
-                if problem_symbol in self.symbol_info:
+                if problem_symbol in self.exchange_info:
                     logger.info(f"✅ {problem_symbol} found in exchange info")
                     logger.debug(f"   Max leverage: {self.symbol_leverage_limits.get(problem_symbol, 'N/A')}")
                 else:
                     logger.warning(f"⚠️ {problem_symbol} NOT found in exchange info")
-        # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
 
     async def close(self):
         if self.session:
@@ -174,13 +177,12 @@ class BinanceExchange(BaseExchange):
         """Get maximum allowed leverage for symbol"""
         return self.symbol_leverage_limits.get(symbol, 20)
 
-    # <<< ИЗМЕНЕНИЕ: Использование унифицированной переменной >>>
     def format_price(self, symbol: str, price: float) -> str:
         """Format price according to exchange rules"""
         try:
-            if symbol in self.symbol_info:
+            if symbol in self.exchange_info:
                 price_filter = next(
-                    (f for f in self.symbol_info[symbol]['filters']
+                    (f for f in self.exchange_info[symbol]['filters']
                      if f['filterType'] == 'PRICE_FILTER'),
                     None
                 )
@@ -199,9 +201,9 @@ class BinanceExchange(BaseExchange):
     def format_quantity(self, symbol: str, quantity: float) -> str:
         """Format quantity with proper rounding and min/max checks"""
         try:
-            if symbol in self.symbol_info:
+            if symbol in self.exchange_info:
                 lot_size_filter = next(
-                    (f for f in self.symbol_info[symbol]['filters']
+                    (f for f in self.exchange_info[symbol]['filters']
                      if f['filterType'] == 'LOT_SIZE'),
                     None
                 )
@@ -245,7 +247,6 @@ class BinanceExchange(BaseExchange):
             logger.error(f"Error formatting quantity for {symbol}: {e}")
 
         return str(quantity)
-    # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
 
     async def get_open_positions(self) -> List[Dict]:
         """Get all open positions"""

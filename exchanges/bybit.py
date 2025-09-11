@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Bybit Exchange Implementation - V5 API PRODUCTION READY v2.0
-- Упрощена и усилена логика верификации market-ордеров
+Bybit Exchange Implementation - CLEAN PRODUCTION VERSION
+Created from scratch using BinanceExchange as template
 """
 
 import asyncio
@@ -14,15 +14,19 @@ import time
 import aiohttp
 import json
 from urllib.parse import urlencode
+
+try:
+    from ..api_error_handler import get_error_handler
+except ImportError:
+    from api_error_handler import get_error_handler
+
 from .base import BaseExchange
 
 logger = logging.getLogger(__name__)
 
 
 class BybitExchange(BaseExchange):
-    """
-    Bybit futures exchange implementation with FIXED signature and ROBUST order verification
-    """
+    """Bybit futures exchange implementation - clean version"""
 
     def __init__(self, config: Dict):
         """Initialize Bybit exchange with configuration"""
@@ -42,6 +46,8 @@ class BybitExchange(BaseExchange):
         self.recv_window = 5000
         self.symbol_info = {}
         self.position_mode = None
+        # Initialize error handler
+        self.error_handler = get_error_handler("Bybit")
 
     async def initialize(self):
         """Initialize Bybit connection and load market info"""
@@ -52,6 +58,8 @@ class BybitExchange(BaseExchange):
             raise Exception("Failed to connect to Bybit")
 
         await self._detect_position_mode()
+        # Advanced error handling
+        self.error_handler = get_error_handler("Bybit")
         await self._load_instruments_info()
 
         logger.info(f"Bybit {'testnet' if self.testnet else 'mainnet'} initialized")
@@ -77,72 +85,47 @@ class BybitExchange(BaseExchange):
     async def _load_instruments_info(self):
         """Load all active trading instruments"""
         try:
-            cursor = None
-            while True:
-                params = {'category': 'linear', 'limit': 1000}
-                if cursor:
-                    params['cursor'] = cursor
-                result = await self._make_request("GET", "/v5/market/instruments-info", params)
-                if not result or 'list' not in result:
-                    break
-                for instrument in result['list']:
-                    if instrument.get('status') == 'Trading':
-                        symbol = instrument['symbol']
-                        self.symbol_info[symbol] = {
-                            'min_qty': float(instrument['lotSizeFilter']['minOrderQty']),
-                            'max_qty': float(instrument['lotSizeFilter']['maxOrderQty']),
-                            'qty_step': float(instrument['lotSizeFilter']['qtyStep']),
-                            'min_price': float(instrument['priceFilter']['minPrice']),
-                            'max_price': float(instrument['priceFilter']['maxPrice']),
-                            'tick_size': float(instrument['priceFilter']['tickSize']),
-                            'max_leverage': float(instrument['leverageFilter']['maxLeverage']),
-                            'min_leverage': float(instrument['leverageFilter']['minLeverage']),
-                        }
-                cursor = result.get('nextPageCursor')
-                if not cursor:
-                    break
+            result = await self._make_request("GET", "/v5/market/instruments-info")
+            if result and 'result' in result and 'list' in result['result']:
+                for symbol_info in result['result']['list']:
+                    if symbol_info.get('status') == 'Trading':
+                        symbol = symbol_info['symbol']
+                        self.symbol_info[symbol] = symbol_info
+            logger.info(f"Loaded {len(self.symbol_info)} trading instruments")
         except Exception as e:
             logger.error(f"Error loading instruments: {e}")
 
     def _generate_signature(self, timestamp: str, params: str) -> str:
+        """Generate HMAC SHA256 signature for Bybit API"""
         param_str = f"{timestamp}{self.api_key}{self.recv_window}{params}"
         signature = hmac.new(self.api_secret.encode('utf-8'), param_str.encode('utf-8'), hashlib.sha256).hexdigest()
         return signature
 
     async def _make_request(self, method: str, endpoint: str, params: Dict = None, signed: bool = False):
-        if not self.session:
-            return None
-        url = self.base_url + endpoint
-        timestamp = str(int(time.time() * 1000))
-        headers = {}
-        if not signed:
-            try:
+        """Make API request to Bybit"""
+        try:
+            if not self.session:
+                return None
+            url = self.base_url + endpoint
+            timestamp = str(int(time.time() * 1000))
+            headers = {}
+
+            if signed and self.api_key and self.api_secret:
+                headers = {
+                    'X-BAPI-API-KEY': self.api_key,
+                    'X-BAPI-TIMESTAMP': timestamp,
+                    'X-BAPI-RECV-WINDOW': str(self.recv_window)
+                }
+
                 if method == "GET":
                     if params:
                         query_string = urlencode(sorted(params.items()))
                         url = f"{url}?{query_string}"
-                    async with self.session.get(url, headers=headers, timeout=10) as response:
-                        return await self._handle_response(response)
-                elif method == "POST":
-                    async with self.session.post(url, json=params, headers=headers, timeout=10) as response:
-                        return await self._handle_response(response)
-            except Exception as e:
-                logger.error(f"Request error: {e}")
-                return None
-        if signed and self.api_key and self.api_secret:
-            headers = {'X-BAPI-API-KEY': self.api_key, 'X-BAPI-TIMESTAMP': timestamp,
-                       'X-BAPI-RECV-WINDOW': str(self.recv_window)}
-            try:
-                if method == "GET":
-                    if params:
-                        sorted_params = sorted(params.items())
-                        query_string = urlencode(sorted_params)
+                        signature = self._generate_signature(timestamp, query_string)
                     else:
-                        query_string = ""
-                    signature = self._generate_signature(timestamp, query_string)
+                        # Even without params, we need to generate signature for authenticated endpoints
+                        signature = self._generate_signature(timestamp, "")
                     headers['X-BAPI-SIGN'] = signature
-                    if query_string:
-                        url = f"{url}?{query_string}"
                     async with self.session.get(url, headers=headers, timeout=10) as response:
                         return await self._handle_response(response)
                 elif method == "POST":
@@ -152,12 +135,21 @@ class BybitExchange(BaseExchange):
                     headers['Content-Type'] = 'application/json'
                     async with self.session.post(url, json=params, headers=headers, timeout=10) as response:
                         return await self._handle_response(response)
-            except asyncio.TimeoutError:
-                logger.error(f"Request timeout for {endpoint}")
                 return None
-            except Exception as e:
-                logger.error(f"Bybit request error: {e}")
+            else:
+                if method == "GET":
+                    if params:
+                        query_string = urlencode(sorted(params.items()))
+                        url = f"{url}?{query_string}"
+                    async with self.session.get(url, headers=headers, timeout=10) as response:
+                        return await self._handle_response(response)
+                elif method == "POST":
+                    async with self.session.post(url, json=params, headers=headers, timeout=10) as response:
+                        return await self._handle_response(response)
                 return None
+        except Exception as e:
+            logger.error(f"Error making Bybit request: {e}")
+            return None
 
     async def _handle_response(self, response):
         """Handle API response"""
@@ -168,22 +160,42 @@ class BybitExchange(BaseExchange):
                 if ret_code == 0:
                     return data.get('result', data)
 
-                # Считаем "not modified" успешным результатом, т.к. желаемое состояние достигнуто
-                if ret_code == 34040:
-                    logger.debug(f"Bybit: State not modified (retCode {ret_code}), treating as success.")
-                    return data  # Возвращаем не None, чтобы retry-цикл остановился
+                # Use advanced error handler
+                error_type = self.error_handler.classify_error(ret_code, data.get('retMsg', 'Unknown error'), response.status)
+                logger.error(f"Bybit API error {ret_code}: {data.get('retMsg', 'Unknown error')} (type: {error_type.value})")
 
-                ret_msg = data.get('retMsg', 'Unknown error')
-                if ret_code == 10001:
-                    logger.error(f"Bybit: Parameter error - {ret_msg}")
-                elif ret_code == 10004:
-                    logger.error(f"Bybit: Sign error - {ret_msg}")
-                elif ret_code == 110043:
-                    logger.debug(f"Bybit: Leverage not modified - {ret_msg}")
-                    return data
-                else:
-                    logger.error(f"Bybit API error {ret_code}: {ret_msg}")
-                return None  # Возвращаем None для всех настоящих ошибок
+                # Provide specific suggestions
+                suggestion = self.error_handler.suggest_fix(error_type, data.get('retMsg', 'Unknown error'))
+                if suggestion:
+                    logger.info(f"💡 Suggestion: {suggestion}")
+
+                return None
+            else:
+                logger.error(f"Bybit HTTP error {response.status}: {await response.text()}")
+                return None
+        except Exception as e:
+            logger.error(f"Error parsing Bybit response: {e}")
+            return None
+
+    async def _handle_response_with_error_handler(self, response):
+        """Handle API response with advanced error classification"""
+        try:
+            data = await response.json()
+            if response.status == 200:
+                ret_code = data.get('retCode')
+                if ret_code == 0:
+                    return data.get('result', data)
+
+                # Use advanced error handler
+                error_type = self.error_handler.classify_error(ret_code, data.get('retMsg', 'Unknown error'), response.status)
+                logger.error(f"Bybit API error {ret_code}: {data.get('retMsg', 'Unknown error')} (type: {error_type.value})")
+
+                # Provide specific suggestions - ensure variable is always defined
+                suggestion = self.error_handler.suggest_fix(error_type, data.get('retMsg', 'Unknown error'))
+                if suggestion:
+                    logger.info(f"💡 Suggestion: {suggestion}")
+
+                return None
             else:
                 logger.error(f"Bybit HTTP error {response.status}: {await response.text()}")
                 return None
@@ -192,288 +204,576 @@ class BybitExchange(BaseExchange):
             return None
 
     def format_quantity(self, symbol: str, quantity: float) -> str:
+        """Format quantity according to symbol precision"""
         if symbol not in self.symbol_info:
             logger.warning(f"No symbol info for {symbol}, using default formatting")
-            return str(round(quantity, 4)) if quantity < 1 else str(int(quantity))
-        info = self.symbol_info[symbol]
-        qty_step = Decimal(str(info['qty_step']))
-        min_qty = Decimal(str(info['min_qty']))
-        max_qty = Decimal(str(info['max_qty']))
-        qty_decimal = Decimal(str(quantity))
-        if qty_step > 0:
-            step_str = str(qty_step)
-            decimal_places = len(step_str.split('.')[1].rstrip('0')) if '.' in step_str else 0
-            rounded_qty = (qty_decimal / qty_step).quantize(Decimal('1'), rounding=ROUND_DOWN) * qty_step
-            if rounded_qty < min_qty:
-                rounded_qty = min_qty
-            if rounded_qty > max_qty:
-                rounded_qty = max_qty
-            result = f"{{:.{decimal_places}f}}".format(float(rounded_qty)) if decimal_places > 0 else str(
-                int(rounded_qty))
-            if '.' in result:
-                result = result.rstrip('0').rstrip('.')
-            return result
-        else:
-            return str(quantity)
+            return ".8f".format(quantity)
+        precision = self.symbol_info[symbol].get('lotSize', {}).get('stepSize', "0.00000001")
+        decimals = len(precision.split(".")[1].rstrip("0")) if "." in precision else 0
+        return f".{decimals}f".format(quantity)
 
     def format_price(self, symbol: str, price: float) -> str:
+        """Format price according to symbol precision"""
         if symbol not in self.symbol_info:
-            return str(round(price, 2))
-        info = self.symbol_info[symbol]
-        tick_size = Decimal(str(info['tick_size']))
-        price_decimal = Decimal(str(price))
-        rounded_price = (price_decimal / tick_size).quantize(Decimal('1'), rounding=ROUND_DOWN) * tick_size
-        result = str(rounded_price)
-        if '.' in result:
-            result = result.rstrip('0').rstrip('.')
-        return result
+            logger.warning(f"No symbol info for {symbol}, using default formatting")
+            return ".8f".format(price)
+        precision = self.symbol_info[symbol].get('priceFilter', {}).get('tickSize', "0.00000001")
+        decimals = len(precision.split(".")[1].rstrip("0")) if "." in precision else 0
+        return f".{decimals}f".format(price)
 
     async def get_balance(self) -> float:
-        for account_type in ['UNIFIED', 'CONTRACT']:
-            wallet = await self._make_request("GET", "/v5/account/wallet-balance", {'accountType': account_type},
-                                              signed=True)
-            if wallet and 'list' in wallet:
-                for account in wallet['list']:
-                    for coin in account.get('coin', []):
-                        if coin['coin'] == 'USDT':
-                            balance_str = coin.get('walletBalance', '0')
-                            try:
-                                return float(balance_str) if balance_str else 0.0
-                            except (ValueError, TypeError):
-                                return 0.0
-        return 0.0
+        """Get account balance"""
+        try:
+            result = await self._make_request("GET", "/v5/account/wallet-balance", signed=True)
+            if result and 'result' in result and 'list' in result['result']:
+                for balance_info in result['result']['list']:
+                    if balance_info.get('accountType') == 'UNIFIED':
+                        return float(balance_info.get('totalWalletBalance', 0))
+            return 0.0
+        except Exception as e:
+            logger.error(f"Error getting Bybit balance: {e}")
+            return 0.0
 
     async def get_ticker(self, symbol: str) -> Dict:
-        ticker = await self._make_request("GET", "/v5/market/tickers", {'category': 'linear', 'symbol': symbol})
-        if not ticker or 'list' not in ticker or not ticker['list']:
-            return {}
-        ticker_data = ticker['list'][0]
+        """Get ticker information"""
         try:
-            bid = float(ticker_data.get('bid1Price', 0))
-        except (ValueError, TypeError):
-            bid = 0
+            result = await self._make_request("GET", "/v5/market/tickers", {"category": "linear", "symbol": symbol})
+            if result and 'result' in result and 'list' in result['result']:
+                ticker = result['result']['list'][0]
+                return {
+                    'symbol': ticker.get('symbol'),
+                    'price': float(ticker.get('lastPrice', 0)),
+                    'bid': float(ticker.get('bid1Price', 0)),
+                    'ask': float(ticker.get('ask1Price', 0)),
+                    'volume': float(ticker.get('volume24h', 0))
+                }
+        except Exception as e:
+            logger.error(f"Error getting Bybit open positions: {e}")
+            return []
+
+    async def set_stop_loss(self, symbol: str, stop_price: float, position_side: str = "long") -> bool:
+        """Set stop loss for position"""
         try:
-            ask = float(ticker_data.get('ask1Price', 0))
-        except (ValueError, TypeError):
-            ask = 0
+            # First check if position exists
+            positions = await self.get_open_positions(symbol)
+            position_found = False
+            for pos in positions:
+                if pos['symbol'] == symbol and pos['quantity'] > 0:
+                    position_found = True
+                    break
+
+            if not position_found:
+                logger.warning(f"No open position found for {symbol}, cannot set stop loss")
+                return False
+
+            # Format stop price according to symbol precision
+            formatted_stop_price = self.format_price(symbol, stop_price)
+
+            # Set stop loss
+            stop_params = {
+                "category": "linear",
+                "symbol": symbol,
+                "stopLoss": formatted_stop_price,
+                "tpslMode": "Full"
+            }
+
+            result = await self._make_request("POST", "/v5/position/trading-stop", stop_params, signed=True)
+
+            if result and result.get('retCode') == 0:
+                logger.info(f"✅ Bybit stop loss set for {symbol} at {stop_price}")
+                return True
+            else:
+                if result and 'retMsg' in result:
+                    logger.error(f"Bybit API message: {result['retMsg']}")
+                if result and 'retCode' in result:
+                    logger.error(f"Bybit API code: {result['retCode']}")
+                return False
+        except Exception as e:
+            logger.error(f"Error setting Bybit stop loss for {symbol}: {e}")
+            return False
+
+    async def _check_order_status(self, order_id: str, symbol: str) -> Optional[Dict]:
+        """Check order status by orderId"""
         try:
-            last = float(ticker_data.get('lastPrice', 0))
-        except (ValueError, TypeError):
-            last = 0
-        price = (bid + ask) / 2 if bid > 0 and ask > 0 else last
-        if price <= 0: return {}
-        if bid == 0: bid = price * 0.9995
-        if ask == 0: ask = price * 1.0005
-        return {'symbol': ticker_data.get('symbol'), 'bid': bid, 'ask': ask, 'price': price}
+            logger.debug(f"Checking order status for {order_id} on {symbol}")
 
-    async def set_leverage(self, symbol: str, leverage: int) -> bool:
-        if symbol in self.symbol_info:
-            max_leverage = int(self.symbol_info[symbol]['max_leverage'])
-            min_leverage = int(self.symbol_info[symbol]['min_leverage'])
-            leverage = max(min_leverage, min(leverage, max_leverage))
-        params = {'category': 'linear', 'symbol': symbol, 'buyLeverage': str(leverage), 'sellLeverage': str(leverage)}
-        result = await self._make_request("POST", "/v5/position/set-leverage", params, signed=True)
-        return result is not None
+            # Bybit API v5 doesn't support orderId filter in history/realtime endpoints
+            # We need to get all recent orders and find our order by orderId
 
-    # <<< ИЗМЕНЕНИЕ: Полностью переписанная, упрощенная и более надежная логика верификации ордера >>>
-    async def create_market_order(self, symbol: str, side: str, quantity: float) -> Optional[Dict]:
-        """
-        Creates a market order and verifies execution by checking the position state.
-        This is the most reliable way to confirm execution and get the average entry price.
-        """
-        formatted_qty = self.format_quantity(symbol, quantity)
-        position_idx = 1 if side.upper() == 'BUY' and self.position_mode == "hedge" else \
-            2 if side.upper() == 'SELL' and self.position_mode == "hedge" else 0
+            # Try to get recent orders (both open and closed) from realtime endpoint
+            result = await self._make_request("GET", "/v5/order/realtime", {
+                "category": "linear",
+                "symbol": symbol,
+                "openOnly": 0,  # Get both open and recent closed orders
+                "limit": "50"   # Maximum allowed
+            }, signed=True)
 
-        params = {
-            'category': 'linear',
-            'symbol': symbol,
-            'side': 'Buy' if side.upper() == 'BUY' else 'Sell',
-            'orderType': 'Market',
-            'qty': formatted_qty,
-            'positionIdx': position_idx
-        }
+            if result and 'result' in result and 'list' in result['result']:
+                orders = result['result']['list']
+                logger.debug(f"Got {len(orders)} orders from realtime for {symbol}")
 
-        logger.info(f"Creating market order for {symbol}: {formatted_qty} @ Market")
-        order_result = await self._make_request("POST", "/v5/order/create", params, signed=True)
+                # Search for our order by orderId or orderLinkId
+                for order in orders:
+                    if order.get('orderId') == order_id or order.get('orderLinkId') == order_id:
+                        status = order.get('orderStatus')
+                        logger.debug(f"✅ Found order {order_id} in realtime: status={status}, executedQty={order.get('cumExecQty', '0')}")
+                        return {
+                            'status': status,
+                            'avgPrice': order.get('avgPrice', '0'),
+                            'executedQty': order.get('cumExecQty', '0')
+                        }
 
-        if not order_result or 'orderId' not in order_result:
-            logger.error(f"Failed to create market order for {symbol}. Result: {order_result}")
+            # If not found in realtime, try history endpoint
+            result = await self._make_request("GET", "/v5/order/history", {
+                "category": "linear",
+                "symbol": symbol,
+                "limit": "50"  # Maximum allowed
+            }, signed=True)
+
+            if result and 'result' in result and 'list' in result['result']:
+                orders = result['result']['list']
+                logger.debug(f"Got {len(orders)} orders from history for {symbol}")
+
+                # Search for our order by orderId or orderLinkId
+                for order in orders:
+                    if order.get('orderId') == order_id or order.get('orderLinkId') == order_id:
+                        status = order.get('orderStatus')
+                        logger.debug(f"✅ Found order {order_id} in history: status={status}, executedQty={order.get('cumExecQty', '0')}")
+                        return {
+                            'status': status,
+                            'avgPrice': order.get('avgPrice', '0'),
+                            'executedQty': order.get('cumExecQty', '0')
+                        }
+
+            # Try without symbol filter (get all symbols)
+            result = await self._make_request("GET", "/v5/order/realtime", {
+                "category": "linear",
+                "openOnly": 0,
+                "limit": "50"
+            }, signed=True)
+
+            if result and 'result' in result and 'list' in result['result']:
+                orders = result['result']['list']
+                logger.debug(f"Got {len(orders)} orders from realtime (all symbols)")
+
+                # Search for our order by orderId or orderLinkId
+                for order in orders:
+                    if (order.get('orderId') == order_id or order.get('orderLinkId') == order_id) and order.get('symbol') == symbol:
+                        status = order.get('orderStatus')
+                        logger.debug(f"✅ Found order {order_id} in realtime (all symbols): status={status}, executedQty={order.get('cumExecQty', '0')}")
+                        return {
+                            'status': status,
+                            'avgPrice': order.get('avgPrice', '0'),
+                            'executedQty': order.get('cumExecQty', '0')
+                        }
+
+            # Last attempt - get all history without symbol filter
+            result = await self._make_request("GET", "/v5/order/history", {
+                "category": "linear",
+                "limit": "50"
+            }, signed=True)
+
+            if result and 'result' in result and 'list' in result['result']:
+                orders = result['result']['list']
+                logger.debug(f"Got {len(orders)} orders from history (all symbols)")
+
+                # Search for our order by orderId or orderLinkId
+                for order in orders:
+                    if (order.get('orderId') == order_id or order.get('orderLinkId') == order_id) and order.get('symbol') == symbol:
+                        status = order.get('orderStatus')
+                        logger.debug(f"✅ Found order {order_id} in history (all symbols): status={status}, executedQty={order.get('cumExecQty', '0')}")
+                        return {
+                            'status': status,
+                            'avgPrice': order.get('avgPrice', '0'),
+                            'executedQty': order.get('cumExecQty', '0')
+                        }
+
+            logger.warning(f"❌ Order {order_id} for {symbol} not found in any endpoint after extensive search")
             return None
 
-        order_id = order_result['orderId']
-        logger.info(f"Order {order_id} for {symbol} placed. Verifying execution by position state...")
+        except Exception as e:
+            logger.error(f"Error checking Bybit order status for {order_id}: {e}")
+            return None
 
-        # Verify execution by checking the position after a short delay
-        for attempt in range(5):  # 5 attempts over ~5 seconds
-            await asyncio.sleep(1.0 + attempt * 0.5)  # Increasing delay
-            try:
-                positions = await self.get_open_positions()
-                for pos in positions:
-                    if pos['symbol'] == symbol:
-                        # Position found, this is our confirmation
-                        logger.info(
-                            f"✅ Position for {symbol} confirmed. Qty: {pos['quantity']}, AvgPrice: {pos['entry_price']}")
+    async def close_position(self, symbol: str) -> bool:
+        """Close position"""
+        try:
+            positions = await self.get_open_positions()
+            for pos in positions:
+                if pos['symbol'] == symbol:
+                    side = "Sell" if pos['side'] == 'long' else "Buy"
+                    qty = abs(pos['quantity'])
+
+                    result = await self._make_request("POST", "/v5/order/create", {
+                        "category": "linear",
+                        "symbol": symbol,
+                        "side": side,
+                        "orderType": "Market",
+                        "qty": str(qty),
+                        "timeInForce": "GTC",
+                        "reduceOnly": True
+                    }, signed=True)
+                    return result is not None
+            return False
+        except Exception as e:
+            logger.error(f"Error closing Bybit position for {symbol}: {e}")
+            return False
+
+    async def cleanup(self):
+        """Cleanup resources"""
+        if self.session and not self.session.closed:
+            await self.session.close()
+
+    async def get_balance(self) -> float:
+        """Get account balance"""
+        try:
+            # Bybit v5 requires accountType parameter
+            result = await self._make_request("GET", "/v5/account/wallet-balance", 
+                                             {"accountType": "UNIFIED"}, signed=True)
+            if result and 'list' in result:
+                for balance_info in result['list']:
+                    if balance_info.get('accountType') == 'UNIFIED':
+                        # totalWalletBalance is at the same level as accountType
+                        return float(balance_info.get('totalWalletBalance', 0))
+            return 0.0
+        except Exception as e:
+            logger.error(f"Error getting Bybit balance: {e}")
+            return 0.0
+
+    async def get_ticker(self, symbol: str) -> Dict:
+        """Get ticker information"""
+        try:
+            result = await self._make_request("GET", "/v5/market/tickers", {"category": "linear", "symbol": symbol})
+            if result and 'list' in result:
+                if len(result['list']) > 0:
+                    ticker = result['list'][0]
+                    # Handle empty price values
+                    last_price = ticker.get('lastPrice', '0')
+                    if not last_price or last_price == '':
+                        return {}
+                    
+                    return {
+                        'symbol': ticker.get('symbol'),
+                        'price': float(last_price) if last_price else 0,
+                        'bid': float(ticker.get('bid1Price', 0) or 0),
+                        'ask': float(ticker.get('ask1Price', 0) or 0),
+                        'volume': float(ticker.get('volume24h', 0) or 0)
+                    }
+            return {}
+        except Exception as e:
+            logger.error(f"Error getting Bybit ticker for {symbol}: {e}")
+            return {}
+
+    async def set_leverage(self, symbol: str, leverage: int) -> bool:
+        """Set leverage for symbol"""
+        try:
+            result = await self._make_request("POST", "/v5/position/set-leverage", {
+                "category": "linear",
+                "symbol": symbol,
+                "buyLeverage": str(leverage),
+                "sellLeverage": str(leverage)
+            }, signed=True)
+            return result is not None
+        except Exception as e:
+            logger.error(f"Error setting Bybit leverage for {symbol}: {e}")
+            return False
+
+    async def create_market_order(self, symbol: str, side: str, quantity: float) -> Optional[Dict]:
+        """Create market order - try simple approach first, fallback to marketUnit if needed"""
+        try:
+            # Fix Bybit API side parameter - Bybit expects "Buy"/"Sell" not "BUY"/"SELL"
+            bybit_side = "Buy" if side.upper() == "BUY" else "Sell"
+
+            # Try simple market order first (works for most symbols)
+            formatted_qty = self.format_quantity(symbol, quantity)
+
+            order_params = {
+                "category": "linear",
+                "symbol": symbol,
+                "side": bybit_side,
+                "orderType": "Market",
+                "qty": formatted_qty,
+                "timeInForce": "GTC"
+            }
+
+            result = await self._make_request("POST", "/v5/order/create", order_params, signed=True)
+            
+            # Bybit API returns orderId directly when successful, not in 'result' field
+            if result and 'orderId' in result and result['orderId']:
+                # Success! Order was created
+                order_id = result['orderId']
+                logger.info(f"✅ Bybit order created successfully: {order_id} for {symbol}")
+                
+                # For BUY orders, wait longer before checking status (market orders may take time to fill)
+                if side.upper() == "BUY":
+                    await asyncio.sleep(2.0)  # Longer wait for BUY orders
+                else:
+                    await asyncio.sleep(0.5)  # Shorter wait for SELL orders
+                
+                order_status = await self._check_order_status(order_id, symbol)
+                
+                if order_status:
+                    status = order_status.get('status')
+                    executed_qty = float(order_status.get('executedQty', '0'))
+                    avg_price = float(order_status.get('avgPrice', '0'))
+                    
+                    if status == 'Filled' and executed_qty > 0:
+                        logger.info(f"✅ Bybit order executed successfully: {order_id}")
                         return {
                             'orderId': order_id,
                             'symbol': symbol,
                             'side': side,
-                            'quantity': pos['quantity'],
-                            'price': pos['entry_price'],
+                            'quantity': quantity,
+                            'price': avg_price,
                             'status': 'FILLED'
                         }
-            except Exception as e:
-                logger.error(f"Error during position check (attempt {attempt + 1}): {e}")
+                    elif status in ['New', 'PartiallyFilled']:
+                        logger.warning(f"⚠️ Bybit order created but not fully filled: {order_id}, status: {status}")
+                        return {
+                            'orderId': order_id,
+                            'symbol': symbol,
+                            'side': side,
+                            'quantity': quantity,
+                            'price': 0,
+                            'status': 'PENDING'
+                        }
+                    else:
+                        logger.error(f"❌ Bybit order failed: {order_id}, status: {status}")
+                        return None
+                else:
+                    logger.warning(f"⚠️ Bybit order created but status unknown: {order_id}")
+                    return {
+                        'orderId': order_id,
+                        'symbol': symbol,
+                        'side': side,
+                        'quantity': quantity,
+                        'price': 0,
+                        'status': 'UNKNOWN'
+                    }
+            elif result and 'result' in result:
+                # Alternative success format
+                order_info = result['result']
+                return {
+                    'orderId': order_info.get('orderId'),
+                    'symbol': symbol,
+                    'side': side,
+                    'quantity': quantity,
+                    'price': float(order_info.get('avgPrice', 0)),
+                    'status': 'FILLED' if order_info.get('orderStatus') == 'Filled' else 'NEW'
+                }
+            else:
+                # Add detailed logging for debugging
+                logger.error(f"Bybit market order failed for {symbol}: {result}")
+                if result and 'retMsg' in result:
+                    logger.error(f"Bybit API message: {result['retMsg']}")
+                if result and 'retCode' in result:
+                    logger.error(f"Bybit API code: {result['retCode']}")
+                return None
+        except Exception as e:
+            logger.error(f"Error creating Bybit market order: {e}")
+            return None
 
-        logger.error(f"❌ Order {order_id} verification failed for {symbol}. Could not find resulting position.")
-        return None
+    async def get_open_positions(self, symbol: str = None) -> List[Dict]:
+        """Get open positions"""
+        try:
+            # Bybit v5 requires category and either symbol or settleCoin
+            params = {"category": "linear"}
+            if symbol:
+                params["symbol"] = symbol
+            else:
+                params["settleCoin"] = "USDT"
 
-    # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
-
-    async def get_open_positions(self) -> List[Dict]:
-        positions = await self._make_request("GET", "/v5/position/list", {'category': 'linear', 'settleCoin': 'USDT'},
-                                             signed=True)
-        if not positions or 'list' not in positions: return []
-        open_positions = []
-        for pos in positions['list']:
-            try:
-                size = float(pos.get('size', 0))
-                if size > 0:
-                    open_positions.append({
-                        'symbol': pos['symbol'],
-                        'side': pos['side'].upper(),
-                        'quantity': size,
-                        'entry_price': float(pos.get('avgPrice', 0)),
-                        'mark_price': float(pos.get('markPrice', 0)),
-                        'pnl': float(pos.get('unrealisedPnl', 0)),
-                        'leverage': float(pos.get('leverage', 1)),
-                        'created_time': int(pos.get('createdTime', 0))
-                    })
-            except (ValueError, TypeError):
-                logger.warning(f"Could not parse position data for {pos.get('symbol')}")
-                continue
-        return open_positions
+            result = await self._make_request("GET", "/v5/position/list", params, signed=True)
+            positions = []
+            if result and 'result' in result and 'list' in result['result']:
+                for pos in result['result']['list']:
+                    if float(pos.get('size', 0)) > 0:
+                        positions.append({
+                            'symbol': pos.get('symbol'),
+                            'quantity': float(pos.get('size', 0)),
+                            'entry_price': float(pos.get('avgPrice', 0)),
+                            'pnl': float(pos.get('unrealisedPnl', 0)),
+                            'side': 'long' if pos.get('side') == 'Buy' else 'short'
+                        })
+            return positions
+        except Exception as e:
+            logger.error(f"Error getting Bybit open positions: {e}")
+            return []
 
     async def close_position(self, symbol: str) -> bool:
-        positions = await self.get_open_positions()
-        for pos in positions:
-            if pos['symbol'] == symbol:
-                side = 'Sell' if pos['side'] == 'BUY' else 'Buy'
-                params = {
-                    'category': 'linear', 'symbol': symbol, 'side': side,
-                    'orderType': 'Market', 'qty': self.format_quantity(symbol, pos['quantity']),
-                    'reduceOnly': True
-                }
-                result = await self._make_request("POST", "/v5/order/create", params, signed=True)
-                if result and 'orderId' in result:
-                    logger.info(f"Position close order created for {symbol}: {result['orderId']}")
-                    return True
-        return False
+        """Close position"""
+        try:
+            positions = await self.get_open_positions()
+            for pos in positions:
+                if pos['symbol'] == symbol:
+                    side = "Sell" if pos['side'] == 'long' else "Buy"
+                    qty = abs(pos['quantity'])
+                    
+                    result = await self._make_request("POST", "/v5/order/create", {
+                        "category": "linear",
+                        "symbol": symbol,
+                        "side": side,
+                        "orderType": "Market",
+                        "qty": str(qty),
+                        "timeInForce": "GTC",
+                        "reduceOnly": True
+                    }, signed=True)
+                    return result is not None
+            return False
+        except Exception as e:
+            logger.error(f"Error closing Bybit position for {symbol}: {e}")
+            return False
 
     async def set_stop_loss(self, symbol: str, stop_price: float) -> bool:
-        """Set stop loss with retry logic."""
-        params = {'category': 'linear', 'symbol': symbol, 'stopLoss': self.format_price(symbol, stop_price),
-                  'slTriggerBy': 'MarkPrice', 'positionIdx': 0}
-        for attempt in range(4):
-            try:
-                result = await self._make_request("POST", "/v5/position/trading-stop", params, signed=True)
-                if result:
-                    logger.info(f"✅ Stop loss set for {symbol} at {stop_price}")
-                    return True
+        """Set stop loss"""
+        try:
+            # First check if position exists
+            positions = await self.get_open_positions()
+            position_exists = any(pos['symbol'] == symbol for pos in positions)
 
-                logger.warning(f"Attempt {attempt + 1} to set SL for {symbol} failed. Retrying...")
-                await asyncio.sleep(0.5 + attempt)
-            except Exception as e:
-                logger.error(f"Attempt {attempt + 1} to set SL for {symbol} threw an exception: {e}")
-                await asyncio.sleep(0.5 + attempt)
+            if not position_exists:
+                logger.warning(f"No open position found for {symbol}, cannot set stop loss")
+                return False
 
-        logger.error(f"❌ Failed to set stop loss for {symbol} after multiple attempts.")
-        return False
+            # Format stop price properly
+            formatted_price = self.format_price(symbol, stop_price)
+
+            result = await self._make_request("POST", "/v5/position/trading-stop", {
+                "category": "linear",
+                "symbol": symbol,
+                "stopLoss": formatted_price,
+                "positionIdx": 0
+            }, signed=True)
+
+            if result and 'retCode' in result and result['retCode'] == 0:
+                logger.info(f"✅ Bybit stop loss set successfully for {symbol} at {formatted_price}")
+                return True
+            else:
+                logger.error(f"Failed to set Bybit stop loss for {symbol}: {result}")
+                return False
+
+        except Exception as e:
+            logger.error(f"Error setting Bybit stop loss for {symbol}: {e}")
+            return False
 
     async def set_take_profit(self, symbol: str, take_profit_price: float) -> bool:
-        """Set take profit with retry logic."""
-        params = {'category': 'linear', 'symbol': symbol, 'takeProfit': self.format_price(symbol, take_profit_price),
-                  'tpTriggerBy': 'MarkPrice', 'positionIdx': 0}
-        for attempt in range(4):
-            try:
-                result = await self._make_request("POST", "/v5/position/trading-stop", params, signed=True)
-                if result:
-                    logger.info(f"✅ Take profit set for {symbol} at {take_profit_price}")
-                    return True
-
-                logger.warning(f"Attempt {attempt + 1} to set TP for {symbol} failed. Retrying...")
-                await asyncio.sleep(0.5 + attempt)
-            except Exception as e:
-                logger.error(f"Attempt {attempt + 1} to set TP for {symbol} threw an exception: {e}")
-                await asyncio.sleep(0.5 + attempt)
-
-        logger.error(f"❌ Failed to set take profit for {symbol} after multiple attempts.")
-        return False
+        """Set take profit"""
+        try:
+            result = await self._make_request("POST", "/v5/position/trading-stop", {
+                "category": "linear",
+                "symbol": symbol,
+                "takeProfit": str(take_profit_price),
+                "positionIdx": 0
+            }, signed=True)
+            return result is not None
+        except Exception as e:
+            logger.error(f"Error setting Bybit take profit for {symbol}: {e}")
+            return False
 
     async def set_trailing_stop(self, symbol: str, activation_price: float, callback_rate: float) -> bool:
-        """Set trailing stop with retry logic."""
-        params = None
-        for attempt in range(4):
-            try:
-                # Нам нужно получить цену входа для расчета дистанции, поэтому получаем позицию
-                if not params:
-                    positions = await self.get_open_positions()
-                    pos_found = next((p for p in positions if p['symbol'] == symbol), None)
-                    if pos_found:
-                        trailing_stop_distance = pos_found['entry_price'] * (callback_rate / 100)
-                        params = {'category': 'linear', 'symbol': symbol,
-                                  'trailingStop': self.format_price(symbol, trailing_stop_distance),
-                                  'activePrice': self.format_price(symbol, activation_price), 'positionIdx': 0}
-                    else:
-                        # Позиция не найдена, ждем и пробуем снова
-                        await asyncio.sleep(0.5 + attempt)
-                        continue
+        """Set trailing stop"""
+        try:
+            result = await self._make_request("POST", "/v5/position/trading-stop", {
+                "category": "linear",
+                "symbol": symbol,
+                "trailingStop": str(callback_rate),
+                "positionIdx": 0
+            }, signed=True)
+            return result is not None
+        except Exception as e:
+            logger.error(f"Error setting Bybit trailing stop for {symbol}: {e}")
+            return False
 
-                result = await self._make_request("POST", "/v5/position/trading-stop", params, signed=True)
-                if result:
-                    logger.info(f"✅ Trailing stop set for {symbol}")
-                    return True
-
-                logger.warning(f"Attempt {attempt + 1} to set TS for {symbol} failed. Retrying...")
-                await asyncio.sleep(0.5 + attempt)
-
-            except Exception as e:
-                logger.error(f"Attempt {attempt + 1} to set TS for {symbol} threw an exception: {e}")
-                await asyncio.sleep(0.5 + attempt)
-
-        logger.error(f"❌ Failed to set trailing stop for {symbol} after multiple attempts.")
-        return False
+    async def cancel_position_trading_stops(self, symbol: str) -> bool:
+        """Cancel position-level trading stops (TL/SL/TP) by sending '0' values"""
+        try:
+            result = await self._make_request("POST", "/v5/position/trading-stop", {
+                "category": "linear",
+                "symbol": symbol,
+                "takeProfit": "0",
+                "stopLoss": "0",
+                "trailingStop": "0",
+                "positionIdx": 0
+            }, signed=True)
+            if result:
+                logger.info(f"✅ Cancelled trading stops for {symbol}")
+                return True
+            return False
+        except Exception as e:
+            logger.error(f"Error cancelling Bybit trading stops for {symbol}: {e}")
+            return False
 
     async def get_open_orders(self, symbol: str = None) -> List[Dict]:
         """Get open orders"""
-        params = {'category': 'linear', 'settleCoin': 'USDT'} # Явно указываем монету
-        if symbol:
-            params['symbol'] = symbol
-
-        result = await self._make_request("GET", "/v5/order/realtime", params, signed=True)
-        return result['list'] if result and 'list' in result else []
+        try:
+            params = {"category": "linear"}
+            if symbol:
+                params["symbol"] = symbol
+            
+            result = await self._make_request("GET", "/v5/order/realtime", params, signed=True)
+            orders = []
+            if result and 'result' in result and 'list' in result['result']:
+                for order in result['result']['list']:
+                    orders.append({
+                        'orderId': order.get('orderId'),
+                        'symbol': order.get('symbol'),
+                        'side': order.get('side').lower(),
+                        'quantity': float(order.get('qty', 0)),
+                        'price': float(order.get('price', 0)),
+                        'status': order.get('orderStatus'),
+                        'type': order.get('orderType').lower()
+                    })
+            return orders
+        except Exception as e:
+            logger.error(f"Error getting Bybit open orders: {e}")
+            return []
 
     async def cancel_all_open_orders(self, symbol: str) -> bool:
-        params = {'category': 'linear', 'symbol': symbol}
-        result = await self._make_request("POST", "/v5/order/cancel-all", params, signed=True)
-        if result:
-            logger.info(f"All orders cancelled for {symbol}")
-            return True
-        return False
+        """Cancel all open orders for symbol"""
+        try:
+            result = await self._make_request("POST", "/v5/order/cancel-all", {
+                "category": "linear",
+                "symbol": symbol
+            }, signed=True)
+            return result is not None
+        except Exception as e:
+            logger.error(f"Error cancelling Bybit orders for {symbol}: {e}")
+            return False
 
     async def create_limit_order(self, symbol: str, side: str, quantity: float, price: float, reduce_only: bool = False) -> Optional[Dict]:
         """Create limit order"""
-        params = {
-            'category': 'linear', 'symbol': symbol,
-            'side': side.capitalize(),  # 'SELL' -> 'Sell', 'BUY' -> 'Buy'
-            'orderType': 'Limit',
-            'qty': self.format_quantity(symbol, quantity),
-            'price': self.format_price(symbol, price),
-            'timeInForce': 'GTC', 'reduceOnly': reduce_only
-        }
-        return await self._make_request("POST", "/v5/order/create", params, signed=True)
-
+        try:
+            order_params = {
+                "category": "linear",
+                "symbol": symbol,
+                "side": side.upper(),
+                "orderType": "Limit",
+                "qty": str(quantity),
+                "price": str(price),
+                "timeInForce": "GTC"
+            }
+            
+            if reduce_only:
+                order_params["reduceOnly"] = True
+            
+            result = await self._make_request("POST", "/v5/order/create", order_params, signed=True)
+            if result and 'result' in result:
+                order_info = result['result']
+                return {
+                    'orderId': order_info.get('orderId'),
+                    'symbol': symbol,
+                    'side': side,
+                    'quantity': quantity,
+                    'price': price,
+                    'status': 'NEW'
+                }
+            return None
+        except Exception as e:
+            logger.error(f"Error creating Bybit limit order: {e}")
+            return None
 
     async def close(self):
+        """Close connections"""
         if self.session:
             await self.session.close()
+            self.session = None

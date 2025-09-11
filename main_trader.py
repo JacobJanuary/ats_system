@@ -23,6 +23,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from exchanges.binance import BinanceExchange
 from exchanges.bybit import BybitExchange
+from utils.rate_limiter import RateLimiter
 
 load_dotenv()
 
@@ -121,6 +122,32 @@ class MainTrader:
         self.bybit = None
         self.db_pool = None
         self.processing_signals: Set[int] = set()
+        
+        # Система предотвращения дубликатов сигналов
+        self.processed_signals_cache: Set[int] = set()
+        self.signal_cache_ttl = 3600  # 1 час
+        self.last_cache_cleanup = datetime.now(timezone.utc)
+        
+        # Буфер для сигналов
+        self.signal_buffer = asyncio.Queue(maxsize=1000)
+        self.buffer_processor_task = None
+        
+        # Мониторинг сигналов
+        self.signal_stats = {
+            'processed': 0,
+            'duplicates_prevented': 0,
+            'errors': 0,
+            'avg_processing_time': 0.0,
+            'last_signal_time': None
+        }
+        
+        # Семафоры для контроля параллелизма
+        self.signal_semaphore = asyncio.Semaphore(20)  # Максимум 20 одновременных сигналов
+        self.db_semaphore = asyncio.Semaphore(10)  # Максимум 10 одновременных DB операций
+        
+        # Rate limiter для предотвращения банов на биржах
+        self.rate_limiter = RateLimiter()
+        
         self.failed_symbols: Dict[str, datetime] = {}
         self.symbol_cooldown_minutes = 60
 
@@ -134,6 +161,8 @@ class MainTrader:
         }
 
         self.shutdown_event = asyncio.Event()
+        self.start_time = datetime.now(timezone.utc)
+        self.health_check_count = 0
         self._log_configuration()
 
     def _log_configuration(self):
@@ -148,11 +177,47 @@ class MainTrader:
         logger.info(f"Signal Window: {self.signal_time_window} minutes")
         logger.info(f"Spread Limit: {self.spread_limit}%")
         # <<< ИЗМЕНЕНИЕ: Логирование параметра SL >>>
-        logger.info(f"Initial Stop Loss: {self.initial_sl_percent}%")
-        # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
+        logger.info(f"   Signal Semaphore: {self.signal_semaphore._value}")
+        logger.info(f"   DB Semaphore: {self.db_semaphore._value}")
         logger.info("=" * 60)
 
+    def validate_config(self) -> bool:
+        """Validate configuration parameters"""
+        try:
+            # Check required environment variables
+            required_vars = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD']
+            for var in required_vars:
+                if not os.getenv(var):
+                    logger.error(f"Missing required environment variable: {var}")
+                    return False
+            
+            # Validate numeric parameters
+            if self.position_size_usd <= 0:
+                logger.error("Position size must be positive")
+                return False
+            
+            if self.leverage < 1 or self.leverage > 125:
+                logger.error("Leverage must be between 1 and 125")
+                return False
+            
+            if self.min_score_week < 0 or self.min_score_week > 100:
+                logger.error("Min score week must be between 0 and 100")
+                return False
+            
+            if self.min_score_month < 0 or self.min_score_month > 100:
+                logger.error("Min score month must be between 0 and 100")
+                return False
+            
+            return True
+        except Exception as e:
+            logger.error(f"Configuration validation error: {e}")
+            return False
+    
     async def initialize(self):
+        # Validate configuration
+        if not self.validate_config():
+            raise ValueError("Configuration validation failed")
+        
         max_retries = 3
         retry_delay = 5
 
@@ -241,8 +306,41 @@ class MainTrader:
             del self.failed_symbols[symbol]
             return False
 
+    async def _cleanup_signal_cache(self):
+        """Очистка кэша обработанных сигналов"""
+        current_time = datetime.now(timezone.utc)
+        if (current_time - self.last_cache_cleanup).seconds > self.signal_cache_ttl:
+            # Очистка старых записей из кэша
+            self.processed_signals_cache.clear()
+            self.last_cache_cleanup = current_time
+            logger.debug("Signal cache cleaned up")
+
+    async def _get_recently_processed_signal_ids(self) -> List[int]:
+        """Получение ID недавно обработанных сигналов из БД"""
+        try:
+            async with self.db_semaphore:
+                async with self.db_pool.acquire() as conn:
+                    # Получить сигналы обработанные за последний час
+                    query = """
+                        SELECT DISTINCT signal_id
+                        FROM monitoring.trades
+                        WHERE created_at > $1
+                    """
+                    cutoff_time = datetime.now(timezone.utc) - timedelta(hours=1)
+                    rows = await conn.fetch(query, cutoff_time)
+                    return [row['signal_id'] for row in rows]
+        except Exception as e:
+            logger.error(f"Error getting recently processed signals: {e}")
+            return []
+
     async def get_unprocessed_signals(self) -> List[Signal]:
+        # Очистка кэша обработанных сигналов
+        await self._cleanup_signal_cache()
+        
         time_threshold = datetime.now(timezone.utc) - timedelta(minutes=self.signal_time_window)
+
+        # Получить недавно обработанные сигналы для дополнительной проверки
+        recently_processed = await self._get_recently_processed_signal_ids()
 
         # <<< ИЗМЕНЕНИЕ: Запрос теперь фильтрует по sh.is_active = true >>>
         query = """
@@ -262,68 +360,82 @@ class MainTrader:
             FROM fas.scoring_history sh
             JOIN public.trading_pairs tp ON sh.trading_pair_id = tp.id
             WHERE sh.id NOT IN (SELECT unnest($1::int[]))
+            AND sh.id NOT IN (SELECT unnest($2::int[]))
             AND sh.is_active = true
-            AND sh.score_week >= $2
-            AND sh.score_month >= $3
-            AND sh.created_at > $4
+            AND sh.score_week >= $3
+            AND sh.score_month >= $4
+            AND sh.created_at > $5
             AND tp.is_active = true
             AND tp.exchange_id IN (1, 2)
             ORDER BY 
                 (sh.score_week + sh.score_month) DESC,
                 sh.created_at DESC
-            LIMIT $5
+            LIMIT $6
         """
         # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
 
         try:
-            async with self.db_pool.acquire() as conn:
-                # <<< ИЗМЕНЕНИЕ: Убрана проверка по таблице monitoring.trades, т.к. is_active надежнее >>>
-                rows = await conn.fetch(
-                    query,
-                    list(self.processing_signals),
-                    self.min_score_week,
-                    self.min_score_month,
-                    time_threshold,
-                    self.max_concurrent_orders
-                )
-                # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
+            async with self.db_semaphore:
+                async with self.db_pool.acquire() as conn:
+                    # <<< ИЗМЕНЕНИЕ: Убрана проверка по таблице monitoring.trades, т.к. is_active надежнее >>>
+                    rows = await conn.fetch(
+                        query,
+                        list(self.processing_signals),
+                        recently_processed,
+                        self.min_score_week,
+                        self.min_score_month,
+                        time_threshold,
+                        self.max_concurrent_orders
+                    )
+                    # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
 
-                signals = []
-                for row in rows:
-                    symbol = row['symbol']
+                    signals = []
+                    for row in rows:
+                        signal_id = row['id']
+                        symbol = row['symbol']
 
-                    if self._is_symbol_in_cooldown(symbol):
-                        logger.debug(f"Skipping {symbol} - in cooldown")
-                        continue
+                        # Дополнительная проверка на дубликаты в кэше
+                        if signal_id in self.processed_signals_cache:
+                            self.signal_stats['duplicates_prevented'] += 1
+                            logger.debug(f"Skipping duplicate signal #{signal_id}")
+                            continue
 
-                    signals.append(Signal(
-                        id=row['id'],
-                        symbol=symbol,
-                        exchange_id=row['exchange_id'],
-                        exchange_name=row['exchange_name'],
-                        score_week=float(row['score_week']),
-                        score_month=float(row['score_month']),
-                        timestamp=row['timestamp'],
-                        trading_pair_id=row['trading_pair_id']
-                    ))
+                        if self._is_symbol_in_cooldown(symbol):
+                            logger.debug(f"Skipping {symbol} - in cooldown")
+                            continue
 
-                if signals:
-                    binance_count = sum(1 for s in signals if s.exchange_id == 1)
-                    bybit_count = sum(1 for s in signals if s.exchange_id == 2)
+                        signals.append(Signal(
+                            id=signal_id,
+                            symbol=symbol,
+                            exchange_id=row['exchange_id'],
+                            exchange_name=row['exchange_name'],
+                            score_week=float(row['score_week']),
+                            score_month=float(row['score_month']),
+                            timestamp=row['timestamp'],
+                            trading_pair_id=row['trading_pair_id']
+                        ))
 
-                    newest_signal_time = max(s.timestamp for s in signals)
-                    if newest_signal_time.tzinfo is None:
-                        newest_signal_time = newest_signal_time.replace(tzinfo=timezone.utc)
-                    age_minutes = (datetime.now(timezone.utc) - newest_signal_time).total_seconds() / 60
+                    if signals:
+                        binance_count = sum(1 for s in signals if s.exchange_id == 1)
+                        bybit_count = sum(1 for s in signals if s.exchange_id == 2)
 
-                    logger.info(f"📈 Found {len(signals)} new signals to process")
-                    logger.info(f"   Distribution: Binance={binance_count}, Bybit={bybit_count}")
-                    logger.info(f"   Newest signal age: {age_minutes:.1f} minutes")
+                        newest_signal_time = max(s.timestamp for s in signals)
+                        if newest_signal_time.tzinfo is None:
+                            newest_signal_time = newest_signal_time.replace(tzinfo=timezone.utc)
+                        age_minutes = (datetime.now(timezone.utc) - newest_signal_time).total_seconds() / 60
 
-                return signals
+                        logger.info(f"📈 Found {len(signals)} new signals to process")
+                        logger.info(f"   Distribution: Binance={binance_count}, Bybit={bybit_count}")
+                        logger.info(f"   Newest signal age: {age_minutes:.1f} minutes")
+                        logger.info(f"   Duplicates prevented: {self.signal_stats['duplicates_prevented']}")
+
+                        self.signal_stats['last_signal_time'] = newest_signal_time
+
+                    return signals
 
         except Exception as e:
             logger.error(f"Error fetching signals: {e}")
+            self.signal_stats['errors'] += 1
             return []
 
     async def check_daily_limits(self) -> bool:
@@ -351,9 +463,17 @@ class MainTrader:
         return True
 
     async def _check_spread(self, exchange, symbol: str) -> bool:
-        """ИСПРАВЛЕНО: Улучшенная обработка пустых значений"""
+        """ИСПРАВЛЕНО: Улучшенная обработка пустых значений с rate limiting"""
         try:
+            # Проверяем rate limit перед получением тикера для проверки спреда
+            exchange_key = 'binance' if isinstance(exchange, BinanceExchange) else 'bybit'
+            if not await self.rate_limiter.acquire(exchange_key, 'query', f'check_spread_{symbol}'):
+                logger.warning(f"Rate limit exceeded for {exchange_key} check_spread_{symbol}")
+                # На rate limit возвращаем True чтобы не блокировать торговлю
+                return True
+
             ticker = await exchange.get_ticker(symbol)
+            await self.rate_limiter.record_request(exchange_key, 'query', f'check_spread_{symbol}')
             if not ticker or not ticker.get('price'):
                 logger.warning(f"No ticker data for {symbol}")
                 if self.testnet:
@@ -415,9 +535,17 @@ class MainTrader:
             return False
 
     async def _validate_order_size(self, exchange, symbol: str, position_size_usd: float) -> Tuple[bool, float]:
-        """ИСПРАВЛЕНО: Улучшенная валидация размера ордера"""
+        """ИСПРАВЛЕНО: Улучшенная валидация размера ордера с rate limiting"""
         try:
+            # Проверяем rate limit перед получением тикера для валидации размера
+            exchange_key = 'binance' if isinstance(exchange, BinanceExchange) else 'bybit'
+            if not await self.rate_limiter.acquire(exchange_key, 'query', f'validate_order_{symbol}'):
+                logger.warning(f"Rate limit exceeded for {exchange_key} validate_order_{symbol}")
+                # На rate limit возвращаем True с оригинальным размером
+                return True, position_size_usd
+
             ticker = await exchange.get_ticker(symbol)
+            await self.rate_limiter.record_request(exchange_key, 'query', f'validate_order_{symbol}')
             if not ticker:
                 logger.error(f"No ticker for {symbol}")
                 return False, 0
@@ -460,7 +588,14 @@ class MainTrader:
 
         for attempt in range(self.order_retry_max):
             try:
-                balance = await exchange.get_balance()
+                # Проверяем rate limit перед получением баланса
+                exchange_key = 'binance' if isinstance(exchange, BinanceExchange) else 'bybit'
+                if not await self.rate_limiter.acquire(exchange_key, 'query', 'get_balance'):
+                    logger.warning(f"Rate limit exceeded for {exchange_key} get_balance")
+                    balance = 0.0
+                else:
+                    balance = await exchange.get_balance()
+                    await self.rate_limiter.record_request(exchange_key, 'query', 'get_balance')
                 try:
                     balance = float(balance) if balance and balance != '' else 0
                 except (ValueError, TypeError) as e:
@@ -483,7 +618,14 @@ class MainTrader:
                     position_size_usd = max_available
                     logger.warning(f"Adjusted position to available balance: ${position_size_usd:.2f}")
 
+                # Проверяем rate limit перед получением тикера
+                exchange_key = 'binance' if isinstance(exchange, BinanceExchange) else 'bybit'
+                if not await self.rate_limiter.acquire(exchange_key, 'query', f'get_ticker_{signal.symbol}'):
+                    logger.warning(f"Rate limit exceeded for {exchange_key} get_ticker_{signal.symbol}")
+                    return OrderResult(success=False, error_message="Rate limit exceeded for ticker")
+
                 ticker = await exchange.get_ticker(signal.symbol)
+                await self.rate_limiter.record_request(exchange_key, 'query', f'get_ticker_{signal.symbol}')
                 if not ticker:
                     logger.error(f"No ticker for {signal.symbol}")
                     if attempt < self.order_retry_max - 1:
@@ -513,11 +655,23 @@ class MainTrader:
                 logger.info(f"📝 Order attempt {attempt + 1}/{self.order_retry_max}:")
                 logger.info(f"   ${position_size_usd:.2f} = {quantity:.6f} {signal.symbol} @ ${price:.4f}")
 
+                # Проверяем rate limit перед установкой leverage
+                if not await self.rate_limiter.acquire(exchange_key, 'order', f'set_leverage_{signal.symbol}'):
+                    logger.warning(f"Rate limit exceeded for {exchange_key} set_leverage_{signal.symbol}")
+                    return OrderResult(success=False, error_message="Rate limit exceeded for leverage")
+
                 leverage_set = await exchange.set_leverage(signal.symbol, self.leverage)
+                await self.rate_limiter.record_request(exchange_key, 'order', f'set_leverage_{signal.symbol}')
                 if not leverage_set:
                     logger.warning(f"Could not set leverage for {signal.symbol}, continuing anyway")
 
+                # Проверяем rate limit перед созданием ордера
+                if not await self.rate_limiter.acquire(exchange_key, 'order', f'create_order_{signal.symbol}'):
+                    logger.warning(f"Rate limit exceeded for {exchange_key} create_order_{signal.symbol}")
+                    return OrderResult(success=False, error_message="Rate limit exceeded for order creation")
+
                 order = await exchange.create_market_order(signal.symbol, 'BUY', quantity)
+                await self.rate_limiter.record_request(exchange_key, 'order', f'create_order_{signal.symbol}')
 
                 if order and order.get('quantity', 0) > 0:
                     executed_qty = order.get('quantity', 0)
@@ -582,7 +736,14 @@ class MainTrader:
 
             # Убеждаемся, что в коннекторе есть метод set_stop_loss
             if hasattr(exchange, 'set_stop_loss'):
+                # Проверяем rate limit перед установкой stop loss
+                exchange_key = 'binance' if isinstance(exchange, BinanceExchange) else 'bybit'
+                if not await self.rate_limiter.acquire(exchange_key, 'order', f'set_stop_loss_{order_result.symbol}'):
+                    logger.warning(f"Rate limit exceeded for {exchange_key} set_stop_loss_{order_result.symbol}")
+                    return False
+
                 success = await exchange.set_stop_loss(order_result.symbol, sl_price)
+                await self.rate_limiter.record_request(exchange_key, 'order', f'set_stop_loss_{order_result.symbol}')
                 if success:
                     logger.info(f"🛡️ Initial Stop Loss set for {order_result.symbol} at ${sl_price:.4f}")
                 else:
@@ -731,25 +892,142 @@ class MainTrader:
             logger.error(f"Failed to log failed trade: {e}")
 
     async def process_signals_batch(self, signals: List[Signal]):
+        """ПОСЛЕДОВАТЕЛЬНАЯ обработка сигналов с rate limiting для предотвращения банов"""
         if not signals:
             return
 
-        tasks = []
+        # Группировка сигналов по биржам для последовательной обработки
+        binance_signals = [s for s in signals if s.exchange_id == 1]
+        bybit_signals = [s for s in signals if s.exchange_id == 2]
+
+        logger.info(f"🔄 Sequential processing: Binance={len(binance_signals)}, Bybit={len(bybit_signals)}")
+
+        # ПОСЛЕДОВАТЕЛЬНАЯ обработка по биржам
+        if binance_signals:
+            await self._process_exchange_signals_sequential('Binance', binance_signals)
+
+        if bybit_signals:
+            await self._process_exchange_signals_sequential('Bybit', bybit_signals)
+
+        logger.info("✅ Sequential batch processing completed")
+
+    async def _process_exchange_signals_sequential(self, exchange_name: str, signals: List[Signal]):
+        """ПОСЛЕДОВАТЕЛЬНАЯ обработка сигналов для конкретной биржи с rate limiting"""
+        processed = 0
+        errors = 0
+
         for signal in signals:
-            if signal.id not in self.processing_signals:
-                task = asyncio.create_task(self.process_signal(signal))
-                tasks.append(task)
+            try:
+                # Проверяем rate limit перед обработкой
+                exchange_key = exchange_name.lower()
+                if not await self.rate_limiter.acquire(exchange_key, 'order', f'signal_{signal.id}'):
+                    logger.warning(f"⚠️ Rate limit exceeded for {exchange_name}, skipping signal #{signal.id}")
+                    await asyncio.sleep(1)  # Ждем 1 секунду перед следующей попыткой
+                    continue
 
-        if tasks:
-            logger.info(f"⚡ Processing {len(tasks)} signals concurrently")
-            results = await asyncio.gather(*tasks, return_exceptions=True)
+                # Записываем запрос в rate limiter
+                await self.rate_limiter.record_request(exchange_key, 'order', f'signal_{signal.id}')
 
-            success_count = sum(1 for r in results if r is True)
-            failure_count = sum(1 for r in results if r is False or isinstance(r, Exception))
+                # Обрабатываем сигнал
+                success = await self.process_signal(signal)
 
-            logger.info(f"📊 Batch results: {success_count} success, {failure_count} failed")
+                if success:
+                    processed += 1
+                    logger.info(f"✅ Signal #{signal.id} processed successfully")
+                else:
+                    errors += 1
+                    logger.warning(f"❌ Signal #{signal.id} failed")
 
-    async def print_statistics(self):
+                # Добавляем задержку между сигналами для предотвращения rate limit
+                await asyncio.sleep(0.2)  # 200ms задержка между сигналами
+
+            except Exception as e:
+                logger.error(f"Error processing signal #{signal.id}: {e}")
+                errors += 1
+                await asyncio.sleep(0.5)  # Увеличиваем задержку при ошибке
+
+        logger.info(f"📊 Sequential {exchange_name}: {processed} processed, {errors} errors")
+
+    async def _process_exchange_signals_batch(self, exchange_name: str, signals: List[Signal]) -> Tuple[int, int]:
+        """УСТАРЕВШИЙ метод - заменен на последовательную обработку"""
+        logger.warning("Using old parallel method - should use sequential processing instead")
+        return await self._process_exchange_signals_sequential(exchange_name, signals)
+
+    async def monitor_signal_processing(self):
+        """Мониторинг обработки сигналов и алертинг"""
+        while not self.shutdown_event.is_set():
+            try:
+                await asyncio.sleep(300)  # Каждые 5 минут
+
+                # Проверка backlog сигналов
+                buffer_size = self.signal_buffer.qsize()
+                if buffer_size > 50:
+                    logger.warning(f"⚠️ Signal backlog: {buffer_size} signals in buffer")
+
+                # Проверка средней скорости обработки
+                if self.signal_stats['avg_processing_time'] > 10.0:
+                    logger.warning(f"⚠️ Slow signal processing: {self.signal_stats['avg_processing_time']:.2f}s avg")
+
+                # Проверка количества ошибок
+                error_rate = 0
+                if self.signal_stats['processed'] > 0:
+                    error_rate = (self.signal_stats['errors'] / self.signal_stats['processed']) * 100
+
+                if error_rate > 20.0:
+                    logger.error(f"⚠️ High error rate: {error_rate:.1f}%")
+
+                # Проверка возраста последнего сигнала
+                if self.signal_stats['last_signal_time']:
+                    signal_age = (datetime.now(timezone.utc) - self.signal_stats['last_signal_time']).total_seconds() / 60
+                    if signal_age > 60:  # Больше часа без новых сигналов
+                        logger.warning(f"⚠️ No new signals for {signal_age:.1f} minutes")
+
+                # Логирование статистики
+                logger.info("📊 Signal Processing Stats:")
+                logger.info(f"   Processed: {self.signal_stats['processed']}")
+                logger.info(f"   Duplicates prevented: {self.signal_stats['duplicates_prevented']}")
+                logger.info(f"   Errors: {self.signal_stats['errors']}")
+                logger.info(f"   Avg processing time: {self.signal_stats['avg_processing_time']:.2f}s")
+                logger.info(f"   Buffer size: {buffer_size}")
+
+            except Exception as e:
+                logger.error(f"Error in signal monitoring: {e}")
+
+    async def _log_successful_trade_transactional(self, signal: Signal, order_result: OrderResult):
+        """Логирование успешной сделки с транзакцией"""
+        async with self.db_semaphore:
+            async with self.db_pool.acquire() as conn:
+                async with conn.transaction():
+                    try:
+                        # Логирование сделки
+                        await conn.execute(
+                            """
+                            INSERT INTO monitoring.trades (
+                                signal_id, trading_pair_id, symbol, exchange, side,
+                                quantity, executed_qty, price, status, order_id, created_at
+                            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+                            """,
+                            signal.id, signal.trading_pair_id, signal.symbol,
+                            signal.exchange_name.lower(), order_result.side,
+                            order_result.quantity, order_result.executed_qty,
+                            order_result.price, order_result.status.value,
+                            order_result.order_id, datetime.now(timezone.utc)
+                        )
+
+                        # Деактивация сигнала
+                        await conn.execute(
+                            "UPDATE fas.scoring_history SET is_active = false WHERE id = $1",
+                            signal.id
+                        )
+
+                        # Добавление в кэш обработанных сигналов
+                        self.processed_signals_cache.add(signal.id)
+
+                        logger.info(f"✅ Trade logged and signal #{signal.id} deactivated")
+
+                    except Exception as e:
+                        logger.error(f"Error in transactional logging: {e}")
+                        raise
         logger.info("=" * 60)
         logger.info("Daily Trading Statistics")
         logger.info("=" * 60)
@@ -841,6 +1119,39 @@ class MainTrader:
         finally:
             await self.cleanup()
 
+    async def print_statistics(self):
+        """Print trading statistics"""
+        try:
+            logger.info("=" * 60)
+            logger.info("📊 Trading Statistics")
+            logger.info("=" * 60)
+            
+            # Calculate uptime
+            uptime = datetime.now(timezone.utc) - self.start_time
+            hours, remainder = divmod(uptime.total_seconds(), 3600)
+            minutes, seconds = divmod(remainder, 60)
+            
+            logger.info(f"Uptime: {int(hours)}h {int(minutes)}m {int(seconds)}s")
+            logger.info(f"Signals processed: {self.signal_stats['processed']}")
+            logger.info(f"Duplicates prevented: {self.signal_stats['duplicates_prevented']}")
+            logger.info(f"Errors: {self.signal_stats['errors']}")
+            
+            # Daily stats
+            logger.info(f"\n📈 Daily Statistics:")
+            logger.info(f"Trades today: {self.daily_stats['trades_count']}")
+            logger.info(f"Successful: {self.daily_stats['successful_trades']}")
+            logger.info(f"Failed: {self.daily_stats['failed_trades']}")
+            logger.info(f"Total volume: ${self.daily_stats['total_volume']:.2f}")
+            
+            # Cache stats
+            logger.info(f"\n💾 Cache Statistics:")
+            logger.info(f"Processed signals in cache: {len(self.processed_signals_cache)}")
+            logger.info(f"Failed symbols: {len(self.failed_symbols)}")
+            
+            logger.info("=" * 60)
+        except Exception as e:
+            logger.error(f"Error printing statistics: {e}")
+    
     async def cleanup(self):
         logger.info("🧹 Cleaning up resources...")
 
