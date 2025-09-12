@@ -45,27 +45,31 @@ class BinanceExchange(BaseExchange):
         self.last_error = None
 
     async def initialize(self):
-        """Initialize connection and load exchange info"""
+        """Initialize with better symbol loading"""
         self.session = aiohttp.ClientSession()
-        
-        # Advanced error handling
-        self.error_handler = get_error_handler("Binance")
+
+        # Test connection
         await self._make_request("GET", "/fapi/v1/ping")
 
-        # Load exchange info including leverage limits
+        # Load exchange info with complete symbol data
         exchange_info = await self._make_request("GET", "/fapi/v1/exchangeInfo")
+
         if exchange_info:
+            self.exchange_info = {}
+            self.symbol_info = {}
+            self.symbol_leverage_limits = {}
+
             for symbol_info in exchange_info.get('symbols', []):
-                # Only process active PERPETUAL contracts
+                # Обрабатываем все активные PERPETUAL контракты
                 if (symbol_info.get('status') == 'TRADING' and
                         symbol_info.get('contractType') == 'PERPETUAL'):
 
                     symbol = symbol_info['symbol']
                     self.exchange_info[symbol] = symbol_info
-                    self.symbol_info[symbol] = symbol_info  # Also set for compatibility
+                    self.symbol_info[symbol] = symbol_info
 
-                    # Try to extract max leverage
-                    # First check for LEVERAGE_BRACKET filter
+                    # Извлекаем информацию о leverage
+                    # Метод 1: LEVERAGE_BRACKET filter
                     leverage_bracket = next(
                         (f for f in symbol_info.get('filters', [])
                          if f['filterType'] == 'LEVERAGE_BRACKET'),
@@ -74,42 +78,43 @@ class BinanceExchange(BaseExchange):
 
                     if leverage_bracket:
                         brackets = leverage_bracket.get('brackets', [])
-                        if brackets and len(brackets) > 0:
-                            # Get max leverage from first bracket
+                        if brackets:
+                            # Берем максимальный leverage из первого bracket
                             max_leverage = int(brackets[0].get('initialLeverage', 20))
                             self.symbol_leverage_limits[symbol] = max_leverage
 
-                    # Fallback: check MAX_LEVERAGE filter
+                    # Метод 2: MAX_LEVERAGE filter (fallback)
                     if symbol not in self.symbol_leverage_limits:
                         max_leverage_filter = next(
                             (f for f in symbol_info.get('filters', [])
                              if f['filterType'] == 'MAX_LEVERAGE'),
                             None
                         )
-                        if max_leverage_filter:
-                            self.symbol_leverage_limits[symbol] = int(
-                                max_leverage_filter.get('maxLeverage', 20)
-                            )
-                        else:
-                            # Default for testnet/new pairs
-                            self.symbol_leverage_limits[symbol] = 20 if not self.testnet else 125
 
-        # Log summary
+                        if max_leverage_filter:
+                            max_lev = int(max_leverage_filter.get('maxLeverage', 20))
+                            self.symbol_leverage_limits[symbol] = max_lev
+                        else:
+                            # Default values
+                            if self.testnet:
+                                self.symbol_leverage_limits[symbol] = 125
+                            else:
+                                # На mainnet используем консервативное значение
+                                self.symbol_leverage_limits[symbol] = 20
+
+                    # Логируем для отладки
+                    logger.debug(f"Loaded {symbol}: max_leverage={self.symbol_leverage_limits.get(symbol, 'N/A')}")
+
+            # Проверяем проблемные символы
+            problem_symbols = ['LINEAUSDT', 'ICPUSDT', 'PORT3USDT', 'PUMPUSDT', 'BDXNUSDT']
+            for symbol in problem_symbols:
+                if symbol in self.exchange_info:
+                    logger.info(f"✅ {symbol} loaded: max_leverage={self.symbol_leverage_limits.get(symbol, 'N/A')}")
+                else:
+                    logger.warning(f"⚠️ {symbol} not found in exchange info")
+
         logger.info(f"Binance {'testnet' if self.testnet else 'mainnet'} initialized")
         logger.info(f"Loaded {len(self.exchange_info)} active perpetual contracts")
-
-        # On testnet, log some example pairs for debugging
-        if self.testnet and self.exchange_info:
-            sample_symbols = list(self.exchange_info.keys())[:5]
-            logger.debug(f"Sample symbols: {sample_symbols}")
-
-            # Check for specific problematic pairs
-            for problem_symbol in ['PUFFERUSDT', 'SKATEUSDT']:
-                if problem_symbol in self.exchange_info:
-                    logger.info(f"✅ {problem_symbol} found in exchange info")
-                    logger.debug(f"   Max leverage: {self.symbol_leverage_limits.get(problem_symbol, 'N/A')}")
-                else:
-                    logger.warning(f"⚠️ {problem_symbol} NOT found in exchange info")
 
     async def close(self):
         if self.session:
@@ -199,54 +204,66 @@ class BinanceExchange(BaseExchange):
         return str(price)
 
     def format_quantity(self, symbol: str, quantity: float) -> str:
-        """Format quantity with proper rounding and min/max checks"""
+        """Format quantity with precision validation"""
         try:
-            if symbol in self.exchange_info:
-                lot_size_filter = next(
-                    (f for f in self.exchange_info[symbol]['filters']
-                     if f['filterType'] == 'LOT_SIZE'),
-                    None
-                )
+            if symbol not in self.exchange_info:
+                logger.warning(f"No info for {symbol}, using default formatting")
+                # Для Binance минимальная точность обычно 3 знака
+                return str(round(quantity, 3))
 
-                if lot_size_filter:
-                    step_size = Decimal(lot_size_filter['stepSize'])
-                    min_qty = Decimal(lot_size_filter.get('minQty', '0'))
-                    max_qty = Decimal(lot_size_filter.get('maxQty', '999999999'))
+            lot_size_filter = next(
+                (f for f in self.exchange_info[symbol]['filters']
+                 if f['filterType'] == 'LOT_SIZE'),
+                None
+            )
 
-                    quantity_decimal = Decimal(str(quantity))
+            if lot_size_filter:
+                step_size = Decimal(lot_size_filter['stepSize'])
+                min_qty = Decimal(lot_size_filter.get('minQty', '0'))
+                max_qty = Decimal(lot_size_filter.get('maxQty', '999999999'))
 
-                    # Round down to step_size
-                    quantized_quantity = (quantity_decimal / step_size).quantize(
-                        Decimal('1'),
-                        rounding=ROUND_DOWN
-                    ) * step_size
+                quantity_decimal = Decimal(str(quantity))
 
-                    # If less than minimum, try rounding up
-                    if quantized_quantity < min_qty:
-                        quantized_up = (quantity_decimal / step_size).quantize(
-                            Decimal('1'),
-                            rounding=ROUND_UP
-                        ) * step_size
+                # Определяем количество десятичных знаков
+                step_str = str(step_size)
+                if '.' in step_str:
+                    # Убираем trailing zeros для определения точности
+                    step_str = step_str.rstrip('0')
+                    if '.' in step_str:
+                        decimals = len(step_str.split('.')[1])
+                    else:
+                        decimals = 0
+                else:
+                    decimals = 0
 
-                        quantized_quantity = max(quantized_up, min_qty)
-                        logger.debug(f"{symbol}: adjusted quantity to minimum {quantized_quantity}")
+                # Округляем вниз до step_size
+                quantized_quantity = (quantity_decimal / step_size).quantize(
+                    Decimal('1'),
+                    rounding=ROUND_DOWN
+                ) * step_size
 
-                    # Check maximum
-                    if quantized_quantity > max_qty:
-                        quantized_quantity = max_qty
-                        logger.warning(f"{symbol}: quantity capped at maximum {max_qty}")
+                # Проверка на минимум/максимум
+                if quantized_quantity < min_qty:
+                    quantized_quantity = min_qty
+                    logger.debug(f"{symbol}: adjusted to minimum {min_qty}")
+                elif quantized_quantity > max_qty:
+                    quantized_quantity = max_qty
+                    logger.warning(f"{symbol}: capped at maximum {max_qty}")
 
-                    # Clean up trailing zeros
-                    result = str(quantized_quantity)
-                    if '.' in result:
-                        result = result.rstrip('0').rstrip('.')
+                # Форматируем с правильным количеством знаков
+                # ВАЖНО: Не добавляем лишние нули
+                result = format(quantized_quantity, f'.{decimals}f')
 
-                    return result
+                # Убираем trailing zeros и точку если нужно
+                if '.' in result:
+                    result = result.rstrip('0').rstrip('.')
+
+                logger.debug(f"{symbol}: formatted {quantity} -> {result}")
+                return result
 
         except Exception as e:
             logger.error(f"Error formatting quantity for {symbol}: {e}")
-
-        return str(quantity)
+            return str(round(quantity, 3))
 
     async def get_open_positions(self) -> List[Dict]:
         """Get all open positions"""
@@ -307,36 +324,61 @@ class BinanceExchange(BaseExchange):
         return {}
 
     async def set_leverage(self, symbol: str, leverage: int) -> bool:
-        """Set leverage with automatic fallback to max allowed"""
-        max_leverage = self.get_max_leverage(symbol)
+        """Set leverage with automatic adjustment for symbol limits"""
+        try:
+            # Получаем информацию о максимальном leverage для символа
+            max_leverage = self.get_max_leverage(symbol)
 
-        # Try requested leverage first, then fallback
-        leverage_options = [min(leverage, max_leverage)]
-        if leverage > max_leverage:
-            leverage_options.extend([max_leverage, 10, 5, 3, 2, 1])
-        else:
-            leverage_options.extend([10, 5, 3, 2, 1])
+            # Если запрошенный leverage больше максимального, используем максимальный
+            target_leverage = min(leverage, max_leverage)
 
-        for lev in leverage_options:
+            # Пробуем установить leverage
             try:
-                params = {'symbol': symbol, 'leverage': lev}
+                params = {'symbol': symbol, 'leverage': target_leverage}
                 result = await self._make_request("POST", "/fapi/v1/leverage", params, signed=True)
 
                 if result:
-                    if lev != leverage:
-                        logger.info(f"{symbol}: Using leverage {lev}x (requested {leverage}x, max {max_leverage}x)")
+                    if target_leverage != leverage:
+                        logger.info(
+                            f"✅ {symbol}: Leverage set to {target_leverage}x (requested {leverage}x, max {max_leverage}x)")
+                    else:
+                        logger.info(f"✅ {symbol}: Leverage set to {target_leverage}x")
                     return True
 
-            except ValueError as e:
-                if "Invalid leverage" in str(e):
-                    continue  # Try next leverage option
-                raise
             except Exception as e:
-                logger.error(f"Failed to set leverage {lev}x for {symbol}: {e}")
-                if lev == leverage_options[-1]:
-                    return False
+                error_str = str(e)
 
-        return False
+                # Если ошибка про invalid leverage, пробуем меньшие значения
+                if "Invalid leverage" in error_str or "4028" in error_str:
+                    # Пробуем стандартные значения leverage в порядке убывания
+                    fallback_leverages = [20, 10, 5, 3, 2, 1]
+
+                    for fallback_lev in fallback_leverages:
+                        if fallback_lev >= target_leverage:
+                            continue
+
+                        try:
+                            params = {'symbol': symbol, 'leverage': fallback_lev}
+                            result = await self._make_request("POST", "/fapi/v1/leverage", params, signed=True)
+
+                            if result:
+                                logger.warning(
+                                    f"⚠️ {symbol}: Leverage set to {fallback_lev}x (requested {leverage}x failed)")
+                                # Обновляем информацию о максимальном leverage
+                                self.symbol_leverage_limits[symbol] = fallback_lev
+                                return True
+
+                        except Exception as inner_e:
+                            continue
+
+                raise e
+
+        except Exception as e:
+            logger.error(f"Failed to set leverage for {symbol}: {e}")
+            # На testnet не критично если leverage не установился
+            if self.testnet:
+                return True
+            return False
 
     async def create_market_order(self, symbol: str, side: str, quantity: float) -> Optional[Dict]:
         """Create market order with proper response handling"""
@@ -431,28 +473,70 @@ class BinanceExchange(BaseExchange):
         return None
 
     async def set_stop_loss(self, symbol: str, stop_price: float) -> bool:
-        """Set stop loss order with retry logic."""
-        for attempt in range(4):
+        """Set stop loss with improved retry logic"""
+        max_attempts = 3
+
+        for attempt in range(max_attempts):
             try:
+                # Ждем пока позиция зарегистрируется
+                if attempt > 0:
+                    await asyncio.sleep(2)
+
+                # Получаем текущие позиции
                 positions = await self.get_open_positions()
                 pos = next((p for p in positions if p['symbol'] == symbol), None)
-                if pos:
-                    side = 'SELL' if pos['side'] == 'LONG' else 'BUY'
-                    params = {'symbol': symbol, 'side': side, 'type': 'STOP_MARKET',
-                              'stopPrice': self.format_price(symbol, stop_price), 'closePosition': 'true'}
-                    result = await self._make_request("POST", "/fapi/v1/order", params, signed=True)
-                    if result and result.get('orderId'):
-                        logger.info(f"✅ Stop Loss set for {symbol} at {stop_price}")
-                        return True
 
-                # Если позиция не найдена, ждем и пробуем снова
-                await asyncio.sleep(0.5 + attempt)
+                if not pos:
+                    logger.warning(f"Position for {symbol} not found yet, attempt {attempt + 1}/{max_attempts}")
+                    continue
+
+                # Определяем side для stop order
+                side = 'SELL' if pos['side'] == 'LONG' else 'BUY'
+
+                # Проверяем существующие ордера
+                existing_orders = await self.get_open_orders(symbol)
+
+                # Проверяем есть ли уже stop order
+                stop_exists = any(
+                    o.get('type') in ['STOP_MARKET', 'STOP', 'STOP_LOSS']
+                    for o in existing_orders
+                )
+
+                if stop_exists:
+                    logger.info(f"Stop loss already exists for {symbol}")
+                    return True
+
+                # Создаем stop order
+                params = {
+                    'symbol': symbol,
+                    'side': side,
+                    'type': 'STOP_MARKET',
+                    'stopPrice': self.format_price(symbol, stop_price),
+                    'closePosition': 'true',
+                    'timeInForce': 'GTE_GTC',
+                    'workingType': 'MARK_PRICE'  # Используем Mark Price для стабильности
+                }
+
+                result = await self._make_request("POST", "/fapi/v1/order", params, signed=True)
+
+                if result and result.get('orderId'):
+                    logger.info(f"✅ Stop Loss set for {symbol} at {stop_price}")
+                    return True
 
             except Exception as e:
                 logger.error(f"Attempt {attempt + 1} to set SL for {symbol} failed: {e}")
-                await asyncio.sleep(0.5 + attempt)
 
-        logger.error(f"❌ Failed to set Stop Loss for {symbol} after multiple attempts.")
+                # На последней попытке проверяем, может SL уже установлен
+                if attempt == max_attempts - 1:
+                    try:
+                        orders = await self.get_open_orders(symbol)
+                        if any(o.get('type') in ['STOP_MARKET', 'STOP'] for o in orders):
+                            logger.info(f"Stop loss found for {symbol} on final check")
+                            return True
+                    except:
+                        pass
+
+        logger.error(f"Failed to set Stop Loss for {symbol} after {max_attempts} attempts")
         return False
 
     async def set_take_profit(self, symbol: str, take_profit_price: float) -> bool:

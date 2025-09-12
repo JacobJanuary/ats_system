@@ -25,6 +25,46 @@ from .base import BaseExchange
 logger = logging.getLogger(__name__)
 
 
+def safe_float(value, default=0.0):
+    """
+    Safely convert value to float with comprehensive error handling
+    Handles: None, empty strings, 'null', 'undefined', and invalid values
+    """
+    if value is None or value == '' or value == 'null' or value == 'undefined':
+        return default
+
+    # Если уже float, просто возвращаем
+    if isinstance(value, (int, float)):
+        return float(value)
+
+    # Пытаемся преобразовать строку
+    if isinstance(value, str):
+        value = value.strip()
+        if not value or value.lower() in ['null', 'none', 'undefined', 'nan']:
+            return default
+
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            logger.debug(f"Could not convert '{value}' to float, using default {default}")
+            return default
+
+    # Для всех остальных типов
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        logger.debug(f"Could not convert {type(value)} to float, using default {default}")
+        return default
+
+
+def safe_int(value, default=0):
+    """
+    Safely convert value to integer
+    """
+    float_val = safe_float(value, default)
+    return int(float_val)
+
+
 class BybitExchange(BaseExchange):
     """Bybit futures exchange implementation - complete fixed version"""
 
@@ -46,6 +86,7 @@ class BybitExchange(BaseExchange):
         self.recv_window = 5000
         self.symbol_info = {}
         self.position_mode = None
+        self.last_error = None  # ← ДОБАВИТЬ ЭТУ СТРОКУ!
         # Initialize error handler
         self.error_handler = get_error_handler("Bybit")
 
@@ -88,22 +129,96 @@ class BybitExchange(BaseExchange):
             self.position_mode = "one-way"
 
     async def _load_instruments_info(self):
-        """Load all active trading instruments - FIXED with category parameter"""
+        """Load all active trading instruments with better filtering - FIXED VERSION"""
         try:
-            # FIX: Add category parameter for v5 API
-            result = await self._make_request("GET", "/v5/market/instruments-info",
-                                              {"category": "linear"})
+            self.symbol_info = {}
+            cursor = ""
+            total_loaded = 0
 
-            if result and 'list' in result:
-                for symbol_info in result['list']:
-                    if symbol_info.get('status') == 'Trading':
-                        symbol = symbol_info['symbol']
-                        self.symbol_info[symbol] = symbol_info
-                        logger.debug(f"Loaded {symbol}: lotSizeFilter={symbol_info.get('lotSizeFilter')}")
+            logger.info("🔄 Loading Bybit instruments...")
 
-            logger.info(f"Loaded {len(self.symbol_info)} trading instruments")
+            while True:
+                params = {
+                    "category": "linear",
+                    "limit": "1000"
+                }
+
+                if cursor:
+                    params["cursor"] = cursor
+
+                result = await self._make_request("GET", "/v5/market/instruments-info", params)
+
+                if result and 'list' in result:
+                    for symbol_info in result['list']:
+                        symbol = symbol_info.get('symbol', '')
+                        status = symbol_info.get('status', '')
+
+                        # ВАЖНО: На testnet некоторые символы могут иметь другой статус
+                        # Загружаем символы с разными статусами для testnet
+                        if self.testnet:
+                            # На testnet принимаем символы с любым непустым статусом
+                            if symbol and status:
+                                logger.debug(f"Loading {symbol} with status: {status}")
+                            else:
+                                logger.debug(f"Skipping {symbol} - empty status")
+                                continue
+                        else:
+                            # На mainnet только Trading статус
+                            if status != 'Trading':
+                                logger.debug(f"Skipping {symbol} - status: {status}")
+                                continue
+
+                        # Сохраняем полную информацию о символе
+                        self.symbol_info[symbol] = {
+                            'symbol': symbol,
+                            'status': status,  # Сохраняем реальный статус
+                            'minOrderQty': float(symbol_info.get('lotSizeFilter', {}).get('minOrderQty', 0.001)),
+                            'maxOrderQty': float(symbol_info.get('lotSizeFilter', {}).get('maxOrderQty', 999999999)),
+                            'qtyStep': float(symbol_info.get('lotSizeFilter', {}).get('qtyStep', 0.001)),
+                            'tickSize': float(symbol_info.get('priceFilter', {}).get('tickSize', 0.0001)),
+                            'minPrice': float(symbol_info.get('priceFilter', {}).get('minPrice', 0)),
+                            'maxPrice': float(symbol_info.get('priceFilter', {}).get('maxPrice', 999999)),
+                            'settleCoin': symbol_info.get('settleCoin', 'USDT'),
+                            'quoteCoin': symbol_info.get('quoteCoin', 'USDT'),
+                            'baseCoin': symbol_info.get('baseCoin', ''),
+                            'contractType': symbol_info.get('contractType', 'LinearPerpetual'),
+                            'launchTime': symbol_info.get('launchTime', ''),
+                            'deliveryTime': symbol_info.get('deliveryTime', ''),
+                            'deliveryFeeRate': symbol_info.get('deliveryFeeRate', ''),
+                            'priceScale': symbol_info.get('priceScale', '2')
+                        }
+
+                        total_loaded += 1
+
+                        # Специальная проверка для проблемных символов
+                        if symbol in ['ORBSUSDT', 'TAIUSDT', 'XNOUSDT', 'ZEUSUSDT', 'VELOUSDT']:
+                            logger.info(
+                                f"✅ Loaded {symbol}: status={status}, minQty={self.symbol_info[symbol]['minOrderQty']}")
+
+                    # Проверяем есть ли еще данные
+                    cursor = result.get('nextPageCursor', '')
+                    if not cursor:
+                        break
+                else:
+                    break
+
+            logger.info(f"✅ Loaded {total_loaded} trading instruments from Bybit")
+
+            # Проверяем проблемные символы
+            problem_symbols = ['ORBSUSDT', 'TAIUSDT', 'XNOUSDT', 'ZEUSUSDT', 'VELOUSDT', 'XTERUSDT', 'CPOOLUSDT']
+            for symbol in problem_symbols:
+                if symbol in self.symbol_info:
+                    info = self.symbol_info[symbol]
+                    logger.info(f"✅ {symbol} found: status={info.get('status')}, minQty={info.get('minOrderQty')}")
+                else:
+                    logger.warning(f"⚠️ {symbol} NOT found in loaded instruments")
+                    # Пытаемся загрузить отдельно
+                    await self._load_single_symbol_info(symbol)
+
         except Exception as e:
             logger.error(f"Error loading instruments: {e}")
+            # Загружаем минимальный набор для работы
+            self.symbol_info = {}
 
     def _generate_signature(self, timestamp: str, params: str) -> str:
         """Generate HMAC SHA256 signature for Bybit API"""
@@ -166,15 +281,17 @@ class BybitExchange(BaseExchange):
             return None
 
     async def _handle_response(self, response):
-        """Handle API response - COMPLETELY FIXED"""
+        """Handle API response - FIXED with error tracking"""
         try:
             data = await response.json()
             if response.status == 200:
                 ret_code = data.get('retCode')
                 if ret_code == 0:
+                    self.last_error = None  # Очищаем ошибку при успехе
                     return data.get('result', data)
                 else:
                     error_msg = data.get('retMsg', 'Unknown error')
+                    self.last_error = f"{ret_code}: {error_msg}"  # Сохраняем ошибку
 
                     # Special handling for known error codes
                     if ret_code == 110043:  # Leverage not modified
@@ -196,49 +313,109 @@ class BybitExchange(BaseExchange):
 
                     return None
             else:
-                logger.error(f"Bybit HTTP error {response.status}: {await response.text()}")
+                error_text = await response.text()
+                self.last_error = f"HTTP {response.status}: {error_text}"
+                logger.error(f"Bybit HTTP error {response.status}: {error_text}")
                 return None
         except Exception as e:
+            self.last_error = str(e)
             logger.error(f"Error parsing Bybit response: {e}")
             return None
 
+    async def _load_single_symbol_info(self, symbol: str):
+        """Load info for a single symbol if missing - IMPROVED VERSION"""
+        try:
+            logger.info(f"🔍 Attempting to load single symbol: {symbol}")
+
+            result = await self._make_request("GET", "/v5/market/instruments-info", {
+                "category": "linear",
+                "symbol": symbol
+            })
+
+            if result and 'list' in result and len(result['list']) > 0:
+                symbol_info = result['list'][0]
+                status = symbol_info.get('status', '')
+
+                logger.info(f"Found {symbol} with status: {status}")
+
+                # На testnet загружаем с любым статусом
+                if self.testnet or status == 'Trading':
+                    self.symbol_info[symbol] = {
+                        'symbol': symbol,
+                        'status': status,
+                        'minOrderQty': float(symbol_info.get('lotSizeFilter', {}).get('minOrderQty', 0.001)),
+                        'maxOrderQty': float(symbol_info.get('lotSizeFilter', {}).get('maxOrderQty', 999999999)),
+                        'qtyStep': float(symbol_info.get('lotSizeFilter', {}).get('qtyStep', 0.001)),
+                        'tickSize': float(symbol_info.get('priceFilter', {}).get('tickSize', 0.0001)),
+                        'minPrice': float(symbol_info.get('priceFilter', {}).get('minPrice', 0)),
+                        'maxPrice': float(symbol_info.get('priceFilter', {}).get('maxPrice', 999999)),
+                        'settleCoin': symbol_info.get('settleCoin', 'USDT'),
+                        'quoteCoin': symbol_info.get('quoteCoin', 'USDT'),
+                        'baseCoin': symbol_info.get('baseCoin', ''),
+                        'contractType': symbol_info.get('contractType', 'LinearPerpetual')
+                    }
+                    logger.info(f"✅ Successfully loaded {symbol} info")
+                else:
+                    logger.warning(f"⚠️ {symbol} has status '{status}', not loading on mainnet")
+            else:
+                logger.warning(f"⚠️ {symbol} not found in Bybit API response")
+
+        except Exception as e:
+            logger.error(f"Failed to load symbol info for {symbol}: {e}")
+
     def format_quantity(self, symbol: str, quantity: float) -> str:
-        """Format quantity according to symbol precision - IMPROVED"""
+        """Format quantity with improved fallback for missing symbols"""
+        # Проверяем наличие информации о символе
         if symbol not in self.symbol_info:
-            logger.warning(f"No symbol info for {symbol}, using default formatting")
-            return f"{quantity:.8f}"
+            logger.warning(f"No symbol info for {symbol}, attempting to load...")
+            # Пытаемся загрузить информацию о конкретном символе
+            asyncio.create_task(self._load_single_symbol_info(symbol))
+
+            # Используем безопасные дефолтные значения
+            # Для Bybit обычно минимальный размер 1 контракт
+            if quantity < 1:
+                quantity = 1
+
+            # Округляем до разумного количества знаков
+            return str(round(quantity, 4))
 
         try:
-            # Get lot size filter
-            lot_filter = self.symbol_info[symbol].get('lotSizeFilter', {})
-            step_size = float(lot_filter.get('qtyStep', 1))
-            min_qty = float(lot_filter.get('minOrderQty', 0))
-            max_qty = float(lot_filter.get('maxOrderQty', 999999999))
+            symbol_data = self.symbol_info[symbol]
+            step_size = symbol_data.get('qtyStep', 0.001)
+            min_qty = symbol_data.get('minOrderQty', 1)
+            max_qty = symbol_data.get('maxOrderQty', 999999999)
 
-            # Round to step size
+            # Округляем к step_size
             qty_decimal = Decimal(str(quantity))
             step_decimal = Decimal(str(step_size))
+
+            # Определяем количество десятичных знаков в step_size
+            step_str = str(step_size)
+            if '.' in step_str:
+                decimals = len(step_str.split('.')[1])
+            else:
+                decimals = 0
+
+            # Округляем вниз до step_size
             rounded_qty = (qty_decimal / step_decimal).quantize(Decimal('1'), rounding=ROUND_DOWN) * step_decimal
 
-            # Check bounds
+            # Проверяем минимум и максимум
             if rounded_qty < Decimal(str(min_qty)):
                 rounded_qty = Decimal(str(min_qty))
-                logger.debug(f"{symbol}: Adjusted quantity to minimum {min_qty}")
+                logger.debug(f"{symbol}: Adjusted to minimum {min_qty}")
             elif rounded_qty > Decimal(str(max_qty)):
                 rounded_qty = Decimal(str(max_qty))
-                logger.warning(f"{symbol}: Quantity capped at maximum {max_qty}")
+                logger.warning(f"{symbol}: Capped at maximum {max_qty}")
 
-            # Format with appropriate precision
-            result = str(rounded_qty)
-            if '.' in result:
-                result = result.rstrip('0').rstrip('.')
+            # Форматируем с нужным количеством знаков
+            result = format(rounded_qty, f'.{decimals}f')
 
-            logger.debug(f"{symbol}: Formatted quantity {quantity} -> {result}")
+            logger.debug(f"{symbol}: Formatted {quantity} -> {result}")
             return result
 
         except Exception as e:
             logger.error(f"Error formatting quantity for {symbol}: {e}")
-            return f"{quantity:.8f}"
+            return str(round(quantity, 4))
 
     def format_price(self, symbol: str, price: float) -> str:
         """Format price according to symbol precision"""
@@ -267,37 +444,55 @@ class BybitExchange(BaseExchange):
             return f"{price:.8f}"
 
     async def get_balance(self) -> float:
-        """Get account balance - FIXED for v5 API"""
+        """Get account balance - FIXED with safe value handling"""
         try:
             result = await self._make_request("GET", "/v5/account/wallet-balance",
                                               {"accountType": "UNIFIED"}, signed=True)
             if result and 'list' in result:
                 for balance_info in result['list']:
                     if balance_info.get('accountType') == 'UNIFIED':
-                        return float(balance_info.get('totalWalletBalance', 0))
+                        # БЕЗОПАСНОЕ преобразование баланса
+                        total_balance = safe_float(balance_info.get('totalWalletBalance'), 0)
+                        available_balance = safe_float(balance_info.get('availableBalance'), 0)
+
+                        logger.debug(f"Bybit balance: total={total_balance}, available={available_balance}")
+
+                        # Возвращаем доступный баланс если есть, иначе общий
+                        return available_balance if available_balance > 0 else total_balance
+
+            logger.warning("No balance information found")
             return 0.0
+
         except Exception as e:
             logger.error(f"Error getting Bybit balance: {e}")
             return 0.0
 
     async def get_ticker(self, symbol: str) -> Dict:
-        """Get ticker information"""
+        """Get ticker information - FIXED with safe value handling"""
         try:
             result = await self._make_request("GET", "/v5/market/tickers",
                                               {"category": "linear", "symbol": symbol})
             if result and 'list' in result:
                 if len(result['list']) > 0:
                     ticker = result['list'][0]
-                    last_price = ticker.get('lastPrice', '0')
-                    if not last_price or last_price == '':
+
+                    # БЕЗОПАСНОЕ преобразование всех ценовых значений
+                    last_price = safe_float(ticker.get('lastPrice'), 0)
+                    bid_price = safe_float(ticker.get('bid1Price'), 0)
+                    ask_price = safe_float(ticker.get('ask1Price'), 0)
+                    volume = safe_float(ticker.get('volume24h'), 0)
+
+                    # Проверяем что есть хотя бы какая-то цена
+                    if last_price == 0 and bid_price == 0 and ask_price == 0:
+                        logger.warning(f"No valid price data for {symbol}")
                         return {}
 
                     return {
                         'symbol': ticker.get('symbol'),
-                        'price': float(last_price) if last_price else 0,
-                        'bid': float(ticker.get('bid1Price', 0) or 0),
-                        'ask': float(ticker.get('ask1Price', 0) or 0),
-                        'volume': float(ticker.get('volume24h', 0) or 0)
+                        'price': last_price if last_price > 0 else (bid_price + ask_price) / 2,
+                        'bid': bid_price,
+                        'ask': ask_price,
+                        'volume': volume
                     }
             return {}
         except Exception as e:
@@ -326,7 +521,7 @@ class BybitExchange(BaseExchange):
             return True  # Continue anyway on testnet
 
     async def create_market_order(self, symbol: str, side: str, quantity: float) -> Optional[Dict]:
-        """Create market order - FIXED with better price handling"""
+        """Create market order - FIXED with price limit handling"""
         try:
             # Get current price first
             ticker = await self.get_ticker(symbol)
@@ -350,6 +545,24 @@ class BybitExchange(BaseExchange):
             logger.info(f"Creating Bybit order: {order_params}")
 
             result = await self._make_request("POST", "/v5/order/create", order_params, signed=True)
+
+            # Если получили ошибку 30208 (цена выше максимальной), пробуем limit order
+            if not result and self.last_error and "30208" in str(self.last_error):
+                logger.warning(f"Market order failed with price limit error, trying limit order")
+
+                # Для покупки используем текущую цену + 0.5%
+                # Для продажи используем текущую цену - 0.5%
+                if bybit_side == "Buy":
+                    limit_price = current_price * 1.005
+                else:
+                    limit_price = current_price * 0.995
+
+                order_params["orderType"] = "Limit"
+                order_params["price"] = self.format_price(symbol, limit_price)
+                order_params["timeInForce"] = "IOC"  # Immediate or cancel
+
+                logger.info(f"Retrying with limit order at ${limit_price:.4f}")
+                result = await self._make_request("POST", "/v5/order/create", order_params, signed=True)
 
             if result and 'orderId' in result:
                 order_id = result['orderId']
@@ -377,44 +590,36 @@ class BybitExchange(BaseExchange):
                         'symbol': symbol,
                         'side': side,
                         'quantity': float(formatted_qty),
-                        'price': current_price if current_price > 0 else 1.0,  # Fallback to prevent division by zero
+                        'price': current_price if current_price > 0 else 1.0,
                         'status': 'FILLED'
                     }
             else:
-                logger.error(f"Bybit order creation failed: {result}")
+                logger.error(f"Bybit order creation failed: {self.last_error}")
                 return None
 
         except Exception as e:
+            self.last_error = str(e)
             logger.error(f"Error creating Bybit market order: {e}")
             return None
 
     async def _check_order_status(self, order_id: str, symbol: str) -> Optional[Dict]:
-        """Check order status - FIXED empty string handling"""
+        """Check order status - FIXED with safe value handling"""
         try:
             # Try realtime orders first
             result = await self._make_request("GET", "/v5/order/realtime", {
                 "category": "linear",
                 "settleCoin": "USDT",
-                "limit": "50"  # Get recent orders
+                "limit": "50"
             }, signed=True)
 
             if result and 'list' in result:
                 for order in result['list']:
                     if order.get('orderId') == order_id or order.get('orderLinkId') == order_id:
-                        # Handle empty strings in numeric fields
-                        avg_price = order.get('avgPrice', '0')
-                        cum_exec_qty = order.get('cumExecQty', '0')
+                        # БЕЗОПАСНОЕ преобразование с использованием safe_float
+                        avg_price = safe_float(order.get('avgPrice'), 0)
+                        executed_qty = safe_float(order.get('cumExecQty'), 0)
 
-                        # Convert to float safely
-                        try:
-                            avg_price = float(avg_price) if avg_price and avg_price != '' else 0
-                        except (ValueError, TypeError):
-                            avg_price = 0
-
-                        try:
-                            executed_qty = float(cum_exec_qty) if cum_exec_qty and cum_exec_qty != '' else 0
-                        except (ValueError, TypeError):
-                            executed_qty = 0
+                        logger.debug(f"Order {order_id}: avgPrice={avg_price}, executedQty={executed_qty}")
 
                         return {
                             'status': order.get('orderStatus'),
@@ -432,19 +637,9 @@ class BybitExchange(BaseExchange):
             if result and 'list' in result:
                 for order in result['list']:
                     if order.get('orderId') == order_id or order.get('orderLinkId') == order_id:
-                        # Handle empty strings
-                        avg_price = order.get('avgPrice', '0')
-                        cum_exec_qty = order.get('cumExecQty', '0')
-
-                        try:
-                            avg_price = float(avg_price) if avg_price and avg_price != '' else 0
-                        except (ValueError, TypeError):
-                            avg_price = 0
-
-                        try:
-                            executed_qty = float(cum_exec_qty) if cum_exec_qty and cum_exec_qty != '' else 0
-                        except (ValueError, TypeError):
-                            executed_qty = 0
+                        # БЕЗОПАСНОЕ преобразование
+                        avg_price = safe_float(order.get('avgPrice'), 0)
+                        executed_qty = safe_float(order.get('cumExecQty'), 0)
 
                         return {
                             'status': order.get('orderStatus'),
@@ -460,16 +655,13 @@ class BybitExchange(BaseExchange):
             return None
 
     async def get_open_positions(self, symbol: str = None) -> List[Dict]:
-        """Get open positions - WORKING VERSION with settleCoin"""
+        """Get open positions - FIXED with safe value handling"""
         try:
-            # CRITICAL: Must use settleCoin for testnet to work properly
             params = {
                 "category": "linear",
-                "settleCoin": "USDT"  # This is REQUIRED for proper detection
+                "settleCoin": "USDT"
             }
 
-            # Don't add symbol to params if not provided
-            # Bybit doesn't like empty symbol parameter
             if symbol:
                 params["symbol"] = symbol
 
@@ -478,18 +670,19 @@ class BybitExchange(BaseExchange):
             positions = []
             if result and 'list' in result:
                 for pos in result['list']:
-                    size = float(pos.get('size', 0))
+                    # БЕЗОПАСНОЕ преобразование всех числовых полей
+                    size = safe_float(pos.get('size'), 0)
 
                     # Only include positions with size > 0
                     if size > 0:
                         position_data = {
                             'symbol': pos.get('symbol'),
                             'quantity': size,
-                            'entry_price': float(pos.get('avgPrice', 0)),
-                            'pnl': float(pos.get('unrealisedPnl', 0)),
+                            'entry_price': safe_float(pos.get('avgPrice'), 0),
+                            'pnl': safe_float(pos.get('unrealisedPnl'), 0),
                             'side': 'long' if pos.get('side') == 'Buy' else 'short',
                             'size': size,
-                            'updatedTime': int(pos.get('updatedTime', 0)),
+                            'updatedTime': safe_int(pos.get('updatedTime'), 0),
                             # Additional fields for compatibility
                             'stopLoss': pos.get('stopLoss'),
                             'takeProfit': pos.get('takeProfit'),
@@ -497,8 +690,8 @@ class BybitExchange(BaseExchange):
                         }
                         positions.append(position_data)
 
-                        # Log for debugging
-                        logger.debug(f"Position found: {pos.get('symbol')} size={size} @ {pos.get('avgPrice')}")
+                        logger.debug(
+                            f"Position found: {pos.get('symbol')} size={size} @ {position_data['entry_price']}")
 
             if positions:
                 logger.info(f"✅ Found {len(positions)} open positions")
@@ -512,47 +705,69 @@ class BybitExchange(BaseExchange):
             return []
 
     async def set_stop_loss(self, symbol: str, stop_price: float) -> bool:
-        """Set stop loss - IMPROVED VERSION"""
+        """Set stop loss with better error handling - FIXED VERSION"""
         try:
-            # Format stop price
             formatted_price = self.format_price(symbol, stop_price)
 
-            # Try to set stop loss directly (even if position not immediately visible)
+            # Сначала проверяем, есть ли уже stop loss
+            positions = await self.get_open_positions(symbol)
+            if not positions:
+                logger.warning(f"No position found for {symbol} to set SL")
+                self.last_error = "No position found"
+                return False
+
+            pos = positions[0]
+            existing_sl = pos.get('stopLoss')
+
+            # Если SL уже установлен и близок к нужному значению, возвращаем успех
+            if existing_sl and existing_sl != '0' and existing_sl != '':
+                try:
+                    existing_sl_float = float(existing_sl)
+                    if abs(existing_sl_float - float(formatted_price)) < 0.0001:
+                        logger.info(f"Stop loss already set for {symbol} at {existing_sl}")
+                        return True
+                except (ValueError, TypeError):
+                    pass
+
+            # Пытаемся установить SL
             result = await self._make_request("POST", "/v5/position/trading-stop", {
                 "category": "linear",
                 "symbol": symbol,
                 "stopLoss": formatted_price,
                 "tpslMode": "Full",
+                "slTriggerBy": "LastPrice",
                 "positionIdx": 0
             }, signed=True)
 
             if result:
                 logger.info(f"✅ Stop loss set for {symbol} at {formatted_price}")
                 return True
-            else:
-                # If failed, wait and retry once
-                await asyncio.sleep(2.0)
 
-                # Check if position exists now
-                positions = await self.get_open_positions(symbol)
-                if positions:
-                    # Retry setting stop loss
-                    result = await self._make_request("POST", "/v5/position/trading-stop", {
-                        "category": "linear",
-                        "symbol": symbol,
-                        "stopLoss": formatted_price,
-                        "tpslMode": "Full",
-                        "positionIdx": 0
-                    }, signed=True)
+            # Проверяем специфические ошибки
+            if self.last_error:
+                error_str = str(self.last_error).lower()
+                if "not modified" in error_str or "34040" in error_str:
+                    logger.info(f"Stop loss already exists for {symbol}")
+                    return True
+                elif "zero position" in error_str or "10001" in error_str:
+                    logger.warning(f"Cannot set SL - no position or zero position for {symbol}")
+                    return False
 
-                    if result:
-                        logger.info(f"✅ Stop loss set for {symbol} at {formatted_price} (retry)")
-                        return True
-
-                logger.warning(f"Failed to set stop loss for {symbol}")
-                return False
+            return False
 
         except Exception as e:
+            self.last_error = str(e)
+
+            # Обрабатываем ошибку 34040 (not modified) как успех
+            if "34040" in str(e) or "not modified" in str(e).lower():
+                logger.info(f"Stop loss already set for {symbol}")
+                return True
+
+            # Обрабатываем ошибку 10001 (zero position)
+            if "10001" in str(e) or "zero position" in str(e).lower():
+                logger.warning(f"Cannot set SL - no position for {symbol}")
+                return False
+
             logger.error(f"Error setting stop loss: {e}")
             return False
 
