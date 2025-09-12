@@ -122,16 +122,16 @@ class MainTrader:
         self.bybit = None
         self.db_pool = None
         self.processing_signals: Set[int] = set()
-        
+
         # Система предотвращения дубликатов сигналов
         self.processed_signals_cache: Set[int] = set()
         self.signal_cache_ttl = 3600  # 1 час
         self.last_cache_cleanup = datetime.now(timezone.utc)
-        
+
         # Буфер для сигналов
         self.signal_buffer = asyncio.Queue(maxsize=1000)
         self.buffer_processor_task = None
-        
+
         # Мониторинг сигналов
         self.signal_stats = {
             'processed': 0,
@@ -140,14 +140,14 @@ class MainTrader:
             'avg_processing_time': 0.0,
             'last_signal_time': None
         }
-        
+
         # Семафоры для контроля параллелизма
         self.signal_semaphore = asyncio.Semaphore(20)  # Максимум 20 одновременных сигналов
         self.db_semaphore = asyncio.Semaphore(10)  # Максимум 10 одновременных DB операций
-        
+
         # Rate limiter для предотвращения банов на биржах
         self.rate_limiter = RateLimiter()
-        
+
         self.failed_symbols: Dict[str, datetime] = {}
         self.symbol_cooldown_minutes = 60
 
@@ -190,34 +190,34 @@ class MainTrader:
                 if not os.getenv(var):
                     logger.error(f"Missing required environment variable: {var}")
                     return False
-            
+
             # Validate numeric parameters
             if self.position_size_usd <= 0:
                 logger.error("Position size must be positive")
                 return False
-            
+
             if self.leverage < 1 or self.leverage > 125:
                 logger.error("Leverage must be between 1 and 125")
                 return False
-            
+
             if self.min_score_week < 0 or self.min_score_week > 100:
                 logger.error("Min score week must be between 0 and 100")
                 return False
-            
+
             if self.min_score_month < 0 or self.min_score_month > 100:
                 logger.error("Min score month must be between 0 and 100")
                 return False
-            
+
             return True
         except Exception as e:
             logger.error(f"Configuration validation error: {e}")
             return False
-    
+
     async def initialize(self):
         # Validate configuration
         if not self.validate_config():
             raise ValueError("Configuration validation failed")
-        
+
         max_retries = 3
         retry_delay = 5
 
@@ -336,7 +336,7 @@ class MainTrader:
     async def get_unprocessed_signals(self) -> List[Signal]:
         # Очистка кэша обработанных сигналов
         await self._cleanup_signal_cache()
-        
+
         time_threshold = datetime.now(timezone.utc) - timedelta(minutes=self.signal_time_window)
 
         # Получить недавно обработанные сигналы для дополнительной проверки
@@ -584,11 +584,11 @@ class MainTrader:
             return False, 0
 
     async def _create_order_with_retry(self, exchange, signal: Signal) -> OrderResult:
-        """ИСПРАВЛЕНО: Улучшенная обработка ошибок при создании ордера"""
+        """FIXED: Improved error handling for Bybit orders"""
 
         for attempt in range(self.order_retry_max):
             try:
-                # Проверяем rate limit перед получением баланса
+                # Check rate limit before getting balance
                 exchange_key = 'binance' if isinstance(exchange, BinanceExchange) else 'bybit'
                 if not await self.rate_limiter.acquire(exchange_key, 'query', 'get_balance'):
                     logger.warning(f"Rate limit exceeded for {exchange_key} get_balance")
@@ -596,6 +596,7 @@ class MainTrader:
                 else:
                     balance = await exchange.get_balance()
                     await self.rate_limiter.record_request(exchange_key, 'query', 'get_balance')
+
                 try:
                     balance = float(balance) if balance and balance != '' else 0
                 except (ValueError, TypeError) as e:
@@ -605,6 +606,7 @@ class MainTrader:
                 if balance <= self.min_balance_reserve:
                     return OrderResult(success=False, error_message=f"Insufficient balance: ${balance:.2f}")
 
+                # Validate order size
                 valid, adjusted_size = await self._validate_order_size(exchange, signal.symbol, self.position_size_usd)
                 if not valid:
                     return OrderResult(success=False, error_message="Invalid order size")
@@ -618,14 +620,14 @@ class MainTrader:
                     position_size_usd = max_available
                     logger.warning(f"Adjusted position to available balance: ${position_size_usd:.2f}")
 
-                # Проверяем rate limit перед получением тикера
-                exchange_key = 'binance' if isinstance(exchange, BinanceExchange) else 'bybit'
+                # Get ticker
                 if not await self.rate_limiter.acquire(exchange_key, 'query', f'get_ticker_{signal.symbol}'):
                     logger.warning(f"Rate limit exceeded for {exchange_key} get_ticker_{signal.symbol}")
                     return OrderResult(success=False, error_message="Rate limit exceeded for ticker")
 
                 ticker = await exchange.get_ticker(signal.symbol)
                 await self.rate_limiter.record_request(exchange_key, 'query', f'get_ticker_{signal.symbol}')
+
                 if not ticker:
                     logger.error(f"No ticker for {signal.symbol}")
                     if attempt < self.order_retry_max - 1:
@@ -655,17 +657,17 @@ class MainTrader:
                 logger.info(f"📝 Order attempt {attempt + 1}/{self.order_retry_max}:")
                 logger.info(f"   ${position_size_usd:.2f} = {quantity:.6f} {signal.symbol} @ ${price:.4f}")
 
-                # Проверяем rate limit перед установкой leverage
+                # Set leverage - don't fail if already set
                 if not await self.rate_limiter.acquire(exchange_key, 'order', f'set_leverage_{signal.symbol}'):
                     logger.warning(f"Rate limit exceeded for {exchange_key} set_leverage_{signal.symbol}")
-                    return OrderResult(success=False, error_message="Rate limit exceeded for leverage")
+                    # Continue anyway, leverage might already be set
+                else:
+                    leverage_set = await exchange.set_leverage(signal.symbol, self.leverage)
+                    await self.rate_limiter.record_request(exchange_key, 'order', f'set_leverage_{signal.symbol}')
+                    if not leverage_set:
+                        logger.warning(f"Could not set leverage for {signal.symbol}, continuing anyway")
 
-                leverage_set = await exchange.set_leverage(signal.symbol, self.leverage)
-                await self.rate_limiter.record_request(exchange_key, 'order', f'set_leverage_{signal.symbol}')
-                if not leverage_set:
-                    logger.warning(f"Could not set leverage for {signal.symbol}, continuing anyway")
-
-                # Проверяем rate limit перед созданием ордера
+                # Create order
                 if not await self.rate_limiter.acquire(exchange_key, 'order', f'create_order_{signal.symbol}'):
                     logger.warning(f"Rate limit exceeded for {exchange_key} create_order_{signal.symbol}")
                     return OrderResult(success=False, error_message="Rate limit exceeded for order creation")
@@ -673,25 +675,33 @@ class MainTrader:
                 order = await exchange.create_market_order(signal.symbol, 'BUY', quantity)
                 await self.rate_limiter.record_request(exchange_key, 'order', f'create_order_{signal.symbol}')
 
-                if order and order.get('quantity', 0) > 0:
-                    executed_qty = order.get('quantity', 0)
-                    avg_price = order.get('price', price)
+                # IMPROVED: Better handling of Bybit order results
+                if order:
+                    # For Bybit, check if order was created even with unknown status
+                    if order.get('status') in ['FILLED', 'UNKNOWN']:
+                        executed_qty = order.get('quantity', quantity)
+                        avg_price = order.get('price', price) if order.get('price', 0) > 0 else price
 
-                    self.daily_stats['successful_trades'] += 1
-                    self.daily_stats['total_volume'] += executed_qty * avg_price
+                        self.daily_stats['successful_trades'] += 1
+                        self.daily_stats['total_volume'] += executed_qty * avg_price
 
-                    logger.info(f"✅ Order filled: {executed_qty:.6f} @ ${avg_price:.4f}")
+                        logger.info(f"✅ Order processed: {executed_qty:.6f} @ ${avg_price:.4f}")
 
-                    return OrderResult(
-                        success=True,
-                        order_id=str(order.get('orderId')),
-                        symbol=signal.symbol,
-                        side='BUY',
-                        quantity=quantity,
-                        executed_qty=executed_qty,
-                        price=avg_price,
-                        status=OrderStatus.FILLED
-                    )
+                        return OrderResult(
+                            success=True,
+                            order_id=str(order.get('orderId')),
+                            symbol=signal.symbol,
+                            side='BUY',
+                            quantity=quantity,
+                            executed_qty=executed_qty,
+                            price=avg_price,
+                            status=OrderStatus.FILLED
+                        )
+                    elif order.get('status') == 'PENDING':
+                        logger.warning(f"Order pending: {signal.symbol}")
+                        if attempt < self.order_retry_max - 1:
+                            await asyncio.sleep(self.order_retry_delay * (attempt + 1))
+                            continue
                 else:
                     logger.warning(f"Order attempt {attempt + 1} failed: No execution")
                     if attempt < self.order_retry_max - 1:
@@ -700,20 +710,20 @@ class MainTrader:
             except Exception as e:
                 error_msg = str(e)
                 logger.error(f"Order attempt {attempt + 1} error: {error_msg}")
-                error_lower = error_msg.lower()
-                if 'insufficient' in error_lower or 'balance' in error_lower:
+
+                # Handle specific errors
+                if 'insufficient' in error_msg.lower() or 'balance' in error_msg.lower():
                     return OrderResult(success=False, error_message="Insufficient balance", retry_count=attempt + 1)
-                elif 'invalid symbol' in error_lower:
+                elif 'invalid symbol' in error_msg.lower():
                     self.failed_symbols[signal.symbol] = datetime.now(timezone.utc)
                     return OrderResult(success=False, error_message=f"Invalid symbol: {signal.symbol}",
                                        retry_count=attempt + 1)
-                elif 'unable to fill' in error_lower or '-2020' in error_msg:
-                    logger.warning(f"{signal.symbol}: No liquidity on {signal.exchange_name}")
-                    if self.testnet and attempt < self.order_retry_max - 1:
+                elif 'qty invalid' in error_msg.lower():
+                    # Try with minimum quantity on next attempt
+                    logger.warning(f"Quantity invalid for {signal.symbol}, will retry with adjusted size")
+                    if attempt < self.order_retry_max - 1:
                         await asyncio.sleep(self.order_retry_delay * (attempt + 1))
                         continue
-                elif 'leverage' in error_lower:
-                    logger.warning("Leverage error, retrying without leverage change")
 
                 if attempt < self.order_retry_max - 1:
                     await asyncio.sleep(self.order_retry_delay * (attempt + 1))
@@ -725,36 +735,86 @@ class MainTrader:
 
     # <<< ИЗМЕНЕНИЕ: Новый метод для установки первичного стоп-лосса >>>
     async def _set_initial_protection(self, exchange, order_result: OrderResult):
-        """Sets an initial stop-loss immediately after opening a position."""
+        """Sets initial stop-loss - FIXED for both exchanges"""
         try:
             entry_price = order_result.price
             side = order_result.side.upper()
 
-            # Используем тот же процент, что и в protection_monitor
+            # Calculate SL price
             sl_price = entry_price * (1 - self.initial_sl_percent / 100) if side == 'BUY' \
                 else entry_price * (1 + self.initial_sl_percent / 100)
 
-            # Убеждаемся, что в коннекторе есть метод set_stop_loss
-            if hasattr(exchange, 'set_stop_loss'):
-                # Проверяем rate limit перед установкой stop loss
-                exchange_key = 'binance' if isinstance(exchange, BinanceExchange) else 'bybit'
-                if not await self.rate_limiter.acquire(exchange_key, 'order', f'set_stop_loss_{order_result.symbol}'):
-                    logger.warning(f"Rate limit exceeded for {exchange_key} set_stop_loss_{order_result.symbol}")
-                    return False
+            exchange_key = 'binance' if isinstance(exchange, BinanceExchange) else 'bybit'
 
-                success = await exchange.set_stop_loss(order_result.symbol, sl_price)
-                await self.rate_limiter.record_request(exchange_key, 'order', f'set_stop_loss_{order_result.symbol}')
-                if success:
-                    logger.info(f"🛡️ Initial Stop Loss set for {order_result.symbol} at ${sl_price:.4f}")
-                else:
-                    logger.warning(f"⚠️ Failed to set initial SL for {order_result.symbol}")
+            # Wait for position to be registered
+            if exchange_key == 'bybit':
+                await asyncio.sleep(3.0)  # Longer wait for Bybit
             else:
-                logger.error(f"Exchange {exchange} does not support set_stop_loss method.")
+                await asyncio.sleep(1.0)  # Short wait for Binance
+
+            # Get positions - FIXED for different exchange APIs
+            if isinstance(exchange, BinanceExchange):
+                # Binance doesn't accept symbol parameter
+                all_positions = await exchange.get_open_positions()
+                positions = [p for p in all_positions if p['symbol'] == order_result.symbol]
+            else:  # Bybit
+                # Bybit accepts symbol parameter
+                positions = await exchange.get_open_positions(order_result.symbol)
+
+            if not positions:
+                logger.warning(f"Position not yet registered for {order_result.symbol}, retrying...")
+                await asyncio.sleep(3.0)
+
+                # Retry getting positions
+                if isinstance(exchange, BinanceExchange):
+                    all_positions = await exchange.get_open_positions()
+                    positions = [p for p in all_positions if p['symbol'] == order_result.symbol]
+                else:
+                    positions = await exchange.get_open_positions(order_result.symbol)
+
+            if positions:
+                # Set stop loss
+                if hasattr(exchange, 'set_stop_loss'):
+                    if not await self.rate_limiter.acquire(exchange_key, 'order',
+                                                           f'set_stop_loss_{order_result.symbol}'):
+                        logger.warning(f"Rate limit exceeded for {exchange_key} set_stop_loss_{order_result.symbol}")
+                        return False
+
+                    success = await exchange.set_stop_loss(order_result.symbol, sl_price)
+                    await self.rate_limiter.record_request(exchange_key, 'order',
+                                                           f'set_stop_loss_{order_result.symbol}')
+
+                    if success:
+                        logger.info(f"🛡️ Initial Stop Loss set for {order_result.symbol} at ${sl_price:.4f}")
+                    else:
+                        logger.warning(f"⚠️ Failed to set initial SL for {order_result.symbol}")
+                else:
+                    logger.error(f"Exchange {exchange} does not support set_stop_loss method.")
+            else:
+                logger.warning(f"⚠️ No position found for {order_result.symbol} after waiting")
 
         except Exception as e:
             logger.error(f"Error setting initial protection for {order_result.symbol}: {e}")
 
-    # <<< КОНЕЦ ИЗМЕНЕНИЯ >>>
+    async def _is_symbol_tradeable(self, exchange, symbol: str) -> bool:
+        """Check if symbol is tradeable on the exchange"""
+        try:
+            if isinstance(exchange, BybitExchange):
+                # Check if symbol exists in exchange info
+                if symbol not in exchange.symbol_info:
+                    logger.warning(f"Symbol {symbol} not found in Bybit instruments")
+                    return False
+
+                # Check if status is Trading
+                symbol_info = exchange.symbol_info[symbol]
+                if symbol_info.get('status') != 'Trading':
+                    logger.warning(f"Symbol {symbol} status is {symbol_info.get('status')}, not Trading")
+                    return False
+
+            return True
+        except Exception as e:
+            logger.error(f"Error checking if {symbol} is tradeable: {e}")
+            return False
 
     # <<< ИЗМЕНЕНИЕ: Новый метод для деактивации сигнала в БД >>>
     async def _deactivate_signal_in_db(self, signal_id: int):
@@ -1125,33 +1185,33 @@ class MainTrader:
             logger.info("=" * 60)
             logger.info("📊 Trading Statistics")
             logger.info("=" * 60)
-            
+
             # Calculate uptime
             uptime = datetime.now(timezone.utc) - self.start_time
             hours, remainder = divmod(uptime.total_seconds(), 3600)
             minutes, seconds = divmod(remainder, 60)
-            
+
             logger.info(f"Uptime: {int(hours)}h {int(minutes)}m {int(seconds)}s")
             logger.info(f"Signals processed: {self.signal_stats['processed']}")
             logger.info(f"Duplicates prevented: {self.signal_stats['duplicates_prevented']}")
             logger.info(f"Errors: {self.signal_stats['errors']}")
-            
+
             # Daily stats
             logger.info(f"\n📈 Daily Statistics:")
             logger.info(f"Trades today: {self.daily_stats['trades_count']}")
             logger.info(f"Successful: {self.daily_stats['successful_trades']}")
             logger.info(f"Failed: {self.daily_stats['failed_trades']}")
             logger.info(f"Total volume: ${self.daily_stats['total_volume']:.2f}")
-            
+
             # Cache stats
             logger.info(f"\n💾 Cache Statistics:")
             logger.info(f"Processed signals in cache: {len(self.processed_signals_cache)}")
             logger.info(f"Failed symbols: {len(self.failed_symbols)}")
-            
+
             logger.info("=" * 60)
         except Exception as e:
             logger.error(f"Error printing statistics: {e}")
-    
+
     async def cleanup(self):
         logger.info("🧹 Cleaning up resources...")
 
