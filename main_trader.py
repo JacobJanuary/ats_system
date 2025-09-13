@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
-Main Trading Script - PRODUCTION READY v7.0
+Main Trading Script - PRODUCTION READY v7.1 REFINED
 Complete refactoring with monitoring schema integration:
 - Reads from fas.scoring_history with is_active=true
 - Full logging to monitoring.trades and monitoring.positions
 - Sets only Stop Loss after position opening
 - Independent operation with API verification
 - Production-ready error handling and recovery
+- Unified 'executed_qty' handling for all exchanges
 """
 
 import asyncio
@@ -199,7 +200,7 @@ class MainTrader:
     def _log_configuration(self):
         """Log system configuration"""
         logger.info("=" * 80)
-        logger.info("TRADING SYSTEM CONFIGURATION v7.0")
+        logger.info("TRADING SYSTEM CONFIGURATION v7.1")
         logger.info("=" * 80)
         logger.info(f"Environment: {self.trading_mode.value}")
         logger.info(f"Position Size: ${self.position_size_usd} USD")
@@ -752,11 +753,11 @@ class MainTrader:
                     quantity
                 )
 
-                if order_response and order_response.get('quantity', 0) > 0:
+                if order_response and order_response.get('executed_qty', 0) > 0:
                     order_result = order_response
                     break
 
-            if not order_result or order_result.get('quantity', 0) == 0:
+            if not order_result or order_result.get('executed_qty', 0) == 0:
                 logger.error(f"Failed to open position after {self.order_retry_max} attempts")
 
                 # Log failed trade
@@ -780,7 +781,7 @@ class MainTrader:
                 return
 
             # Position opened successfully
-            executed_qty = order_result.get('quantity', 0)
+            executed_qty = order_result.get('executed_qty', 0)
             execution_price = order_result.get('price', 0)
             order_id = str(order_result.get('orderId', ''))
 
@@ -943,7 +944,7 @@ class MainTrader:
 
     async def run(self):
         """Main trading loop with comprehensive error handling"""
-        logger.info("🚀 Starting Main Trader v7.0 - PRODUCTION READY")
+        logger.info("🚀 Starting Main Trader v7.1 - PRODUCTION READY")
         logger.info(f"Mode: {self.trading_mode.value}")
 
         try:

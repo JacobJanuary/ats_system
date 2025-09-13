@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """
-Protection Monitor - PRODUCTION READY v4.0 (FINAL)
-Complete refactoring with monitoring schema integration:
+Protection Monitor - PRODUCTION READY v4.2 REFINED (FINAL)
 - Reads positions from exchange APIs (source of truth)
 - Syncs with monitoring.positions for context
-- Sets Trailing Stop if missing
-- Verifies Stop Loss presence
+- Sets Trailing Stop if missing, verifies Stop Loss
 - Closes timeout positions at breakeven
 - Full logging to monitoring.protection_events
 - Independent operation from main_trader
+- Handles breakeven limit orders to prevent conflicts
 """
 
 import asyncio
@@ -56,7 +55,7 @@ class PositionStatus(Enum):
     PARTIALLY_PROTECTED = "partially_protected"
     FULLY_PROTECTED = "fully_protected"
     TRAILING_ACTIVE = "trailing_active"
-    PENDING_CLOSE = "pending_close"
+    PENDING_CLOSE = "pending_close"  # New status for positions with a breakeven limit order
 
 
 @dataclass
@@ -74,6 +73,7 @@ class PositionInfo:
     has_sl: bool = False
     has_tp: bool = False
     has_trailing: bool = False
+    has_breakeven_order: bool = False  # Flag for pending close order
     sl_price: Optional[float] = None
     tp_price: Optional[float] = None
     trailing_activation_price: Optional[float] = None
@@ -154,7 +154,7 @@ class ProtectionMonitor:
     def _log_configuration(self):
         """Log system configuration"""
         logger.info("=" * 80)
-        logger.info("PROTECTION MONITOR CONFIGURATION v4.0")
+        logger.info("PROTECTION MONITOR CONFIGURATION v4.2")
         logger.info("=" * 80)
         logger.info(f"Environment: {'TESTNET' if self.testnet else 'MAINNET'}")
         logger.info(f"Stop Loss: {self.sl_percent}%")
@@ -448,6 +448,8 @@ class ProtectionMonitor:
             pos_info.entry_price, pos_info.current_price, pos_info.side
         )
 
+        symbol_orders = [o for o in open_orders if o.get('symbol') == symbol]
+
         # Check protection based on exchange
         if exchange_name == 'Bybit':
             # Bybit stores protection in position data
@@ -460,24 +462,30 @@ class ProtectionMonitor:
             if pos_info.has_tp:
                 pos_info.tp_price = float(position.get('takeProfit', 0))
 
-        else:  # Binance
-            # Check orders for protection
-            symbol_orders = [o for o in open_orders if o.get('symbol') == symbol]
+        # For both exchanges, check open orders for more detail
+        for order in symbol_orders:
+            order_type = order.get('type', '').lower()
 
-            for order in symbol_orders:
-                order_type = order.get('type', '').upper()
-                if order_type in ['STOP_MARKET', 'STOP', 'STOP_LOSS']:
+            # Binance protection is always in open orders
+            if exchange_name == 'Binance':
+                if order_type in ['stop_market', 'stop', 'stop_loss']:
                     pos_info.has_sl = True
-                    pos_info.sl_price = float(order.get('stopPrice', 0))
-                elif order_type in ['TAKE_PROFIT_MARKET', 'TAKE_PROFIT']:
+                    pos_info.sl_price = float(order.get('price', 0))
+                elif order_type in ['take_profit_market', 'take_profit']:
                     pos_info.has_tp = True
-                    pos_info.tp_price = float(order.get('stopPrice', 0))
-                elif order_type == 'TRAILING_STOP_MARKET':
+                    pos_info.tp_price = float(order.get('price', 0))
+                elif order_type == 'trailing_stop_market':
                     pos_info.has_trailing = True
                     pos_info.trailing_activation_price = float(order.get('activationPrice', 0))
 
-        # Determine protection status
-        if pos_info.has_sl and pos_info.has_trailing:
+            # Check for a breakeven/reduce_only limit order for BOTH exchanges
+            if order_type == 'limit' and order.get('reduceOnly', False):
+                pos_info.has_breakeven_order = True
+
+        # Determine final protection status
+        if pos_info.has_breakeven_order:
+            pos_info.status = PositionStatus.PENDING_CLOSE
+        elif pos_info.has_sl and pos_info.has_trailing:
             pos_info.status = PositionStatus.FULLY_PROTECTED
         elif pos_info.has_sl or pos_info.has_trailing:
             pos_info.status = PositionStatus.PARTIALLY_PROTECTED
@@ -533,7 +541,7 @@ class ProtectionMonitor:
 
             # 2. Add Trailing Stop if not present
             if not pos_info.has_trailing:
-                # Calculate activation price (slightly above current for profit)
+                # Calculate activation price
                 if pos_info.side in ['LONG', 'BUY']:
                     activation_price = pos_info.entry_price * (1 + self.trailing_activation / 100)
                 else:
@@ -558,8 +566,6 @@ class ProtectionMonitor:
             if protection_applied:
                 self.stats['positions_protected'] += 1
                 pos_info.protection_attempts = 0
-
-                # Update database
                 await self.update_position_protection(pos_info)
             else:
                 pos_info.protection_attempts += 1
@@ -570,120 +576,85 @@ class ProtectionMonitor:
             logger.error(f"Error applying protection to {symbol}: {e}", exc_info=True)
             self.stats['protection_failures'] += 1
             pos_info.protection_attempts += 1
-
             await self.log_protection_event(
                 pos_info, "PROTECTION_FAILED", "ERROR",
                 error_message=str(e), success=False
             )
-
             return False
 
     async def _close_position_breakeven(self, exchange: Union[BinanceExchange, BybitExchange],
                                         pos_info: PositionInfo) -> bool:
-        """Close position at breakeven or small profit"""
+        """Close position at breakeven or small profit, or set a limit order."""
         symbol = pos_info.symbol
 
         try:
-            # Get current ticker
             ticker = await exchange.get_ticker(symbol)
-            if not ticker:
-                logger.error(f"Cannot get ticker for {symbol}")
+            if not ticker or not ticker.get('price'):
+                logger.error(f"Cannot get ticker for {symbol} for breakeven check.")
                 return False
 
             current_price = float(ticker['price'])
             pos_info.current_price = current_price
 
-            # Calculate breakeven price including fees
-            total_fee_percent = self.taker_fee_percent * 2  # Entry + Exit
-
+            total_fee_percent = self.taker_fee_percent * 2
             if pos_info.side in ['LONG', 'BUY']:
                 breakeven_price = pos_info.entry_price * (
                         1 + total_fee_percent / 100 + self.min_profit_for_breakeven / 100)
-                can_close = current_price >= breakeven_price
             else:
                 breakeven_price = pos_info.entry_price * (
                         1 - total_fee_percent / 100 - self.min_profit_for_breakeven / 100)
-                can_close = current_price <= breakeven_price
 
-            if can_close:
-                logger.info(
-                    f"📈 Closing {symbol} at breakeven/profit. Current: ${current_price:.4f}, Breakeven: ${breakeven_price:.4f}")
+            logger.info(f"📊 Setting breakeven limit order for {symbol} at ${breakeven_price:.4f}")
 
-                # Cancel existing orders first
-                await exchange.cancel_all_open_orders(symbol)
-                await asyncio.sleep(self.request_delay)
+            await exchange.cancel_all_open_orders(symbol)
+            await asyncio.sleep(self.request_delay)
 
-                # Close position
-                if await exchange.close_position(symbol):
-                    logger.info(f"✅ Position {symbol} closed at breakeven")
-                    self.stats['breakeven_closes'] += 1
-                    self.stats['positions_closed'] += 1
+            side = 'SELL' if pos_info.side in ['LONG', 'BUY'] else 'BUY'
+            order_placed = await exchange.create_limit_order(
+                symbol=symbol,
+                side=side,
+                quantity=pos_info.quantity,
+                price=breakeven_price,
+                reduce_only=True
+            )
 
-                    # Update database
-                    await self.close_position_in_db(pos_info, "BREAKEVEN")
-
-                    return True
-            else:
-                # Set limit order at breakeven if not in profit yet
-                logger.info(f"📊 Setting breakeven limit order for {symbol} at ${breakeven_price:.4f}")
-
-                side = 'SELL' if pos_info.side in ['LONG', 'BUY'] else 'BUY'
-                await exchange.create_limit_order(
-                    symbol=symbol,
-                    side=side,
-                    quantity=pos_info.quantity,
-                    price=breakeven_price,
-                    reduce_only=True
-                )
-
+            if order_placed:
                 await self.log_protection_event(
                     pos_info, "BREAKEVEN_ORDER_SET", "BREAKEVEN",
                     price_level=breakeven_price, success=True
                 )
-
+                return True
+            else:
+                logger.error(f"Failed to place breakeven limit order for {symbol}")
                 return False
 
         except Exception as e:
-            logger.error(f"Error closing position at breakeven: {e}")
+            logger.error(f"Error in breakeven logic for {symbol}: {e}")
             return False
 
     async def _handle_timeout_position(self, exchange: Union[BinanceExchange, BybitExchange],
                                        pos_info: PositionInfo) -> bool:
         """Handle positions that exceeded timeout"""
         symbol = pos_info.symbol
-
-        logger.warning(f"⏰ Position {symbol} exceeded max duration ({pos_info.age_hours:.1f}h)")
+        logger.warning(f"⏰ Position {symbol} exceeded max duration ({pos_info.age_hours:.1f}h). Forcing close.")
 
         try:
-            # First try breakeven close if position is old but not max timeout
-            if pos_info.age_hours < self.max_position_duration_hours:
-                if pos_info.pnl_percent >= -self.taker_fee_percent * 2:
-                    if await self._close_position_breakeven(exchange, pos_info):
-                        return True
-
-            # Force close if max timeout exceeded
-            logger.warning(f"⚠️ Force closing {symbol} due to timeout")
-
-            # Cancel all orders
             await exchange.cancel_all_open_orders(symbol)
             await asyncio.sleep(self.request_delay)
 
-            # Close position
             if await exchange.close_position(symbol):
-                logger.info(f"✅ Position {symbol} closed due to timeout")
+                logger.info(f"✅ Position {symbol} force-closed due to timeout.")
                 self.stats['timeout_closes'] += 1
                 self.stats['positions_closed'] += 1
-
-                # Update database
                 await self.close_position_in_db(pos_info, "TIMEOUT")
-
                 return True
             else:
+                logger.error(f"Failed to force-close timeout position for {symbol}")
                 pos_info.close_attempts += 1
                 return False
 
         except Exception as e:
-            logger.error(f"Error handling timeout position: {e}")
+            logger.error(f"Error handling timeout position {symbol}: {e}")
             pos_info.close_attempts += 1
             return False
 
@@ -694,7 +665,6 @@ class ProtectionMonitor:
             return
 
         try:
-            # Get positions from exchange API (source of truth)
             positions = await exchange.get_open_positions()
             if not positions:
                 logger.debug(f"No open positions on {exchange_name}")
@@ -703,73 +673,58 @@ class ProtectionMonitor:
             logger.info(f"Found {len(positions)} open positions on {exchange_name}")
             self.stats['positions_found'] += len(positions)
 
-            # Get database positions for context
             db_positions = await self.get_db_positions(exchange_name)
-
-            # Get all open orders once
             all_orders = await exchange.get_open_orders()
-            if all_orders is None:
-                all_orders = []
+            if all_orders is None: all_orders = []
 
-            # Process each position
             for position in positions:
                 symbol = position.get('symbol')
-                if not symbol:
-                    continue
+                if not symbol: continue
 
-                # Add delay between positions
                 await asyncio.sleep(self.between_positions_delay)
 
-                # Find matching DB position
                 pos_key = f"{exchange_name}_{symbol}"
                 db_position = db_positions.get(pos_key)
 
-                # Check protection status
                 pos_info = await self._check_protection_status(
                     exchange_name, position, all_orders, db_position
                 )
-
-                # Store position info
                 self.tracked_positions[pos_key] = pos_info
 
-                # Log position status
                 logger.info(
                     f"📊 {symbol}: PnL={pos_info.pnl_percent:.2f}%, Age={pos_info.age_hours:.1f}h, Status={pos_info.status.value}")
 
-                # Handle based on position age and status
-
-                # 1. Check for timeout
+                # --- Decision Logic ---
+                # Priority 1: Handle positions that must be closed
                 if self.max_position_duration_hours > 0 and pos_info.age_hours > self.max_position_duration_hours:
                     await self._handle_timeout_position(exchange, pos_info)
                     continue
 
-                # 2. Check for breakeven close opportunity
+                # Priority 2: Handle positions pending breakeven close
+                if pos_info.status == PositionStatus.PENDING_CLOSE:
+                    logger.info(f"Position {symbol} has a pending breakeven order. Monitoring.")
+                    continue
+
+                # Priority 3: Check for breakeven timeout opportunity
                 if (self.breakeven_timeout_hours > 0 and
-                        pos_info.age_hours > self.breakeven_timeout_hours):
+                        pos_info.age_hours > self.breakeven_timeout_hours and
+                        pos_info.status != PositionStatus.TRAILING_ACTIVE):
+                    logger.info(f"Position {symbol} is eligible for breakeven logic.")
+                    await self._close_position_breakeven(exchange, pos_info)
+                    continue
 
-                    # Only close if trailing not active or if in good profit
-                    if pos_info.status != PositionStatus.TRAILING_ACTIVE:
-                        if pos_info.pnl_percent > self.min_profit_for_breakeven:
-                            logger.info(f"Position {symbol} eligible for breakeven close")
-                            await self._close_position_breakeven(exchange, pos_info)
-                            continue
-                    elif pos_info.pnl_percent > 2:  # If trailing active and good profit, let it run
-                        logger.info(
-                            f"Position {symbol} has trailing active with {pos_info.pnl_percent:.2f}% profit, keeping open")
-
-                # 3. Apply protection if needed
+                # Priority 4: Apply standard protection if needed
                 if pos_info.status in [PositionStatus.UNPROTECTED, PositionStatus.PARTIALLY_PROTECTED]:
-                    if pos_info.protection_attempts < 3:  # Max 3 attempts
+                    if pos_info.protection_attempts < 3:
                         await self._apply_protection(exchange, pos_info)
                     else:
-                        logger.error(f"Failed to protect {symbol} after 3 attempts")
-
+                        logger.error(f"Failed to protect {symbol} after 3 attempts. Abandoning.")
                         await self.log_protection_event(
                             pos_info, "PROTECTION_ABANDONED", "ERROR",
                             error_message="Max attempts reached", success=False
                         )
 
-                # Update position info in database
+                # Update DB with latest info
                 if pos_info.db_position_id:
                     await self.update_position_protection(pos_info)
 
@@ -787,18 +742,9 @@ class ProtectionMonitor:
             current_hour = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
 
             async with self.db_pool.acquire() as conn:
-                # Update metrics for each exchange
                 for exchange_name in ['Binance', 'Bybit']:
-                    exchange = self.binance if exchange_name == 'Binance' else self.bybit
-                    if not exchange:
+                    if not (self.binance if exchange_name == 'Binance' else self.bybit):
                         continue
-
-                    # Get current hour's stats
-                    positions_protected = 0
-                    positions_closed = 0
-
-                    # Count from our stats (rough estimate for this hour)
-                    # In production, you'd want more precise tracking
 
                     await conn.execute("""
                         INSERT INTO monitoring.performance_metrics (
@@ -812,10 +758,7 @@ class ProtectionMonitor:
                     """,
                                        current_hour.date(),
                                        current_hour.hour,
-                                       exchange_name,
-                                       positions_protected,
-                                       positions_closed
-                                       )
+                                       exchange_name, 0, 0)
         except Exception as e:
             logger.error(f"Error updating performance metrics: {e}")
 
@@ -827,31 +770,26 @@ class ProtectionMonitor:
 
         self.last_health_check = now
 
-        # Check Binance
         if self.binance:
             try:
                 await self.binance.get_balance()
             except Exception as e:
                 logger.warning(f"Binance health check failed: {e}")
-                # Try to reinitialize
                 try:
                     await self.binance.initialize()
                 except:
                     self.binance = None
 
-        # Check Bybit
         if self.bybit:
             try:
                 await self.bybit.get_balance()
             except Exception as e:
                 logger.warning(f"Bybit health check failed: {e}")
-                # Try to reinitialize
                 try:
                     await self.bybit.initialize()
                 except:
                     self.bybit = None
 
-        # Check database
         if self.db_pool:
             try:
                 async with self.db_pool.acquire() as conn:
@@ -880,19 +818,17 @@ class ProtectionMonitor:
         logger.info(f"Protection Failures: {self.stats['protection_failures']}")
         logger.info(f"Errors: {self.stats['errors']}")
 
-        # Current positions summary
         if self.tracked_positions:
             logger.info(f"\nActive Positions: {len(self.tracked_positions)}")
             total_pnl = sum(p.pnl for p in self.tracked_positions.values())
             avg_age = sum(p.age_hours for p in self.tracked_positions.values()) / len(self.tracked_positions)
             logger.info(f"Total PnL: ${total_pnl:.2f}")
             logger.info(f"Average Age: {avg_age:.1f} hours")
-
         logger.info("=" * 60)
 
     async def run(self):
         """Main monitoring loop"""
-        logger.info("🚀 Starting Protection Monitor v4.0 - PRODUCTION READY")
+        logger.info("🚀 Starting Protection Monitor v4.2 - PRODUCTION READY")
         logger.info(f"Mode: {'TESTNET' if self.testnet else 'MAINNET'}")
 
         try:
@@ -901,10 +837,9 @@ class ProtectionMonitor:
             logger.critical(f"Failed to initialize: {e}")
             return
 
-        # Periodic statistics logging
         async def log_stats_periodically():
             while True:
-                await asyncio.sleep(300)  # Every 5 minutes
+                await asyncio.sleep(300)
                 self.log_statistics()
                 await self.update_performance_metrics()
 
@@ -914,29 +849,17 @@ class ProtectionMonitor:
             while True:
                 try:
                     self.stats['checks'] += 1
-
-                    # Health check
                     await self.health_check()
 
-                    # Process positions
-                    logger.info(f"\n{'=' * 40}")
-                    logger.info(f"Protection Check #{self.stats['checks']}")
-                    logger.info(f"{'=' * 40}")
+                    logger.info(f"\n{'=' * 40}\nProtection Check #{self.stats['checks']}\n{'=' * 40}")
 
                     tasks = []
-                    if self.binance:
-                        tasks.append(self.process_exchange_positions('Binance'))
-                    if self.bybit:
-                        tasks.append(self.process_exchange_positions('Bybit'))
+                    if self.binance: tasks.append(self.process_exchange_positions('Binance'))
+                    if self.bybit: tasks.append(self.process_exchange_positions('Bybit'))
+                    if tasks: await asyncio.gather(*tasks, return_exceptions=True)
 
-                    if tasks:
-                        await asyncio.gather(*tasks, return_exceptions=True)
-
-                    # Log brief summary
-                    logger.info(f"Check complete. Protected: {self.stats['positions_protected']}, "
-                                f"Closed: {self.stats['positions_closed']}")
-
-                    # Wait for next check
+                    logger.info(
+                        f"Check complete. Protected: {self.stats['positions_protected']}, Closed: {self.stats['positions_closed']}")
                     await asyncio.sleep(self.check_interval)
 
                 except Exception as e:
@@ -944,7 +867,6 @@ class ProtectionMonitor:
                     self.stats['errors'] += 1
                     await self._log_system_health("protection_monitor", "ERROR", str(e))
                     await asyncio.sleep(10)
-
         except KeyboardInterrupt:
             logger.info("Shutdown requested")
         finally:
@@ -955,21 +877,10 @@ class ProtectionMonitor:
     async def cleanup(self):
         """Clean up resources"""
         logger.info("🧹 Cleaning up...")
-
-        # Final statistics
         self.log_statistics()
-
-        # Close database pool
-        if self.db_pool:
-            await self.db_pool.close()
-            logger.info("Database pool closed")
-
-        # Close exchange connections
-        if self.binance:
-            await self.binance.close()
-        if self.bybit:
-            await self.bybit.close()
-
+        if self.db_pool: await self.db_pool.close()
+        if self.binance: await self.binance.close()
+        if self.bybit: await self.bybit.close()
         logger.info("✅ Cleanup complete")
 
 
