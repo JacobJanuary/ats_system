@@ -131,7 +131,9 @@ class BinanceExchange(BaseExchange):
             if signed:
                 timestamp = int(time.time() * 1000)
                 data['timestamp'] = timestamp
-                query_string = urlencode(data)
+                # Filter out None values
+                filtered_data = {k: v for k, v in data.items() if v is not None}
+                query_string = urlencode(filtered_data)
                 signature = hmac.new(
                     self.api_secret.encode('utf-8'),
                     query_string.encode('utf-8'),
@@ -140,7 +142,9 @@ class BinanceExchange(BaseExchange):
                 query_string += f'&signature={signature}'
                 url += f"?{query_string}"
             else:
-                query_string = urlencode(data)
+                # Filter out None values
+                filtered_data = {k: v for k, v in data.items() if v is not None} if data else {}
+                query_string = urlencode(filtered_data)
                 if query_string:
                     url += f"?{query_string}"
 
@@ -204,7 +208,7 @@ class BinanceExchange(BaseExchange):
         return str(price)
 
     def format_quantity(self, symbol: str, quantity: float) -> str:
-        """Format quantity with precision validation"""
+        """Format quantity with precision validation and minimum notional check"""
         try:
             if symbol not in self.exchange_info:
                 logger.warning(f"No info for {symbol}, using default formatting")
@@ -214,6 +218,12 @@ class BinanceExchange(BaseExchange):
             lot_size_filter = next(
                 (f for f in self.exchange_info[symbol]['filters']
                  if f['filterType'] == 'LOT_SIZE'),
+                None
+            )
+
+            min_notional_filter = next(
+                (f for f in self.exchange_info[symbol]['filters']
+                 if f['filterType'] == 'MIN_NOTIONAL'),
                 None
             )
 
@@ -248,22 +258,65 @@ class BinanceExchange(BaseExchange):
                     logger.debug(f"{symbol}: adjusted to minimum {min_qty}")
                 elif quantized_quantity > max_qty:
                     quantized_quantity = max_qty
-                    logger.warning(f"{symbol}: capped at maximum {max_qty}")
 
-                # Форматируем с правильным количеством знаков
-                # ВАЖНО: Не добавляем лишние нули
+                # Проверка на MIN_NOTIONAL
+                if min_notional_filter:
+                    min_notional = Decimal(min_notional_filter.get('notional', '0'))
+                    if min_notional > 0:
+                        # Получаем текущую цену для расчета notional
+                        ticker = self._get_sync_ticker(symbol)
+                        if ticker and ticker.get('price'):
+                            current_price = Decimal(str(ticker['price']))
+                            current_notional = quantized_quantity * current_price
+
+                            if current_notional < min_notional:
+                                # Увеличиваем количество до минимального notional
+                                required_qty = (min_notional / current_price).quantize(
+                                    step_size, rounding=ROUND_UP
+                                )
+                                if required_qty <= max_qty:
+                                    quantized_quantity = required_qty
+                                    logger.debug(f"{symbol}: adjusted to meet min notional ${min_notional} (was ${current_notional:.2f})")
+                                else:
+                                    logger.warning(f"{symbol}: cannot meet min notional ${min_notional}, max qty {max_qty}")
+                                    return str(quantized_quantity)  # Возвращаем что есть
+
                 result = format(quantized_quantity, f'.{decimals}f')
-
-                # Убираем trailing zeros и точку если нужно
-                if '.' in result:
-                    result = result.rstrip('0').rstrip('.')
-
-                logger.debug(f"{symbol}: formatted {quantity} -> {result}")
                 return result
 
         except Exception as e:
             logger.error(f"Error formatting quantity for {symbol}: {e}")
-            return str(round(quantity, 3))
+        return str(round(quantity, 3))
+
+    def _get_sync_ticker(self, symbol: str) -> Dict:
+        """Get ticker synchronously using asyncio.run_until_complete"""
+        try:
+            # Create a new event loop for this thread
+            import asyncio
+            try:
+                # Try to get existing loop
+                loop = asyncio.get_running_loop()
+                # If we're in an async context, we can't use run_until_complete
+                # Fall back to a different approach
+                return self._get_cached_price(symbol)
+            except RuntimeError:
+                # No running loop, we can create one
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                try:
+                    return loop.run_until_complete(self.get_ticker(symbol))
+                finally:
+                    loop.close()
+        except Exception as e:
+            logger.warning(f"Failed to get sync ticker for {symbol}: {e}")
+            return self._get_cached_price(symbol)
+
+    def _get_cached_price(self, symbol: str) -> Dict:
+        """Fallback method to get cached price data"""
+        # For now, return empty dict to disable MIN_NOTIONAL adjustment
+        # This is safer than guessing prices
+        logger.debug(f"Using fallback pricing for {symbol} MIN_NOTIONAL check")
+        return {}
 
     async def get_open_positions(self) -> List[Dict]:
         """Get all open positions"""
