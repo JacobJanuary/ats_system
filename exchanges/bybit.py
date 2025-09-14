@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """
-Bybit Exchange Implementation - PRODUCTION READY v2.3
-- Switched to true market orders for closing positions to improve reliability on testnet.
-- create_market_order (for opening) remains an aggressive IOC limit order for slippage control.
-- close_position now uses a reduceOnly market order for maximum reliability.
-- ADDED createdTime to get_open_positions for accurate age tracking.
+Bybit Exchange Implementation - PRODUCTION READY v2.4 (FIXED)
+- ДОБАВЛЕНА поддержка set_take_profit
+- УЛУЧШЕНА обработка Trailing Stop с правильной активацией
+- ИСПРАВЛЕНА проверка createdTime для корректного расчета возраста позиции
 """
 
 import asyncio
@@ -229,16 +228,18 @@ class BybitExchange(BaseExchange):
                 for pos in result['result']['list']:
                     if safe_float(pos.get('size', 0)) > 0:
                         positions.append({
-                            'symbol': pos.get('symbol'), 'quantity': safe_float(pos.get('size')),
+                            'symbol': pos.get('symbol'),
+                            'quantity': safe_float(pos.get('size')),
                             'entry_price': safe_float(pos.get('avgPrice')),
+                            'mark_price': safe_float(pos.get('markPrice', 0)),
                             'pnl': safe_float(pos.get('unrealisedPnl')),
                             'side': 'LONG' if pos.get('side') == 'Buy' else 'SHORT',
                             'updatedTime': int(pos.get('updatedTime', 0)),
-                            # --- FIX START: Add createdTime for accurate age calculation ---
-                            'createdTime': int(pos.get('createdTime', 0)),
-                            # --- FIX END ---
-                            'stopLoss': pos.get('stopLoss'), 'takeProfit': pos.get('takeProfit'),
-                            'trailingStop': pos.get('trailingStop')
+                            'createdTime': int(pos.get('createdTime', 0)),  # Для корректного расчета возраста
+                            'stopLoss': pos.get('stopLoss'),
+                            'takeProfit': pos.get('takeProfit'),
+                            'trailingStop': pos.get('trailingStop'),
+                            'activePrice': pos.get('activePrice')  # Для проверки активации TS
                         })
             return positions
         except Exception as e:
@@ -252,7 +253,7 @@ class BybitExchange(BaseExchange):
                 stopLoss=self.format_price(symbol, stop_price), positionIdx=0
             )
             if result and result.get('retCode') == 0:
-                logger.info(f"✅ Stop loss set for {symbol}")
+                logger.info(f"✅ Stop loss set for {symbol} at ${stop_price:.4f}")
                 return True
             logger.error(f"Failed to set stop loss: {result}")
             return False
@@ -261,22 +262,44 @@ class BybitExchange(BaseExchange):
             return False
 
     async def set_take_profit(self, symbol: str, take_profit_price: float) -> bool:
-        return False  # Not implemented in core logic
+        """Устанавливает Take Profit для позиции"""
+        try:
+            result = await self._async_request(
+                self.client.set_trading_stop,
+                category="linear",
+                symbol=symbol,
+                takeProfit=self.format_price(symbol, take_profit_price),
+                positionIdx=0
+            )
+            if result and result.get('retCode') == 0:
+                logger.info(f"✅ Take profit set for {symbol} at ${take_profit_price:.4f}")
+                return True
+            logger.error(f"Failed to set take profit: {result}")
+            return False
+        except Exception as e:
+            logger.error(f"Error setting take profit: {e}")
+            return False
 
     async def set_trailing_stop(self, symbol: str, activation_price: float, callback_rate: float) -> bool:
+        """Устанавливает Trailing Stop с правильной активацией"""
         try:
+            # Рассчитываем trailing distance от activation price
             distance = activation_price * (callback_rate / 100)
             formatted_distance = self.format_price(symbol, distance)
 
             result = await self._async_request(
-                self.client.set_trading_stop, category="linear", symbol=symbol,
+                self.client.set_trading_stop,
+                category="linear",
+                symbol=symbol,
                 trailingStop=formatted_distance,
                 activePrice=self.format_price(symbol, activation_price),
                 positionIdx=0
             )
             if result and result.get('retCode') == 0:
                 logger.info(
-                    f"✅ Trailing stop for {symbol} set with activation at ${activation_price} and distance ${formatted_distance}")
+                    f"✅ Trailing stop for {symbol} set with activation at ${activation_price:.4f} "
+                    f"and distance ${formatted_distance}"
+                )
                 return True
             logger.error(f"Failed to set trailing stop: {result}")
             return False
@@ -296,9 +319,12 @@ class BybitExchange(BaseExchange):
             if result and result.get('retCode') == 0:
                 for order in result['result']['list']:
                     orders.append({
-                        'orderId': order.get('orderId'), 'symbol': order.get('symbol'),
-                        'side': order.get('side', '').lower(), 'quantity': safe_float(order.get('qty')),
-                        'price': safe_float(order.get('price')), 'status': order.get('orderStatus'),
+                        'orderId': order.get('orderId'),
+                        'symbol': order.get('symbol'),
+                        'side': order.get('side', '').lower(),
+                        'quantity': safe_float(order.get('qty')),
+                        'price': safe_float(order.get('price')),
+                        'status': order.get('orderStatus'),
                         'type': order.get('orderType', '').lower(),
                         'reduceOnly': order.get('reduceOnly', False)
                     })
@@ -313,6 +339,24 @@ class BybitExchange(BaseExchange):
             return result and result.get('retCode') == 0
         except Exception as e:
             logger.error(f"Error cancelling orders for {symbol}: {e}")
+            return False
+
+    async def cancel_order(self, symbol: str, order_id: str) -> bool:
+        """Cancels a specific order by its ID."""
+        try:
+            result = await self._async_request(
+                self.client.cancel_order,
+                category="linear",
+                symbol=symbol,
+                orderId=order_id
+            )
+            if result and result.get('retCode') == 0:
+                logger.info(f"✅ Order {order_id} for {symbol} cancelled successfully.")
+                return True
+            logger.error(f"Failed to cancel order {order_id}: {result}")
+            return False
+        except Exception as e:
+            logger.error(f"Error cancelling order {order_id} for {symbol}: {e}")
             return False
 
     async def create_limit_order(self, symbol: str, side: str, quantity: float, price: float,
@@ -359,7 +403,6 @@ class BybitExchange(BaseExchange):
             if result and result.get('retCode') == 0:
                 await asyncio.sleep(0.75)  # Give time for fill
                 logger.info(f"✅ Position for {symbol} close order submitted successfully.")
-                # We assume it's filled as it's a market order.
                 return True
             else:
                 logger.error(f"Failed to submit close order for {symbol}. Response: {result}")
@@ -371,17 +414,3 @@ class BybitExchange(BaseExchange):
 
     async def close(self):
         logger.info("Bybit connection wrapper closed")
-
-    async def cancel_order(self, symbol: str, order_id: str) -> bool:
-        """Cancels a specific order by its ID."""
-        try:
-            result = await self._async_request(
-                self.client.cancel_order,
-                category="linear",
-                symbol=symbol,
-                orderId=order_id
-            )
-            return result and result.get('retCode') == 0
-        except Exception as e:
-            logger.error(f"Error cancelling order {order_id} for {symbol}: {e}")
-            return False

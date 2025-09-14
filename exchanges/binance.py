@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 """
-Binance Exchange Implementation - PRODUCTION READY v2.4
-- Unified order response to use 'executed_qty'
-- Unified open orders response to include 'reduceOnly' flag
-- Fixed all critical issues with order execution and leverage
-- ADDED cancel_order method for precise order management.
-- ADDED robust error handling to get_open_orders to prevent crashes on bad order data.
-- FIXED cancel_order success validation logic.
+Binance Exchange Implementation - PRODUCTION READY v2.5 (FIXED)
+- ВОССТАНОВЛЕН activationPrice для отложенной активации Trailing Stop
+- ДОБАВЛЕН set_take_profit для установки TP
+- УЛУЧШЕНА обработка ошибок при переходе SL → TS
+- ИСПРАВЛЕН cancel_order для точного управления ордерами
 """
 
 import asyncio
@@ -259,11 +257,10 @@ class BinanceExchange(BaseExchange):
         try:
             params = {'symbol': symbol, 'orderId': order_id}
             result = await self._make_request("DELETE", "/fapi/v1/order", params, signed=True)
-            # --- FIX START: Check for 'CANCELED' status for success ---
+            # Check for 'CANCELED' status for success
             if result and str(result.get('orderId')) == order_id and result.get('status') == 'CANCELED':
                 logger.info(f"✅ Order {order_id} for {symbol} cancelled successfully.")
                 return True
-            # --- FIX END ---
             logger.error(f"Failed to cancel order {order_id} for {symbol}: {result}")
             return False
         except Exception as e:
@@ -304,7 +301,34 @@ class BinanceExchange(BaseExchange):
             return False
 
     async def set_take_profit(self, symbol: str, take_profit_price: float) -> bool:
-        return False
+        """Устанавливает Take Profit для позиции"""
+        try:
+            positions = await self.get_open_positions()
+            pos = next((p for p in positions if p['symbol'] == symbol), None)
+            if not pos:
+                logger.warning(f"No position found for {symbol} to set TP.")
+                return False
+
+            # Для LONG позиции TP это SELL ордер, для SHORT - BUY
+            side = 'SELL' if pos['side'] == 'LONG' else 'BUY'
+
+            params = {
+                'symbol': symbol,
+                'side': side,
+                'type': 'TAKE_PROFIT_MARKET',
+                'stopPrice': self.format_price(symbol, take_profit_price),
+                'closePosition': 'true'
+            }
+
+            result = await self._make_request("POST", "/fapi/v1/order", params, signed=True)
+            if result and result.get('orderId'):
+                logger.info(f"✅ Take Profit set for {symbol} at {take_profit_price}")
+                return True
+            logger.error(f"Failed to set TP for {symbol}: {result}")
+            return False
+        except Exception as e:
+            logger.error(f"Exception setting TP for {symbol}: {e}")
+            return False
 
     async def get_open_orders(self, symbol: str = None) -> List[Dict]:
         params = {'symbol': symbol} if symbol else {}
@@ -320,6 +344,7 @@ class BinanceExchange(BaseExchange):
                     'side': o.get('side', '').lower(),
                     'quantity': float(o.get('origQty', 0)),
                     'price': float(o.get('price', 0)),
+                    'stopPrice': float(o.get('stopPrice', 0)) if o.get('stopPrice') else 0,
                     'status': o.get('status'),
                     'type': o.get('type', '').lower(),
                     'reduceOnly': o.get('reduceOnly', False)
@@ -331,6 +356,7 @@ class BinanceExchange(BaseExchange):
         return parsed_orders
 
     async def set_trailing_stop(self, symbol: str, activation_price: float, callback_rate: float) -> bool:
+        """Устанавливает Trailing Stop с отложенной активацией"""
         try:
             positions = await self.get_open_positions()
             pos = next((p for p in positions if p['symbol'] == symbol), None)
@@ -340,22 +366,37 @@ class BinanceExchange(BaseExchange):
 
             side = 'SELL' if pos['side'] == 'LONG' else 'BUY'
 
-            # --- ИЗМЕНЕНИЕ НАЧАЛО: Убираем activationPrice для немедленной активации ---
+            # ИСПРАВЛЕНО: Возвращаем activationPrice для отложенной активации
             params = {
                 'symbol': symbol,
                 'side': side,
                 'type': 'TRAILING_STOP_MARKET',
+                'activationPrice': self.format_price(symbol, activation_price),  # ВАЖНО!
                 'callbackRate': max(0.1, min(5.0, callback_rate)),
-                # 'activationPrice' намеренно не указывается, чтобы ордер стал активным сразу.
                 'quantity': self.format_quantity(symbol, pos['quantity'])
             }
-            # --- ИЗМЕНЕНИЕ КОНЕЦ ---
 
             result = await self._make_request("POST", "/fapi/v1/order", params, signed=True)
             if result and 'orderId' in result:
                 logger.info(
-                    f"✅ Trailing stop set for {symbol}: callback={callback_rate}%. Activated immediately.")
+                    f"✅ Trailing stop set for {symbol}: activation=${activation_price:.4f}, "
+                    f"callback={callback_rate}%. Will activate when price reaches target."
+                )
                 return True
+
+            # Обработка специфических ошибок
+            if result and result.get('code') == -2021:
+                logger.error(f"Order would immediately trigger. Adjusting activation price.")
+                # Добавляем буфер 0.5% к activation price
+                buffer = 1.005 if side == 'SELL' else 0.995
+                new_activation = activation_price * buffer
+                params['activationPrice'] = self.format_price(symbol, new_activation)
+
+                result = await self._make_request("POST", "/fapi/v1/order", params, signed=True)
+                if result and 'orderId' in result:
+                    logger.info(f"✅ Trailing stop set with adjusted activation: ${new_activation:.4f}")
+                    return True
+
             logger.error(f"Failed to set Trailing Stop for {symbol}: {result}")
             return False
         except Exception as e:
