@@ -136,15 +136,23 @@ class BinanceExchange(BaseExchange):
                     (f for f in self.exchange_info[symbol]['filters'] if f['filterType'] == 'LOT_SIZE'), None)
                 if lot_size_filter:
                     step_size = Decimal(lot_size_filter['stepSize'])
+                    min_qty = Decimal(lot_size_filter.get('minQty', '0'))
                     quantity_decimal = Decimal(str(quantity))
+
+                    # Округляем к ближайшему step_size
                     quantized_qty = (quantity_decimal / step_size).quantize(Decimal('1'),
                                                                             rounding=ROUND_DOWN) * step_size
-                    step_str = str(step_size).rstrip('0')
-                    decimals = len(step_str.split('.')[1]) if '.' in step_str else 0
-                    return format(quantized_qty, f'.{decimals}f')
+
+                    # ВАЖНО: Проверяем минимальное количество
+                    if quantized_qty < min_qty:
+                        quantized_qty = min_qty
+
+                    # Правильное определение точности
+                    precision = abs(step_size.as_tuple().exponent)
+                    return f"{quantized_qty:.{precision}f}"
         except Exception as e:
             logger.error(f"Error formatting quantity for {symbol}: {e}")
-        return str(round(quantity, 3))
+        return str(round(quantity, 8))  # Увеличиваем дефолтную точность
 
     async def get_open_positions(self) -> List[Dict]:
         try:

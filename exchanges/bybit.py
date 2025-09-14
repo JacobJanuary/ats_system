@@ -157,42 +157,62 @@ class BybitExchange(BaseExchange):
             return self.testnet
 
     async def create_market_order(self, symbol: str, side: str, quantity: float) -> Optional[Dict]:
-        """Creates an order to OPEN a position (uses aggressive IOC for slippage control)."""
+        """Creates an order with testnet-aware fallback strategy"""
         try:
             ticker = await self.get_ticker(symbol)
-            if not ticker or not ticker.get('ask') or not ticker.get('bid') or not float(ticker['ask']) > 0:
+            if not ticker or not ticker.get('ask') or not ticker.get('bid'):
                 logger.error(f"Cannot place order for {symbol}: invalid ticker data.")
                 return None
 
-            price_multiplier = 1.01 if side.upper() == "BUY" else 0.99
-            limit_price = float(ticker['ask' if side.upper() == "BUY" else 'bid']) * price_multiplier
-
             formatted_qty = self.format_quantity(symbol, quantity)
-            formatted_price = self.format_price(symbol, limit_price)
 
-            result = await self._async_request(
-                self.client.place_order, category="linear", symbol=symbol,
-                side=side.capitalize(), orderType="Limit", qty=formatted_qty,
-                price=formatted_price, timeInForce="IOC", positionIdx=0
-            )
+            # Для тестнета используем обычный Market ордер вместо IOC
+            if self.testnet:
+                result = await self._async_request(
+                    self.client.place_order,
+                    category="linear",
+                    symbol=symbol,
+                    side=side.capitalize(),
+                    orderType="Market",  # Обычный рыночный ордер
+                    qty=formatted_qty,
+                    positionIdx=0
+                )
+            else:
+                # Для продакшена оставляем IOC логику
+                price_multiplier = 1.01 if side.upper() == "BUY" else 0.99
+                limit_price = float(ticker['ask' if side.upper() == "BUY" else 'bid']) * price_multiplier
+                formatted_price = self.format_price(symbol, limit_price)
 
-            if not (result and result.get('retCode') == 0):
-                logger.error(f"IOC order placement failed: {result}")
-                return None
+                result = await self._async_request(
+                    self.client.place_order,
+                    category="linear",
+                    symbol=symbol,
+                    side=side.capitalize(),
+                    orderType="Limit",
+                    qty=formatted_qty,
+                    price=formatted_price,
+                    timeInForce="IOC",
+                    positionIdx=0
+                )
 
-            order_id = result.get('result', {}).get('orderId')
-            await asyncio.sleep(0.75)
-            order_status = await self._check_order_status(order_id, symbol)
+            if result and result.get('retCode') == 0:
+                order_id = result.get('result', {}).get('orderId')
+                await asyncio.sleep(0.75)
 
-            if order_status and order_status.get('executedQty', 0) > 0:
-                logger.info(f"✅ Order {order_id} executed. Qty: {order_status['executedQty']}")
-                return {
-                    'orderId': order_id, 'symbol': symbol, 'status': 'FILLED',
-                    'executed_qty': order_status.get('executedQty', 0.0),
-                    'price': order_status.get('avgPrice', 0.0)
-                }
-            logger.warning(
-                f"Order {order_id} was not executed. Status: {order_status.get('status') if order_status else 'UNKNOWN'}")
+                # Используем get_order_history вместо реального времени для тестнета
+                order_status = await self._check_order_status(order_id, symbol)
+
+                if order_status and order_status.get('executedQty', 0) > 0:
+                    logger.info(f"✅ Order {order_id} executed. Qty: {order_status['executedQty']}")
+                    return {
+                        'orderId': order_id,
+                        'symbol': symbol,
+                        'status': 'FILLED',
+                        'executed_qty': order_status.get('executedQty', 0.0),
+                        'price': order_status.get('avgPrice', 0.0)
+                    }
+
+            logger.warning(f"Order was not executed for {symbol}")
             return None
 
         except Exception as e:

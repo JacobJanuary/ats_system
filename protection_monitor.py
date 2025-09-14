@@ -189,9 +189,22 @@ class ProtectionMonitor:
             logger.error(f"Failed to release lock for {lock_key}: {e}")
 
     def _calculate_position_age(self, position: Dict, exchange_name: str) -> float:
+        # Сначала пытаемся получить из БД
+        symbol = position.get('symbol')
+        if symbol and self.db_pool:
+            db_age = asyncio.create_task(self.get_position_age_from_db(symbol, exchange_name))
+            try:
+                age = asyncio.get_event_loop().run_until_complete(db_age)
+                if age > 0:
+                    return age
+            except:
+                pass
+
+        # Fallback на timestamp из API
         ts_key = "createdTime" if exchange_name == "Bybit" else "updateTime"
         timestamp_ms = position.get(ts_key, 0)
-        if not timestamp_ms: return 0.0
+        if not timestamp_ms:
+            return 0.0
         return (datetime.now(timezone.utc).timestamp() - (int(timestamp_ms) / 1000)) / 3600
 
     def _calculate_pnl_percent(self, entry_price: float, current_price: float, side: str) -> float:
@@ -559,9 +572,27 @@ class ProtectionMonitor:
         try:
             # Action 1: Если нет SL, устанавливаем
             if not pos_info.has_sl:
-                sl_price = pos_info.entry_price * (1 - self.sl_percent / 100) if pos_info.side in ['LONG',
-                                                                                                   'BUY'] else pos_info.entry_price * (
-                        1 + self.sl_percent / 100)
+                # КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Учитываем текущую цену при расчете SL
+                current_price = pos_info.current_price
+                entry_price = pos_info.entry_price
+
+                if pos_info.side in ['LONG', 'BUY']:
+                    # Для LONG: SL должен быть ниже и entry, и current
+                    sl_from_entry = entry_price * (1 - self.sl_percent / 100)
+                    sl_from_current = current_price * (1 - self.sl_percent / 100)
+                    sl_price = min(sl_from_entry, sl_from_current)
+
+                    logger.debug(
+                        f"  LONG SL calculation: from_entry=${sl_from_entry:.4f}, from_current=${sl_from_current:.4f}, using=${sl_price:.4f}")
+                else:  # SHORT
+                    # Для SHORT: SL должен быть выше и entry, и current
+                    sl_from_entry = entry_price * (1 + self.sl_percent / 100)
+                    sl_from_current = current_price * (1 + self.sl_percent / 100)
+                    sl_price = max(sl_from_entry, sl_from_current)
+
+                    logger.debug(
+                        f"  SHORT SL calculation: from_entry=${sl_from_entry:.4f}, from_current=${sl_from_current:.4f}, using=${sl_price:.4f}")
+
                 await asyncio.sleep(self.request_delay)
                 if await exchange.set_stop_loss(symbol, sl_price):
                     logger.info(f"✅ Stop Loss added for {symbol} at ${sl_price:.8f}")
@@ -716,6 +747,26 @@ class ProtectionMonitor:
             if self.bybit: await self.bybit.close()
             logger.info("✅ Cleanup complete")
 
+    async def get_position_age_from_db(self, symbol: str, exchange: str) -> float:
+        """Получает реальный возраст позиции из БД"""
+        if not self.db_pool:
+            return 0.0
+
+        try:
+            async with self.db_pool.acquire() as conn:
+                age_hours = await conn.fetchval("""
+                    SELECT EXTRACT(EPOCH FROM (NOW() - opened_at)) / 3600 
+                    FROM monitoring.positions 
+                    WHERE symbol = $1 
+                    AND exchange = $2 
+                    AND status = 'OPEN'
+                    ORDER BY opened_at DESC 
+                    LIMIT 1
+                """, symbol, exchange)
+                return age_hours or 0.0
+        except Exception as e:
+            logger.error(f"Error getting position age from DB: {e}")
+            return 0.0
 
 async def main():
     monitor = ProtectionMonitor()

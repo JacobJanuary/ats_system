@@ -366,44 +366,29 @@ class MainTrader:
 
     async def calculate_position_size(self, exchange: Union[BinanceExchange, BybitExchange],
                                       symbol: str, price: float) -> float:
-        """ИСПРАВЛЕНО: Расчет размера позиции БЕЗ учета leverage (notional value)"""
+        """Расчет размера позиции с проверкой минимумов"""
         try:
-            # Базовый расчет - это notional value, НЕ margin!
-            # При leverage 10x и позиции $100 USDT:
-            # - margin (то что списывается с баланса) = $10 USDT
-            # - notional value (размер позиции) = $100 USDT
-            # - quantity = $100 / price
-
             base_quantity = self.position_size_usd / price
 
-            logger.debug(f"Position calculation for {symbol}:")
-            logger.debug(f"  Position size (notional): ${self.position_size_usd}")
-            logger.debug(f"  Current price: ${price:.4f}")
-            logger.debug(f"  Base quantity: {base_quantity:.6f}")
-            logger.debug(f"  Leverage: {self.leverage}x")
-            logger.debug(f"  Required margin: ${self.position_size_usd / self.leverage:.2f}")
-
-            # Проверяем минимальный notional для Binance
-            if isinstance(exchange, BinanceExchange):
-                if symbol in exchange.exchange_info:
-                    filters = exchange.exchange_info[symbol].get('filters', [])
-                    min_notional_filter = next(
-                        (f for f in filters if f['filterType'] == 'MIN_NOTIONAL'),
-                        None
-                    )
-                    if min_notional_filter:
-                        min_notional = float(min_notional_filter.get('notional', 5))
-                        if self.position_size_usd < min_notional:
-                            logger.info(
-                                f"Adjusting position size from ${self.position_size_usd} "
-                                f"to minimum ${min_notional} for {symbol}"
-                            )
-                            base_quantity = min_notional / price
-
-            # Форматируем по правилам биржи
+            # Форматируем количество
             formatted_qty = float(exchange.format_quantity(symbol, base_quantity))
 
-            # Финальная проверка notional value
+            # КРИТИЧЕСКИ ВАЖНО: Проверка на 0 после форматирования
+            if formatted_qty == 0:
+                # Пытаемся использовать минимальное допустимое количество
+                if isinstance(exchange, BinanceExchange) and symbol in exchange.exchange_info:
+                    filters = exchange.exchange_info[symbol].get('filters', [])
+                    lot_size_filter = next((f for f in filters if f['filterType'] == 'LOT_SIZE'), None)
+                    if lot_size_filter:
+                        min_qty = float(lot_size_filter.get('minQty', 0))
+                        if min_qty > 0:
+                            formatted_qty = min_qty
+                            logger.warning(f"Using minimum quantity {min_qty} for {symbol}")
+
+            # Финальная проверка
+            if formatted_qty == 0:
+                raise ValueError(f"Cannot determine valid quantity for {symbol}")
+
             final_notional = formatted_qty * price
             logger.info(
                 f"📊 Position sizing for {symbol}: "
@@ -416,8 +401,7 @@ class MainTrader:
 
         except Exception as e:
             logger.error(f"Error calculating position size: {e}")
-            # Fallback to simple calculation
-            return self.position_size_usd / price
+            raise
 
     async def validate_spread(self, exchange: Union[BinanceExchange, BybitExchange], symbol: str) -> bool:
         """Validate bid-ask spread is within acceptable range"""
@@ -569,6 +553,17 @@ class MainTrader:
             logger.info(f"✅ Position opened: {executed_qty:.6f} {signal.pair_symbol} @ ${execution_price:.4f}")
             self.stats['positions_opened'] += 1
 
+            # Логируем позицию в БД
+            position_id = await self.log_position_to_db(
+                signal,  # Передаем весь объект signal
+                signal.pair_symbol,
+                signal.exchange_name,
+                signal.recommended_action,
+                executed_qty,
+                execution_price,
+                order_result.get('orderId')
+            )
+
             # Set Stop Loss...
             await asyncio.sleep(self.delay_between_requests * 2)
             await self.set_stop_loss(exchange, signal, execution_price, position_id)
@@ -673,11 +668,20 @@ class MainTrader:
                             signal: Signal, entry_price: float, position_id: Optional[int] = None) -> bool:
         """Set stop loss for position"""
         try:
-            # Calculate SL price based on side
-            if signal.recommended_action == 'BUY':  # LONG position
+            ticker = await exchange.get_ticker(signal.pair_symbol)
+            current_price = float(ticker.get('price', entry_price))
+
+            if signal.recommended_action == 'BUY':  # LONG
                 sl_price = entry_price * (1 - self.initial_sl_percent / 100)
-            else:  # SHORT position
+                # Если SL выше текущей цены (из-за проскальзывания)
+                if sl_price >= current_price:
+                    # Используем ТОТ ЖЕ процент, но от текущей цены
+                    sl_price = current_price * (1 - self.initial_sl_percent / 100)
+            else:  # SHORT
                 sl_price = entry_price * (1 + self.initial_sl_percent / 100)
+                if sl_price <= current_price:
+                    # Используем ТОТ ЖЕ процент, но от текущей цены
+                    sl_price = current_price * (1 + self.initial_sl_percent / 100)
 
             # Set Stop Loss with retries
             for attempt in range(3):
@@ -751,6 +755,48 @@ class MainTrader:
 
         logger.info("✅ Cleanup complete. Goodbye!")
 
+    async def log_position_to_db(self, signal: Signal, symbol: str, exchange: str,
+                                 side: str, quantity: float, price: float, order_id: str):
+        """Сохраняет информацию о позиции в БД"""
+        if not self.db_pool:
+            return
+
+        try:
+            async with self.db_pool.acquire() as conn:
+                # Используем trading_pair_id из сигнала!
+                trade_id = await conn.fetchval("""
+                    INSERT INTO monitoring.trades (
+                        signal_id, trading_pair_id, symbol, exchange, 
+                        side, quantity, executed_qty, price, status, order_id
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                    RETURNING id
+                """,
+                                               signal.id,  # signal_id
+                                               signal.trading_pair_id,  # trading_pair_id - ИСПРАВЛЕНО!
+                                               symbol,  # symbol
+                                               exchange,  # exchange
+                                               side,  # side
+                                               quantity,  # quantity
+                                               quantity,  # executed_qty
+                                               price,  # price
+                                               'FILLED',  # status
+                                               order_id  # order_id
+                                               )
+
+                # Создаем запись в positions с opened_at
+                await conn.execute("""
+                    INSERT INTO monitoring.positions (
+                        trade_id, symbol, exchange, side, quantity, 
+                        entry_price, opened_at, status
+                    ) VALUES ($1, $2, $3, $4, $5, $6, NOW(), 'OPEN')
+                """, trade_id, symbol, exchange, side, quantity, price)
+
+                logger.info(f"✅ Position logged to DB: trade_id={trade_id}, pair_id={signal.trading_pair_id}")
+                return trade_id
+
+        except Exception as e:
+            logger.error(f"Failed to log position to DB: {e}")
+            return None
 
 async def main():
     """Entry point"""
