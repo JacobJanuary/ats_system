@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-Bybit Exchange Implementation - PRODUCTION READY v2.2
+Bybit Exchange Implementation - PRODUCTION READY v2.3
 - Switched to true market orders for closing positions to improve reliability on testnet.
 - create_market_order (for opening) remains an aggressive IOC limit order for slippage control.
 - close_position now uses a reduceOnly market order for maximum reliability.
+- ADDED createdTime to get_open_positions for accurate age tracking.
 """
 
 import asyncio
@@ -15,6 +16,7 @@ from decimal import Decimal, ROUND_DOWN
 from pybit.unified_trading import HTTP
 from pybit.exceptions import InvalidRequestError
 
+# Assuming base is in the same directory structure
 from .base import BaseExchange
 
 logger = logging.getLogger(__name__)
@@ -232,6 +234,9 @@ class BybitExchange(BaseExchange):
                             'pnl': safe_float(pos.get('unrealisedPnl')),
                             'side': 'LONG' if pos.get('side') == 'Buy' else 'SHORT',
                             'updatedTime': int(pos.get('updatedTime', 0)),
+                            # --- FIX START: Add createdTime for accurate age calculation ---
+                            'createdTime': int(pos.get('createdTime', 0)),
+                            # --- FIX END ---
                             'stopLoss': pos.get('stopLoss'), 'takeProfit': pos.get('takeProfit'),
                             'trailingStop': pos.get('trailingStop')
                         })
@@ -344,14 +349,12 @@ class BybitExchange(BaseExchange):
 
             logger.info(f"Attempting to close {qty_to_close} {symbol} with a reduce-only market order.")
 
-            # --- FIX START: Use a true market order for closing ---
             params = {
                 "category": "linear", "symbol": symbol, "side": side_to_close.capitalize(),
                 "orderType": "Market", "qty": self.format_quantity(symbol, qty_to_close),
                 "reduceOnly": True, "positionIdx": 0
             }
             result = await self._async_request(self.client.place_order, **params)
-            # --- FIX END ---
 
             if result and result.get('retCode') == 0:
                 await asyncio.sleep(0.75)  # Give time for fill
@@ -368,3 +371,17 @@ class BybitExchange(BaseExchange):
 
     async def close(self):
         logger.info("Bybit connection wrapper closed")
+
+    async def cancel_order(self, symbol: str, order_id: str) -> bool:
+        """Cancels a specific order by its ID."""
+        try:
+            result = await self._async_request(
+                self.client.cancel_order,
+                category="linear",
+                symbol=symbol,
+                orderId=order_id
+            )
+            return result and result.get('retCode') == 0
+        except Exception as e:
+            logger.error(f"Error cancelling order {order_id} for {symbol}: {e}")
+            return False
