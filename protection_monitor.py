@@ -570,47 +570,48 @@ class ProtectionMonitor:
             return
 
         try:
-            # Action 1: Если нет SL, устанавливаем
-            if not pos_info.has_sl:
-                # КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Учитываем текущую цену при расчете SL
+            # ВАЖНО: На Binance нельзя иметь SL и TS одновременно!
+            if pos_info.exchange == 'Binance' and pos_info.has_trailing:
+                # Если уже есть TS, ничего не делаем
+                logger.info(f"  Position {symbol} already has Trailing Stop, no additional protection needed")
+                return
+
+            # Action 1: Если нет защиты вообще, устанавливаем SL
+            if not pos_info.has_sl and not pos_info.has_trailing:
+                # Расчет SL с учетом текущей цены
                 current_price = pos_info.current_price
                 entry_price = pos_info.entry_price
 
                 if pos_info.side in ['LONG', 'BUY']:
-                    # Для LONG: SL должен быть ниже и entry, и current
                     sl_from_entry = entry_price * (1 - self.sl_percent / 100)
                     sl_from_current = current_price * (1 - self.sl_percent / 100)
                     sl_price = min(sl_from_entry, sl_from_current)
-
                     logger.debug(
                         f"  LONG SL calculation: from_entry=${sl_from_entry:.4f}, from_current=${sl_from_current:.4f}, using=${sl_price:.4f}")
                 else:  # SHORT
-                    # Для SHORT: SL должен быть выше и entry, и current
                     sl_from_entry = entry_price * (1 + self.sl_percent / 100)
                     sl_from_current = current_price * (1 + self.sl_percent / 100)
                     sl_price = max(sl_from_entry, sl_from_current)
-
                     logger.debug(
                         f"  SHORT SL calculation: from_entry=${sl_from_entry:.4f}, from_current=${sl_from_current:.4f}, using=${sl_price:.4f}")
 
                 await asyncio.sleep(self.request_delay)
                 if await exchange.set_stop_loss(symbol, sl_price):
                     logger.info(f"✅ Stop Loss added for {symbol} at ${sl_price:.8f}")
-                # НЕ возвращаемся, проверяем следующие условия
+                    pos_info.has_sl = True  # Обновляем статус
 
             # Action 2: Апгрейд SL → TS если позиция прибыльна
             if pos_info.has_sl and not pos_info.has_trailing:
                 if pos_info.pnl_percent >= self.trailing_activation:
                     logger.info(
                         f"📈 Position {symbol} is profitable ({pos_info.pnl_percent:.2f}%). Upgrading SL to Trailing Stop.")
-                    await self._safe_sl_to_ts_upgrade(exchange, pos_info)
+                    success = await self._safe_sl_to_ts_upgrade(exchange, pos_info)
+                    if success:
+                        pos_info.has_trailing = True
+                        pos_info.has_sl = False  # На Binance SL заменяется на TS
                 else:
                     logger.debug(
                         f"  Position not ready for TS: PnL {pos_info.pnl_percent:.2f}% < target {self.trailing_activation}%")
-            elif pos_info.has_sl and pos_info.has_trailing:
-                logger.debug(f"  Position already has both SL and TS (or TS only)")
-            elif not pos_info.has_sl and pos_info.has_trailing:
-                logger.warning(f"  ⚠️ Position has TS but no SL - unusual state")
 
         except Exception as e:
             logger.error(f"Error applying protection to {symbol}: {e}", exc_info=True)
