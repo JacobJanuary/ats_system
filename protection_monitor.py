@@ -298,7 +298,7 @@ class ProtectionMonitor:
 
     async def _safe_sl_to_ts_upgrade(self, exchange: Union[BinanceExchange, BybitExchange],
                                      pos_info: PositionInfo) -> bool:
-        """ИСПРАВЛЕНО: Безопасный переход SL → TS с правильным расчетом activation price"""
+        """Безопасный переход SL → TS с правильным расчетом activation price"""
         symbol = pos_info.symbol
 
         logger.info(f"🔄 Starting safe SL→TS upgrade for {symbol}")
@@ -306,76 +306,76 @@ class ProtectionMonitor:
         logger.info(f"  Entry price: ${pos_info.entry_price:.8f}")
         logger.info(f"  PnL: {pos_info.pnl_percent:.2f}%")
 
-        # 1. Получаем ID текущего SL ордера
-        open_orders = await exchange.get_open_orders(symbol)
-        sl_order_id = None
-        for order in open_orders:
-            if order.get('type', '').lower() in ['stop_market', 'stop']:
-                sl_order_id = order.get('orderId')
-                break
-
-        if not sl_order_id:
-            logger.error(f"No SL found for {symbol}, cannot upgrade")
-            return False
-
-        # 2. КРИТИЧНО: Рассчитываем activation price от ТЕКУЩЕЙ цены с буфером
-        # Для LONG: activation = current_price * (1 + buffer%)
-        # Для SHORT: activation = current_price * (1 - buffer%)
-        if pos_info.side in ['LONG', 'BUY']:
-            activation_price = pos_info.current_price * (1 + self.trailing_activation_buffer / 100)
-            logger.info(
-                f"  LONG position: activation = {pos_info.current_price:.8f} * {1 + self.trailing_activation_buffer / 100:.4f} = {activation_price:.8f}")
-        else:
-            activation_price = pos_info.current_price * (1 - self.trailing_activation_buffer / 100)
-            logger.info(
-                f"  SHORT position: activation = {pos_info.current_price:.8f} * {1 - self.trailing_activation_buffer / 100:.4f} = {activation_price:.8f}")
-
-        # 3. Отменяем ТОЛЬКО SL
-        logger.info(f"Cancelling SL order {sl_order_id} for {symbol}")
-        if not await exchange.cancel_order(symbol, sl_order_id):
-            logger.error(f"Failed to cancel SL for {symbol}")
-            return False
-
-        # 4. Минимальная задержка и установка TS
-        await asyncio.sleep(0.1 if not self.testnet else 0.5)
-
-        # 5. Пытаемся установить TS с retry
-        for attempt in range(3):
-            logger.info(
-                f"Attempt {attempt + 1}: Setting TS with activation=${activation_price:.8f}, callback={self.trailing_callback}%")
-
-            if await exchange.set_trailing_stop(symbol, activation_price, self.trailing_callback):
-                logger.info(f"✅ Successfully upgraded SL to TS for {symbol}")
-                return True
-
-            # Если не получилось, увеличиваем буфер
+        # Для Bybit - прямая установка TS (SL не нужно отменять)
+        if isinstance(exchange, BybitExchange):
+            # Рассчитываем activation price от ТЕКУЩЕЙ цены с буфером
             if pos_info.side in ['LONG', 'BUY']:
-                activation_price *= 1.002  # Добавляем еще 0.2%
+                activation_price = pos_info.current_price * (1 + self.trailing_activation_buffer / 100)
             else:
-                activation_price *= 0.998
+                activation_price = pos_info.current_price * (1 - self.trailing_activation_buffer / 100)
 
-            logger.warning(f"Attempt {attempt + 1} failed, adjusting activation to ${activation_price:.8f}")
-            await asyncio.sleep(0.5 * (attempt + 1))
+            logger.info(f"  Bybit: Setting TS directly with activation=${activation_price:.8f}")
 
-        # 6. Если TS не установился, ставим SL + TP
-        logger.error(f"Failed to set TS for {symbol} after 3 attempts, setting SL + TP as fallback")
+            # На Bybit можно напрямую установить TS, он заменит SL
+            if await exchange.set_trailing_stop(symbol, activation_price, self.trailing_callback):
+                logger.info(f"✅ Successfully set TS for {symbol} (replaced SL)")
+                return True
+            else:
+                logger.error(f"Failed to set TS for {symbol}")
+                return False
 
-        # Восстанавливаем SL
-        sl_price = pos_info.entry_price * (1 - self.sl_percent / 100) if pos_info.side in ['LONG',
-                                                                                           'BUY'] else pos_info.entry_price * (
-                    1 + self.sl_percent / 100)
-        sl_set = await exchange.set_stop_loss(symbol, sl_price)
+        # Для Binance - старая логика с поиском и отменой SL ордера
+        else:  # BinanceExchange
+            # Получаем ID текущего SL ордера
+            open_orders = await exchange.get_open_orders(symbol)
+            sl_order_id = None
+            for order in open_orders:
+                if order.get('type', '').lower() in ['stop_market', 'stop']:
+                    sl_order_id = order.get('orderId')
+                    break
 
-        # Ставим TP на +1% от текущей цены
-        tp_price = pos_info.current_price * 1.01 if pos_info.side in ['LONG', 'BUY'] else pos_info.current_price * 0.99
-        tp_set = await exchange.set_take_profit(symbol, tp_price)
+            if not sl_order_id:
+                logger.error(f"No SL order found for {symbol}, cannot upgrade")
+                return False
 
-        if sl_set:
-            logger.info(f"✅ SL restored for {symbol} at ${sl_price:.8f}")
-        if tp_set:
-            logger.info(f"✅ TP set for {symbol} at ${tp_price:.8f} (+1% from current)")
+            # Рассчитываем activation price
+            if pos_info.side in ['LONG', 'BUY']:
+                activation_price = pos_info.current_price * (1 + self.trailing_activation_buffer / 100)
+            else:
+                activation_price = pos_info.current_price * (1 - self.trailing_activation_buffer / 100)
 
-        return False
+            logger.info(f"  Binance: Cancelling SL order {sl_order_id}")
+            if not await exchange.cancel_order(symbol, sl_order_id):
+                logger.error(f"Failed to cancel SL for {symbol}")
+                return False
+
+            await asyncio.sleep(0.1 if not self.testnet else 0.5)
+
+            # Пытаемся установить TS с retry
+            for attempt in range(3):
+                logger.info(f"Attempt {attempt + 1}: Setting TS with activation=${activation_price:.8f}")
+
+                if await exchange.set_trailing_stop(symbol, activation_price, self.trailing_callback):
+                    logger.info(f"✅ Successfully upgraded SL to TS for {symbol}")
+                    return True
+
+                # Увеличиваем буфер при неудаче
+                if pos_info.side in ['LONG', 'BUY']:
+                    activation_price *= 1.002
+                else:
+                    activation_price *= 0.998
+
+                logger.warning(f"Attempt {attempt + 1} failed, adjusting activation to ${activation_price:.8f}")
+                await asyncio.sleep(0.5 * (attempt + 1))
+
+            # Если не удалось - восстанавливаем SL
+            logger.error(f"Failed to set TS, restoring SL")
+            sl_price = pos_info.entry_price * (1 - self.sl_percent / 100) if pos_info.side in ['LONG',
+                                                                                               'BUY'] else pos_info.entry_price * (
+                        1 + self.sl_percent / 100)
+            await exchange.set_stop_loss(symbol, sl_price)
+
+            return False
 
     async def _clean_zombie_orders_smart(self, exchange_name: str):
         """Умная очистка зомби-ордеров с учетом особенностей бирж"""
