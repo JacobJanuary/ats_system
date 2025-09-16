@@ -224,7 +224,7 @@ class MainTrader:
                 self.db_pool = await asyncpg.create_pool(
                     **self.db_config,
                     min_size=2,
-                    max_size=20,
+                    max_size=10,  # Reduced from 20 to prevent connection exhaustion
                     command_timeout=10,
                     max_queries=50000,
                     max_inactive_connection_lifetime=300
@@ -234,7 +234,7 @@ class MainTrader:
                 async with self.db_pool.acquire() as conn:
                     await conn.fetchval("SELECT 1")
 
-                logger.info("✅ Database connected successfully")
+                logger.info("✅ Database connected successfully (pool: min=2, max=10)")
                 return
 
             except Exception as e:

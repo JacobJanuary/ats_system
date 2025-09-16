@@ -41,6 +41,9 @@ class BybitExchange(BaseExchange):
         self.client = HTTP(testnet=self.testnet, api_key=self.api_key, api_secret=self.api_secret)
         self.symbol_info = {}
         self.last_error = None
+        # Кэш для trailing stop параметров, чтобы избежать повторных установок
+        # Формат: {symbol: {'distance': value, 'activePrice': value}}
+        self.trailing_stop_cache = {}
 
     async def initialize(self):
         """Initialize Bybit connection and load market info"""
@@ -164,7 +167,26 @@ class BybitExchange(BaseExchange):
                 logger.error(f"Cannot place order for {symbol}: invalid ticker data.")
                 return None
 
+            # Проверка минимального размера ордера перед отправкой
+            # Предотвращаем ошибку "orderQty will be truncated to zero"
+            if symbol in self.symbol_info:
+                min_order_qty = self.symbol_info[symbol].get('minOrderQty', 0.001)
+                if quantity < min_order_qty:
+                    logger.warning(
+                        f"Market order quantity {quantity} for {symbol} is below minimum {min_order_qty}. "
+                        f"Skipping order creation."
+                    )
+                    return None
+
             formatted_qty = self.format_quantity(symbol, quantity)
+            
+            # Дополнительная проверка после форматирования
+            if float(formatted_qty) == 0:
+                logger.warning(
+                    f"Formatted quantity became 0 for {symbol} market order (original: {quantity}). "
+                    f"Order creation skipped."
+                )
+                return None
 
             # Для тестнета используем обычный Market ордер вместо IOC
             if self.testnet:
@@ -322,21 +344,67 @@ class BybitExchange(BaseExchange):
             # Рассчитываем trailing distance от activation price
             distance = activation_price * (callback_rate / 100)
             formatted_distance = self.format_price(symbol, distance)
+            formatted_active_price = self.format_price(symbol, activation_price)
+            
+            # Проверяем кэш на идентичные параметры
+            # Это предотвращает ошибку "not modified" при повторных попытках
+            cached_params = self.trailing_stop_cache.get(symbol, {})
+            if (cached_params.get('distance') == formatted_distance and 
+                cached_params.get('activePrice') == formatted_active_price):
+                logger.debug(
+                    f"Trailing stop for {symbol} already set with same parameters. "
+                    f"Skipping to avoid 'not modified' error."
+                )
+                return True
+            
+            # Проверяем текущие параметры позиции
+            positions = await self.get_open_positions(symbol)
+            if positions:
+                pos = positions[0]
+                # Проверяем, не установлены ли уже такие же параметры
+                if (pos.get('trailingStop') == formatted_distance and 
+                    pos.get('activePrice') == formatted_active_price):
+                    logger.debug(
+                        f"Position {symbol} already has identical trailing stop parameters. "
+                        f"Updating cache and skipping API call."
+                    )
+                    # Обновляем кэш
+                    self.trailing_stop_cache[symbol] = {
+                        'distance': formatted_distance,
+                        'activePrice': formatted_active_price
+                    }
+                    return True
 
             result = await self._async_request(
                 self.client.set_trading_stop,
                 category="linear",
                 symbol=symbol,
                 trailingStop=formatted_distance,
-                activePrice=self.format_price(symbol, activation_price),
+                activePrice=formatted_active_price,
                 positionIdx=0
             )
             if result and result.get('retCode') == 0:
+                # Сохраняем успешно установленные параметры в кэш
+                self.trailing_stop_cache[symbol] = {
+                    'distance': formatted_distance,
+                    'activePrice': formatted_active_price
+                }
                 logger.info(
                     f"✅ Trailing stop for {symbol} set with activation at ${activation_price:.4f} "
                     f"and distance ${formatted_distance}"
                 )
                 return True
+            
+            # Обработка ошибки "not modified" - это не критическая ошибка
+            if result and result.get('retCode') == 34040:
+                logger.debug(f"Trailing stop for {symbol} already has these parameters (34040).")
+                # Обновляем кэш даже при этой ошибке
+                self.trailing_stop_cache[symbol] = {
+                    'distance': formatted_distance,
+                    'activePrice': formatted_active_price
+                }
+                return True
+                
             logger.error(f"Failed to set trailing stop: {result}")
             return False
         except Exception as e:
@@ -398,9 +466,32 @@ class BybitExchange(BaseExchange):
     async def create_limit_order(self, symbol: str, side: str, quantity: float, price: float,
                                  reduce_only: bool = False) -> Optional[Dict]:
         try:
+            # Проверка минимального размера ордера перед отправкой на биржу
+            # Это предотвращает ошибку "orderQty will be truncated to zero"
+            if symbol in self.symbol_info:
+                min_order_qty = self.symbol_info[symbol].get('minOrderQty', 0.001)
+                if quantity < min_order_qty:
+                    logger.warning(
+                        f"Order quantity {quantity} for {symbol} is below minimum {min_order_qty}. "
+                        f"Skipping order creation to avoid 'truncated to zero' error."
+                    )
+                    return None
+            
+            # Форматирование количества с учетом step size
+            formatted_qty = self.format_quantity(symbol, quantity)
+            
+            # Дополнительная проверка после форматирования
+            # Убеждаемся, что отформатированное количество не стало 0
+            if float(formatted_qty) == 0:
+                logger.warning(
+                    f"Formatted quantity became 0 for {symbol} (original: {quantity}). "
+                    f"Order creation skipped."
+                )
+                return None
+            
             params = {
                 "category": "linear", "symbol": symbol, "side": side.capitalize(),
-                "orderType": "Limit", "qty": self.format_quantity(symbol, quantity),
+                "orderType": "Limit", "qty": formatted_qty,
                 "price": self.format_price(symbol, price), "timeInForce": "GTC",
                 "positionIdx": 0
             }
@@ -439,6 +530,11 @@ class BybitExchange(BaseExchange):
             if result and result.get('retCode') == 0:
                 await asyncio.sleep(0.75)  # Give time for fill
                 logger.info(f"✅ Position for {symbol} close order submitted successfully.")
+                # Очищаем кэш trailing stop для закрытого символа
+                # Это важно для корректной работы при открытии новой позиции
+                if symbol in self.trailing_stop_cache:
+                    del self.trailing_stop_cache[symbol]
+                    logger.debug(f"Cleared trailing stop cache for {symbol}")
                 return True
             else:
                 logger.error(f"Failed to submit close order for {symbol}. Response: {result}")

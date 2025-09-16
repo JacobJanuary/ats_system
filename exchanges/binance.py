@@ -47,6 +47,9 @@ class BinanceExchange(BaseExchange):
         self.symbol_info = {}
         self.symbol_leverage_limits = {}
         self.last_error = None
+        # Кэш для trailing stop параметров, чтобы избежать повторных установок
+        # Формат: {symbol: {'activation_price': value, 'callback_rate': value}}
+        self.trailing_stop_cache = {}
 
     async def initialize(self):
         self.session = aiohttp.ClientSession()
@@ -213,9 +216,29 @@ class BinanceExchange(BaseExchange):
             return self.testnet
 
     async def create_market_order(self, symbol: str, side: str, quantity: float) -> Optional[Dict]:
+        # Проверка минимального размера ордера перед отправкой
+        if symbol in self.symbol_info:
+            min_qty = self.symbol_info[symbol].get('minQty', 0.001)
+            if quantity < min_qty:
+                logger.warning(
+                    f"Market order quantity {quantity} for {symbol} is below minimum {min_qty}. "
+                    f"Skipping order creation."
+                )
+                return None
+        
+        formatted_qty = self.format_quantity(symbol, quantity)
+        
+        # Дополнительная проверка после форматирования
+        if float(formatted_qty) == 0:
+            logger.warning(
+                f"Formatted quantity became 0 for {symbol} market order (original: {quantity}). "
+                f"Order creation skipped."
+            )
+            return None
+            
         params = {
             'symbol': symbol, 'side': side.upper(), 'type': 'MARKET',
-            'quantity': self.format_quantity(symbol, quantity)
+            'quantity': formatted_qty
         }
         try:
             result = await self._make_request("POST", "/fapi/v1/order", params, signed=True)
@@ -239,9 +262,31 @@ class BinanceExchange(BaseExchange):
 
     async def create_limit_order(self, symbol: str, side: str, quantity: float, price: float,
                                  reduce_only: bool = False) -> Optional[Dict]:
+        # Проверка минимального размера ордера перед отправкой на биржу
+        # Это предотвращает ошибки с недостаточным размером ордера
+        if symbol in self.symbol_info:
+            min_qty = self.symbol_info[symbol].get('minQty', 0.001)
+            if quantity < min_qty:
+                logger.warning(
+                    f"Order quantity {quantity} for {symbol} is below minimum {min_qty}. "
+                    f"Skipping order creation."
+                )
+                return None
+        
+        # Форматирование количества и цены
+        formatted_qty = self.format_quantity(symbol, quantity)
+        
+        # Дополнительная проверка после форматирования
+        if float(formatted_qty) == 0:
+            logger.warning(
+                f"Formatted quantity became 0 for {symbol} (original: {quantity}). "
+                f"Order creation skipped."
+            )
+            return None
+            
         params = {
             'symbol': symbol, 'side': side.upper(), 'type': 'LIMIT',
-            'quantity': self.format_quantity(symbol, quantity),
+            'quantity': formatted_qty,
             'price': self.format_price(symbol, price),
             'timeInForce': 'GTC'
         }
@@ -281,7 +326,14 @@ class BinanceExchange(BaseExchange):
         if pos_to_close:
             side = 'SELL' if pos_to_close['side'] == 'LONG' else 'BUY'
             result = await self.create_market_order(symbol, side, pos_to_close['quantity'])
-            return result and result.get('executed_qty', 0) > 0
+            if result and result.get('executed_qty', 0) > 0:
+                # Очищаем кэш trailing stop для закрытого символа
+                # Это важно для корректной работы при открытии новой позиции
+                if symbol in self.trailing_stop_cache:
+                    del self.trailing_stop_cache[symbol]
+                    logger.debug(f"Cleared trailing stop cache for {symbol}")
+                return True
+            return False
         logger.warning(f"No position found to close for {symbol}")
         return True
 
@@ -368,8 +420,20 @@ class BinanceExchange(BaseExchange):
         CRITICAL FIX v2: Умная установка TS с обработкой ошибок
         - Автоматически корректирует activation_price при ошибке
         - Логирует детальную информацию для отладки
+        - Кэширует параметры для избежания повторных установок
         """
         try:
+            # Проверяем кэш на идентичные параметры
+            # Это предотвращает повторные попытки с одинаковыми параметрами
+            cached_params = self.trailing_stop_cache.get(symbol, {})
+            if (cached_params.get('activation_price') == activation_price and 
+                cached_params.get('callback_rate') == callback_rate):
+                logger.debug(
+                    f"Trailing stop for {symbol} already set with same parameters. "
+                    f"Skipping to avoid duplicate API call."
+                )
+                return True
+            
             positions = await self.get_open_positions()
             pos = next((p for p in positions if p['symbol'] == symbol), None)
             if not pos:
@@ -397,6 +461,11 @@ class BinanceExchange(BaseExchange):
             result = await self._make_request("POST", "/fapi/v1/order", params, signed=True)
 
             if result and 'orderId' in result:
+                # Сохраняем успешно установленные параметры в кэш
+                self.trailing_stop_cache[symbol] = {
+                    'activation_price': activation_price,
+                    'callback_rate': callback_rate
+                }
                 logger.info(
                     f"✅ Trailing stop set for {symbol}: "
                     f"activation=${formatted_activation}, "
@@ -420,6 +489,11 @@ class BinanceExchange(BaseExchange):
 
                     result2 = await self._make_request("POST", "/fapi/v1/order", params, signed=True)
                     if result2 and 'orderId' in result2:
+                        # Сохраняем в кэш даже при установке без activation price
+                        self.trailing_stop_cache[symbol] = {
+                            'activation_price': activation_price,
+                            'callback_rate': callback_rate
+                        }
                         logger.info(f"✅ TS set without activation price - active immediately")
                         return True
 
