@@ -275,6 +275,21 @@ class BybitExchange(BaseExchange):
             if result and result.get('retCode') == 0:
                 logger.info(f"✅ Stop loss set for {symbol} at ${stop_price:.4f}")
                 return True
+
+                # NEW: Обработка специфических ошибок Bybit
+            error_code = result.get('retCode') if result else None
+            error_msg = result.get('retMsg', '') if result else ''
+
+            if error_code == 34040:  # "not modified" - SL уже установлен
+                logger.info(f"Stop loss already set at this price for {symbol}")
+                return True
+            elif error_code == 110008:  # "cannot replace_so" - ордер уже triggered
+                logger.warning(f"Cannot modify SL for {symbol}: order already triggered")
+                return False
+            elif error_code == 10001 and "should lower than" in error_msg:
+                logger.error(f"Invalid SL price for {symbol}: {error_msg}")
+                return False
+
             logger.error(f"Failed to set stop loss: {result}")
             return False
         except Exception as e:
@@ -291,6 +306,7 @@ class BybitExchange(BaseExchange):
                 takeProfit=self.format_price(symbol, take_profit_price),
                 positionIdx=0
             )
+
             if result and result.get('retCode') == 0:
                 logger.info(f"✅ Take profit set for {symbol} at ${take_profit_price:.4f}")
                 return True

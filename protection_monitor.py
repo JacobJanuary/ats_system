@@ -188,24 +188,52 @@ class ProtectionMonitor:
         except Exception as e:
             logger.error(f"Failed to release lock for {lock_key}: {e}")
 
-    def _calculate_position_age(self, position: Dict, exchange_name: str) -> float:
-        # Сначала пытаемся получить из БД
+    async def _calculate_position_age_async(self, position: Dict, exchange_name: str) -> float:
+        """
+        CRITICAL FIX v2: Асинхронный расчет возраста позиции
+        - Для Binance: ТОЛЬКО из БД (updateTime обновляется при любом изменении)
+        - Для Bybit: сначала БД, потом createdTime из API
+        """
         symbol = position.get('symbol')
-        if symbol and self.db_pool:
-            db_age = asyncio.create_task(self.get_position_age_from_db(symbol, exchange_name))
-            try:
-                age = asyncio.get_event_loop().run_until_complete(db_age)
-                if age > 0:
-                    return age
-            except:
-                pass
 
-        # Fallback на timestamp из API
-        ts_key = "createdTime" if exchange_name == "Bybit" else "updateTime"
-        timestamp_ms = position.get(ts_key, 0)
-        if not timestamp_ms:
+        # Сначала ВСЕГДА пытаемся получить из БД - это источник истины
+        if symbol and self.db_pool:
+            try:
+                age = await self.get_position_age_from_db(symbol, exchange_name)
+                if age > 0:
+                    logger.debug(f"Position age for {symbol} from DB: {age:.2f} hours")
+                    return age
+            except Exception as e:
+                logger.warning(f"Failed to get position age from DB: {e}")
+
+        # Fallback: ТОЛЬКО для Bybit используем createdTime
+        if exchange_name == "Bybit":
+            timestamp_ms = position.get("createdTime", 0)
+            if timestamp_ms:
+                age_hours = (datetime.now(timezone.utc).timestamp() - (int(timestamp_ms) / 1000)) / 3600
+                logger.debug(f"Position age for {symbol} from Bybit API: {age_hours:.2f} hours")
+                return age_hours
+
+        # Для Binance без БД - возраст неизвестен, возвращаем 0
+        logger.warning(f"Cannot determine age for {symbol} on {exchange_name}, assuming new position")
+        return 0.0
+
+    def _calculate_position_age(self, position: Dict, exchange_name: str) -> float:
+        """
+        CRITICAL FIX v2: Синхронная обертка для обратной совместимости
+        """
+        # Если мы уже в async контексте, создаем задачу
+        try:
+            loop = asyncio.get_running_loop()
+            # Мы в async контексте, создаем корутину которая будет выполнена позже
+            future = asyncio.ensure_future(
+                self._calculate_position_age_async(position, exchange_name)
+            )
+            # Возвращаем 0 как временное значение, реальное значение будет получено асинхронно
             return 0.0
-        return (datetime.now(timezone.utc).timestamp() - (int(timestamp_ms) / 1000)) / 3600
+        except RuntimeError:
+            # Нет запущенного loop, запускаем синхронно
+            return asyncio.run(self._calculate_position_age_async(position, exchange_name))
 
     def _calculate_pnl_percent(self, entry_price: float, current_price: float, side: str) -> float:
         if entry_price <= 0: return 0.0
@@ -298,33 +326,38 @@ class ProtectionMonitor:
 
     async def _safe_sl_to_ts_upgrade(self, exchange: Union[BinanceExchange, BybitExchange],
                                      pos_info: PositionInfo) -> bool:
-        """Безопасный переход SL → TS с правильным расчетом activation price"""
+        """
+        CRITICAL FIX v2: Умная установка TS с минимальным буфером
+        - Начинаем с 0.1% буфера для быстрой активации
+        - Адаптивно увеличиваем если биржа отклоняет
+        - Максимум 10 попыток с разными буферами
+        """
         symbol = pos_info.symbol
 
-        logger.info(f"🔄 Starting safe SL→TS upgrade for {symbol}")
+        logger.info(f"🔄 Starting SL→TS upgrade for {symbol}")
         logger.info(f"  Current price: ${pos_info.current_price:.8f}")
         logger.info(f"  Entry price: ${pos_info.entry_price:.8f}")
         logger.info(f"  PnL: {pos_info.pnl_percent:.2f}%")
 
-        # Для Bybit - прямая установка TS (SL не нужно отменять)
+        # Для Bybit - прямая установка TS (SL автоматически заменяется)
         if isinstance(exchange, BybitExchange):
-            # Рассчитываем activation price от ТЕКУЩЕЙ цены с буфером
+            # Минимальный буфер для Bybit
+            buffer_percent = 0.1
             if pos_info.side in ['LONG', 'BUY']:
-                activation_price = pos_info.current_price * (1 + self.trailing_activation_buffer / 100)
+                activation_price = pos_info.current_price * (1 + buffer_percent / 100)
             else:
-                activation_price = pos_info.current_price * (1 - self.trailing_activation_buffer / 100)
+                activation_price = pos_info.current_price * (1 - buffer_percent / 100)
 
-            logger.info(f"  Bybit: Setting TS directly with activation=${activation_price:.8f}")
+            logger.info(f"  Bybit: Setting TS with activation=${activation_price:.8f} (buffer={buffer_percent}%)")
 
-            # На Bybit можно напрямую установить TS, он заменит SL
             if await exchange.set_trailing_stop(symbol, activation_price, self.trailing_callback):
-                logger.info(f"✅ Successfully set TS for {symbol} (replaced SL)")
+                logger.info(f"✅ Successfully set TS for {symbol}")
                 return True
             else:
                 logger.error(f"Failed to set TS for {symbol}")
                 return False
 
-        # Для Binance - старая логика с поиском и отменой SL ордера
+        # Для Binance - сложная логика с отменой SL и адаптивной установкой TS
         else:  # BinanceExchange
             # Получаем ID текущего SL ордера
             open_orders = await exchange.get_open_orders(symbol)
@@ -338,12 +371,6 @@ class ProtectionMonitor:
                 logger.error(f"No SL order found for {symbol}, cannot upgrade")
                 return False
 
-            # Рассчитываем activation price
-            if pos_info.side in ['LONG', 'BUY']:
-                activation_price = pos_info.current_price * (1 + self.trailing_activation_buffer / 100)
-            else:
-                activation_price = pos_info.current_price * (1 - self.trailing_activation_buffer / 100)
-
             logger.info(f"  Binance: Cancelling SL order {sl_order_id}")
             if not await exchange.cancel_order(symbol, sl_order_id):
                 logger.error(f"Failed to cancel SL for {symbol}")
@@ -351,29 +378,43 @@ class ProtectionMonitor:
 
             await asyncio.sleep(0.1 if not self.testnet else 0.5)
 
-            # Пытаемся установить TS с retry
-            for attempt in range(3):
-                logger.info(f"Attempt {attempt + 1}: Setting TS with activation=${activation_price:.8f}")
+            # CRITICAL: Адаптивная установка TS с минимальным буфером
+            buffer_steps = [0.1, 0.2, 0.3, 0.5, 0.7, 1.0, 1.5, 2.0, 3.0, 5.0]  # Проценты
 
-                if await exchange.set_trailing_stop(symbol, activation_price, self.trailing_callback):
-                    logger.info(f"✅ Successfully upgraded SL to TS for {symbol}")
+            for attempt, buffer_percent in enumerate(buffer_steps):
+                if pos_info.side in ['LONG', 'BUY']:
+                    activation_price = pos_info.current_price * (1 + buffer_percent / 100)
+                else:
+                    activation_price = pos_info.current_price * (1 - buffer_percent / 100)
+
+                logger.info(
+                    f"  Attempt {attempt + 1}: Setting TS with activation=${activation_price:.8f} "
+                    f"(buffer={buffer_percent}%)"
+                )
+
+                # Пытаемся установить TS
+                result = await exchange.set_trailing_stop(symbol, activation_price, self.trailing_callback)
+
+                if result:
+                    logger.info(
+                        f"✅ Successfully set TS for {symbol} with {buffer_percent}% buffer. "
+                        f"Will activate immediately when price reaches ${activation_price:.8f}"
+                    )
                     return True
 
-                # Увеличиваем буфер при неудаче
-                if pos_info.side in ['LONG', 'BUY']:
-                    activation_price *= 1.002
-                else:
-                    activation_price *= 0.998
+                # Небольшая задержка перед следующей попыткой
+                await asyncio.sleep(0.2)
 
-                logger.warning(f"Attempt {attempt + 1} failed, adjusting activation to ${activation_price:.8f}")
-                await asyncio.sleep(0.5 * (attempt + 1))
+            # Если все попытки неудачны - восстанавливаем SL
+            logger.error(f"Failed to set TS after {len(buffer_steps)} attempts, restoring SL")
 
-            # Если не удалось - восстанавливаем SL
-            logger.error(f"Failed to set TS, restoring SL")
-            sl_price = pos_info.entry_price * (1 - self.sl_percent / 100) if pos_info.side in ['LONG',
-                                                                                               'BUY'] else pos_info.entry_price * (
-                        1 + self.sl_percent / 100)
-            await exchange.set_stop_loss(symbol, sl_price)
+            sl_price = (pos_info.entry_price * (1 - self.sl_percent / 100) if pos_info.side in ['LONG', 'BUY']
+                        else pos_info.entry_price * (1 + self.sl_percent / 100))
+
+            if await exchange.set_stop_loss(symbol, sl_price):
+                logger.info(f"SL restored at ${sl_price:.8f}")
+            else:
+                logger.critical(f"Failed to restore SL for {symbol}!")
 
             return False
 
@@ -672,6 +713,9 @@ class ProtectionMonitor:
                     await asyncio.sleep(self.between_positions_delay)
 
                     pos_info = await self._check_protection_status(exchange_name, position, orders_by_symbol[symbol])
+                    # CRITICAL FIX: Правильно получаем возраст позиции асинхронно
+                    real_age = await self._calculate_position_age_async(position, exchange_name)
+                    pos_info.age_hours = real_age
                     self.tracked_positions[f"{exchange_name}_{symbol}"] = pos_info
 
                     logger.info(

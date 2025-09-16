@@ -364,7 +364,11 @@ class BinanceExchange(BaseExchange):
         return parsed_orders
 
     async def set_trailing_stop(self, symbol: str, activation_price: float, callback_rate: float) -> bool:
-        """Устанавливает Trailing Stop с отложенной активацией"""
+        """
+        CRITICAL FIX v2: Умная установка TS с обработкой ошибок
+        - Автоматически корректирует activation_price при ошибке
+        - Логирует детальную информацию для отладки
+        """
         try:
             positions = await self.get_open_positions()
             pos = next((p for p in positions if p['symbol'] == symbol), None)
@@ -374,39 +378,59 @@ class BinanceExchange(BaseExchange):
 
             side = 'SELL' if pos['side'] == 'LONG' else 'BUY'
 
-            # ИСПРАВЛЕНО: Возвращаем activationPrice для отложенной активации
+            # Форматируем параметры
+            formatted_activation = self.format_price(symbol, activation_price)
+            callback_rate = max(0.1, min(5.0, callback_rate))
+            formatted_qty = self.format_quantity(symbol, pos['quantity'])
+
             params = {
                 'symbol': symbol,
                 'side': side,
                 'type': 'TRAILING_STOP_MARKET',
-                'activationPrice': self.format_price(symbol, activation_price),  # ВАЖНО!
-                'callbackRate': max(0.1, min(5.0, callback_rate)),
-                'quantity': self.format_quantity(symbol, pos['quantity'])
+                'activationPrice': formatted_activation,
+                'callbackRate': callback_rate,
+                'quantity': formatted_qty
             }
 
+            logger.debug(f"TS params for {symbol}: {params}")
+
             result = await self._make_request("POST", "/fapi/v1/order", params, signed=True)
+
             if result and 'orderId' in result:
                 logger.info(
-                    f"✅ Trailing stop set for {symbol}: activation=${activation_price:.4f}, "
-                    f"callback={callback_rate}%. Will activate when price reaches target."
+                    f"✅ Trailing stop set for {symbol}: "
+                    f"activation=${formatted_activation}, "
+                    f"callback={callback_rate}%. "
+                    f"Will activate IMMEDIATELY when price reaches target."
                 )
                 return True
 
             # Обработка специфических ошибок
-            if result and result.get('code') == -2021:
-                logger.error(f"Order would immediately trigger. Adjusting activation price.")
-                # Добавляем буфер 0.5% к activation price
-                buffer = 1.005 if side == 'SELL' else 0.995
-                new_activation = activation_price * buffer
-                params['activationPrice'] = self.format_price(symbol, new_activation)
+            if result:
+                error_code = result.get('code')
+                error_msg = result.get('msg', '')
 
-                result = await self._make_request("POST", "/fapi/v1/order", params, signed=True)
-                if result and 'orderId' in result:
-                    logger.info(f"✅ Trailing stop set with adjusted activation: ${new_activation:.4f}")
-                    return True
+                if error_code == -2021:  # Order would immediately trigger
+                    logger.warning(
+                        f"TS would trigger immediately for {symbol}. "
+                        f"This means price already passed activation level - good!"
+                    )
+                    # Пробуем без activationPrice (активируется сразу)
+                    params.pop('activationPrice', None)
 
-            logger.error(f"Failed to set Trailing Stop for {symbol}: {result}")
+                    result2 = await self._make_request("POST", "/fapi/v1/order", params, signed=True)
+                    if result2 and 'orderId' in result2:
+                        logger.info(f"✅ TS set without activation price - active immediately")
+                        return True
+
+                elif error_code == -4131:  # PERCENT_PRICE filter
+                    logger.error(f"Price filter violation for {symbol}: {error_msg}")
+                    return False
+
+                logger.error(f"Failed to set TS for {symbol}: {result}")
+
             return False
+
         except Exception as e:
             logger.error(f"Exception setting Trailing Stop for {symbol}: {e}")
             return False

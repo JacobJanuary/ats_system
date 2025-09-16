@@ -149,10 +149,17 @@ class MainTrader:
         # Risk management
         self.initial_sl_percent = float(os.getenv('STOP_LOSS_PERCENT', '2.0'))
         self.max_spread_percent = float(os.getenv('MAX_SPREAD_PERCENT', '0.5'))
+        # Отдельный лимит для testnet
+        self.max_spread_testnet = float(os.getenv('MAX_SPREAD_TESTNET', '50.0'))
 
         # Environment detection
         self.testnet = os.getenv('TESTNET', 'false').lower() == 'true'
         self.trading_mode = TradingMode.TESTNET if self.testnet else TradingMode.MAINNET
+
+        # NEW: Stop-list для исключения определенных символов
+        stop_list_str = os.getenv('STOP_LIST_SYMBOLS', 'BTCDOMUSDT')
+        self.stop_list = set(s.strip() for s in stop_list_str.split(',') if s.strip())
+        logger.info(f"Stop-list symbols: {self.stop_list}")
 
         # Dynamic rate limiting based on environment
         if self.trading_mode == TradingMode.MAINNET:
@@ -319,6 +326,24 @@ class MainTrader:
 
         logger.info("✅ System initialization complete")
 
+    async def has_open_position(self, exchange: Union[BinanceExchange, BybitExchange],
+                                symbol: str) -> bool:
+        """
+        HIGH PRIORITY: Проверка существующей позиции
+        Предотвращает открытие дублирующих позиций по одному символу
+        """
+        try:
+            positions = await exchange.get_open_positions()
+            for pos in positions:
+                if pos.get('symbol') == symbol and float(pos.get('quantity', 0)) > 0:
+                    logger.info(f"Position already exists for {symbol}")
+                    return True
+            return False
+        except Exception as e:
+            logger.error(f"Error checking existing position for {symbol}: {e}")
+            # В случае ошибки безопаснее считать, что позиция есть
+            return True
+
     async def acquire_position_lock(self, symbol: str, exchange: str, timeout: int = 30) -> bool:
         """Получение эксклюзивной блокировки на позицию через PostgreSQL advisory locks"""
         lock_key = f"{exchange}_{symbol}"
@@ -366,16 +391,19 @@ class MainTrader:
 
     async def calculate_position_size(self, exchange: Union[BinanceExchange, BybitExchange],
                                       symbol: str, price: float) -> float:
-        """Расчет размера позиции с проверкой минимумов"""
+        """
+        CRITICAL FIX v2: Улучшенный расчет размера позиции
+        - Добавлена проверка минимального размера для Bybit
+        - Добавлена валидация notional value с выбросом исключения
+        - Улучшено логирование
+        """
         try:
             base_quantity = self.position_size_usd / price
-
-            # Форматируем количество
             formatted_qty = float(exchange.format_quantity(symbol, base_quantity))
 
-            # КРИТИЧЕСКИ ВАЖНО: Проверка на 0 после форматирования
+            # CRITICAL FIX: Проверка на 0 после форматирования
             if formatted_qty == 0:
-                # Пытаемся использовать минимальное допустимое количество
+                # Для Binance
                 if isinstance(exchange, BinanceExchange) and symbol in exchange.exchange_info:
                     filters = exchange.exchange_info[symbol].get('filters', [])
                     lot_size_filter = next((f for f in filters if f['filterType'] == 'LOT_SIZE'), None)
@@ -383,13 +411,43 @@ class MainTrader:
                         min_qty = float(lot_size_filter.get('minQty', 0))
                         if min_qty > 0:
                             formatted_qty = min_qty
-                            logger.warning(f"Using minimum quantity {min_qty} for {symbol}")
+                            logger.warning(f"Binance: Using minimum quantity {min_qty} for {symbol}")
 
-            # Финальная проверка
+                # NEW: Для Bybit
+                elif isinstance(exchange, BybitExchange) and symbol in exchange.symbol_info:
+                    min_qty = exchange.symbol_info[symbol].get('minOrderQty', 0)
+                    if min_qty > 0:
+                        formatted_qty = min_qty
+                        logger.warning(f"Bybit: Using minimum quantity {min_qty} for {symbol}")
+
+            # Финальная проверка на 0
             if formatted_qty == 0:
                 raise ValueError(f"Cannot determine valid quantity for {symbol}")
 
+            # NEW v2: Строгая проверка notional value
             final_notional = formatted_qty * price
+
+            # Если notional меньше минимума даже после использования min_qty
+            if final_notional < self.min_position_size_usd:
+                # Пытаемся увеличить до минимального notional
+                min_qty_for_notional = self.min_position_size_usd / price
+                adjusted_qty = float(exchange.format_quantity(symbol, min_qty_for_notional))
+                adjusted_notional = adjusted_qty * price
+
+                # CRITICAL: Если даже после корректировки notional слишком мал - выбрасываем исключение
+                if adjusted_notional < self.min_position_size_usd * 0.95:  # 5% допуск
+                    error_msg = (
+                        f"Cannot meet minimum position size for {symbol}: "
+                        f"adjusted notional ${adjusted_notional:.2f} < "
+                        f"minimum ${self.min_position_size_usd:.2f}"
+                    )
+                    logger.error(error_msg)
+                    raise ValueError(error_msg)
+
+                formatted_qty = adjusted_qty
+                final_notional = adjusted_notional
+                logger.warning(f"Adjusted quantity to meet minimum notional: {formatted_qty:.6f}")
+
             logger.info(
                 f"📊 Position sizing for {symbol}: "
                 f"Qty={formatted_qty:.6f}, "
@@ -400,34 +458,74 @@ class MainTrader:
             return formatted_qty
 
         except Exception as e:
-            logger.error(f"Error calculating position size: {e}")
+            logger.error(f"Error calculating position size for {symbol}: {e}")
             raise
 
     async def validate_spread(self, exchange: Union[BinanceExchange, BybitExchange], symbol: str) -> bool:
-        """Validate bid-ask spread is within acceptable range"""
+        """
+        FIX v3: Финальная версия валидации спреда
+        - Разные лимиты для testnet и mainnet
+        - Блокировка экстремальных спредов даже на testnet
+        - Детальное логирование
+        """
         try:
+            # Проверяем что exchange инициализирован
+            if not exchange:
+                logger.error(f"Exchange not initialized for spread validation of {symbol}")
+                return False
+
             ticker = await exchange.get_ticker(symbol)
             if not ticker or not ticker.get('bid') or not ticker.get('ask'):
                 logger.warning(f"No ticker data for {symbol}")
-                return False
+                # На testnet разрешаем если нет данных, на mainnet - блокируем
+                return self.trading_mode == TradingMode.TESTNET
 
             bid = float(ticker['bid'])
             ask = float(ticker['ask'])
 
+            # Проверка на валидность цен
             if bid <= 0 or ask <= 0:
+                logger.error(f"Invalid prices for {symbol}: bid={bid}, ask={ask}")
+                return False
+
+            if ask <= bid:
+                logger.error(f"Ask <= Bid for {symbol}: bid={bid}, ask={ask}")
                 return False
 
             spread_percent = ((ask - bid) / bid) * 100
 
-            if spread_percent > self.spread_limit:
-                logger.warning(f"{symbol} spread {spread_percent:.2f}% exceeds limit {self.spread_limit}%")
+            # Определяем лимит в зависимости от режима
+            if self.trading_mode == TradingMode.TESTNET:
+                # На testnet используем отдельный, более высокий лимит
+                effective_limit = self.max_spread_testnet
+
+                # Но для ЭКСТРЕМАЛЬНЫХ спредов все равно блокируем
+                if spread_percent > 100:  # Спред больше 100% - явно проблема
+                    logger.error(
+                        f"EXTREME spread {spread_percent:.2f}% for {symbol} on testnet. "
+                        f"Blocking to prevent order errors."
+                    )
+                    return False
+            else:
+                # На mainnet используем строгий лимит
+                effective_limit = self.spread_limit
+
+            # Проверка против эффективного лимита
+            if spread_percent > effective_limit:
+                logger.warning(
+                    f"{symbol} spread {spread_percent:.2f}% exceeds "
+                    f"{'testnet' if self.trading_mode == TradingMode.TESTNET else 'mainnet'} "
+                    f"limit {effective_limit}%"
+                )
                 return False
 
+            logger.debug(f"{symbol} spread {spread_percent:.2f}% is acceptable")
             return True
 
         except Exception as e:
-            logger.error(f"Error validating spread for {symbol}: {e}")
-            return False
+            logger.error(f"Error validating spread for {symbol}: {e}", exc_info=True)
+            # При ошибке блокируем на mainnet, разрешаем на testnet
+            return self.trading_mode == TradingMode.TESTNET
 
     async def _log_system_health(self, service_name: str, status: str, error: Optional[str] = None):
         """Log system health to monitoring.system_health"""
@@ -469,6 +567,11 @@ class MainTrader:
             return
 
         self.processing_signals.add(signal.id)
+        # NEW: Проверка stop-list
+        if signal.pair_symbol in self.stop_list:
+            logger.info(f"Symbol {signal.pair_symbol} is in stop-list, skipping")
+            self.processing_signals.discard(signal.id)
+            return
         trade_id = None
         position_id = None
 
@@ -487,6 +590,12 @@ class MainTrader:
             # Select exchange
             exchange = self.binance if signal.exchange_name.lower() == 'binance' else self.bybit
             if not exchange:
+                # NEW: Проверка существующей позиции
+                if await self.has_open_position(exchange, signal.pair_symbol):
+                    logger.warning(f"Position already exists for {signal.pair_symbol}, skipping signal")
+                    self.processing_signals.discard(signal.id)
+                    await self.release_position_lock(signal.pair_symbol, signal.exchange_name)
+                    return
                 logger.error(f"Exchange {signal.exchange_name} not available")
                 self.failed_signals.add(signal.id)
                 return
@@ -568,6 +677,9 @@ class MainTrader:
             await asyncio.sleep(self.delay_between_requests * 2)
             await self.set_stop_loss(exchange, signal, execution_price, position_id)
 
+            # NEW: Верификация и восстановление защиты
+            await self.verify_and_recover_position(exchange, signal.pair_symbol, position_id)
+
             await self.mark_signal_processed(signal.id)
             self.stats['signals_processed'] += 1
 
@@ -582,7 +694,190 @@ class MainTrader:
             await self.release_position_lock(signal.pair_symbol, signal.exchange_name)
             self.processing_signals.discard(signal.id)
 
-    # Остальные методы остаются без изменений, но добавляем методы для работы с БД...
+    async def verify_and_recover_position(self, exchange: Union[BinanceExchange, BybitExchange],
+                                          symbol: str, side: str = None,
+                                          entry_price: float = None, position_id: Optional[int] = None):
+        """
+        HIGH PRIORITY FIX v2: Умная проверка и восстановление защиты позиции
+        - Не пытается установить SL если он уже есть и корректен
+        - Правильно определяет направление позиции
+        - Валидирует SL перед установкой
+        """
+        try:
+            await asyncio.sleep(2)  # Даем время на обработку ордеров
+
+            # Получаем текущие ордера
+            orders = await exchange.get_open_orders(symbol)
+
+            # Проверяем наличие SL ордеров
+            sl_orders = [
+                order for order in orders
+                if order.get('type', '').lower() in ['stop_market', 'stop', 'stop_loss']
+            ]
+
+            # Если SL уже есть - проверяем его корректность
+            if sl_orders:
+                sl_order = sl_orders[0]
+                sl_price = float(sl_order.get('stopPrice', 0) or sl_order.get('price', 0))
+
+                if sl_price > 0:
+                    logger.info(f"✅ Stop Loss verified for {symbol} at ${sl_price:.4f}")
+
+                    # Обновляем БД
+                    if position_id and self.db_pool:
+                        try:
+                            async with self.db_pool.acquire() as conn:
+                                await conn.execute("""
+                                    UPDATE monitoring.positions 
+                                    SET has_stop_loss = true, stop_loss_price = $1
+                                    WHERE id = $2
+                                """, sl_price, position_id)
+                        except:
+                            pass
+
+                    return True
+
+            # SL отсутствует - пытаемся восстановить
+            logger.error(f"⚠️ No Stop Loss detected for {symbol}, attempting recovery...")
+
+            # Получаем позицию для определения параметров
+            positions = await exchange.get_open_positions()
+            position = next((p for p in positions if p['symbol'] == symbol), None)
+
+            if not position:
+                logger.error(f"No position found for {symbol}, cannot set SL")
+                return False
+
+            # Берем данные из позиции или переданные параметры
+            actual_entry = float(position.get('entry_price', 0)) or entry_price
+            actual_side = position.get('side', '').upper() or side
+
+            if not actual_entry or not actual_side:
+                logger.error(f"Cannot determine position parameters for {symbol}")
+                return False
+
+            # Получаем текущую цену
+            ticker = await exchange.get_ticker(symbol)
+            current_price = float(ticker.get('price', actual_entry))
+
+            # Рассчитываем SL с учетом направления
+            is_long = actual_side in ['LONG', 'BUY']
+
+            if is_long:
+                # Для LONG: SL ниже текущей цены
+                sl_price = min(
+                    actual_entry * (1 - self.initial_sl_percent / 100),
+                    current_price * (1 - self.initial_sl_percent / 100)
+                )
+            else:
+                # Для SHORT: SL выше текущей цены
+                sl_price = max(
+                    actual_entry * (1 + self.initial_sl_percent / 100),
+                    current_price * (1 + self.initial_sl_percent / 100)
+                )
+
+            logger.info(
+                f"Recovery SL calculation for {symbol}: "
+                f"side={actual_side}, entry=${actual_entry:.4f}, "
+                f"current=${current_price:.4f}, SL=${sl_price:.4f}"
+            )
+
+            # Пытаемся установить SL с retry
+            for attempt in range(3):
+                if attempt > 0:
+                    await asyncio.sleep(1 + attempt)
+
+                if await exchange.set_stop_loss(symbol, sl_price):
+                    logger.info(f"✅ Recovery successful: SL set at ${sl_price:.4f}")
+                    self.stats['sl_set'] += 1
+
+                    # Обновляем БД
+                    if position_id and self.db_pool:
+                        try:
+                            async with self.db_pool.acquire() as conn:
+                                await conn.execute("""
+                                    UPDATE monitoring.positions 
+                                    SET has_stop_loss = true, stop_loss_price = $1
+                                    WHERE id = $2
+                                """, sl_price, position_id)
+                        except:
+                            pass
+
+                    return True
+
+            logger.critical(f"❌ Failed to recover SL for {symbol} after 3 attempts!")
+            return False
+
+        except Exception as e:
+            logger.error(f"Error in verify_and_recover_position: {e}", exc_info=True)
+            return False
+
+    async def periodic_health_check(self):
+        """
+        HIGH PRIORITY: Периодическая проверка здоровья системы
+        Логирует метрики и проверяет критические компоненты
+        """
+        while not self.shutdown_event.is_set():
+            try:
+                await asyncio.sleep(self.health_check_interval)
+
+                # Рассчитываем метрики
+                uptime = (datetime.now(timezone.utc) - self.stats['start_time']).total_seconds()
+                success_rate = (
+                        self.stats['positions_opened'] /
+                        max(self.stats['positions_opened'] + self.stats['positions_failed'], 1) * 100
+                )
+                sl_success_rate = (
+                        self.stats['sl_set'] /
+                        max(self.stats['sl_set'] + self.stats['sl_failed'], 1) * 100
+                )
+
+                # Логируем метрики
+                logger.info("=" * 60)
+                logger.info("📊 SYSTEM HEALTH CHECK")
+                logger.info(f"Uptime: {uptime / 3600:.1f} hours")
+                logger.info(f"Signals processed: {self.stats['signals_processed']}")
+                logger.info(f"Positions opened: {self.stats['positions_opened']}")
+                logger.info(f"Success rate: {success_rate:.1f}%")
+                logger.info(f"SL success rate: {sl_success_rate:.1f}%")
+                logger.info(f"Failed signals: {len(self.failed_signals)}")
+                logger.info(f"Active locks: {len(self.locked_positions)}")
+
+                # Проверяем подключения
+                checks = []
+                if self.binance:
+                    try:
+                        balance = await self.binance.get_balance()
+                        checks.append(f"Binance: ✅ (${balance:.2f})")
+                    except:
+                        checks.append("Binance: ❌")
+
+                if self.bybit:
+                    try:
+                        balance = await self.bybit.get_balance()
+                        checks.append(f"Bybit: ✅ (${balance:.2f})")
+                    except:
+                        checks.append("Bybit: ❌")
+
+                if self.db_pool:
+                    try:
+                        async with self.db_pool.acquire() as conn:
+                            await conn.fetchval("SELECT 1")
+                        checks.append("Database: ✅")
+                    except:
+                        checks.append("Database: ❌")
+
+                logger.info(f"Connections: {' | '.join(checks)}")
+                logger.info("=" * 60)
+
+                # Логируем в БД
+                await self._log_system_health(
+                    "main_trader",
+                    "HEALTHY" if success_rate > 50 else "DEGRADED"
+                )
+
+            except Exception as e:
+                logger.error(f"Health check error: {e}")
 
     async def get_unprocessed_signals(self) -> List[Signal]:
         """Fetch unprocessed signals from fas.scoring_history"""
@@ -666,22 +961,77 @@ class MainTrader:
 
     async def set_stop_loss(self, exchange: Union[BinanceExchange, BybitExchange],
                             signal: Signal, entry_price: float, position_id: Optional[int] = None) -> bool:
-        """Set stop loss for position"""
+        """
+        CRITICAL FIX v3: Правильный расчет Stop Loss с валидацией
+        - Использует ТЕКУЩУЮ цену если она лучше entry (учитывает проскальзывание)
+        - Валидирует что SL на правильной стороне от цены
+        - Добавлена защита от установки SL который приведет к немедленному срабатыванию
+        """
         try:
+            # Получаем актуальную цену
             ticker = await exchange.get_ticker(signal.pair_symbol)
             current_price = float(ticker.get('price', entry_price))
 
-            if signal.recommended_action == 'BUY':  # LONG
-                sl_price = entry_price * (1 - self.initial_sl_percent / 100)
-                # Если SL выше текущей цены (из-за проскальзывания)
-                if sl_price >= current_price:
-                    # Используем ТОТ ЖЕ процент, но от текущей цены
+            # CRITICAL: Определяем направление позиции правильно
+            is_long = signal.recommended_action == 'BUY'
+
+            # Рассчитываем SL от entry price
+            if is_long:
+                # Для LONG: SL ниже entry на X%
+                sl_from_entry = entry_price * (1 - self.initial_sl_percent / 100)
+
+                # ВАЖНО: SL не может быть выше текущей цены для LONG
+                if sl_from_entry >= current_price:
+                    # Если цена упала сильно, ставим SL от текущей цены
                     sl_price = current_price * (1 - self.initial_sl_percent / 100)
+                    logger.warning(
+                        f"Price slippage detected for {signal.pair_symbol}: "
+                        f"entry=${entry_price:.4f}, current=${current_price:.4f}. "
+                        f"Adjusting SL to ${sl_price:.4f}"
+                    )
+                else:
+                    sl_price = sl_from_entry
+
             else:  # SHORT
-                sl_price = entry_price * (1 + self.initial_sl_percent / 100)
-                if sl_price <= current_price:
-                    # Используем ТОТ ЖЕ процент, но от текущей цены
+                # Для SHORT: SL выше entry на X%
+                sl_from_entry = entry_price * (1 + self.initial_sl_percent / 100)
+
+                # ВАЖНО: SL не может быть ниже текущей цены для SHORT
+                if sl_from_entry <= current_price:
+                    # Если цена выросла сильно, ставим SL от текущей цены
                     sl_price = current_price * (1 + self.initial_sl_percent / 100)
+                    logger.warning(
+                        f"Price slippage detected for {signal.pair_symbol}: "
+                        f"entry=${entry_price:.4f}, current=${current_price:.4f}. "
+                        f"Adjusting SL to ${sl_price:.4f}"
+                    )
+                else:
+                    sl_price = sl_from_entry
+
+            # ВАЛИДАЦИЯ: Проверяем что SL имеет смысл
+            if is_long:
+                if sl_price >= current_price:
+                    logger.error(
+                        f"Invalid SL for LONG {signal.pair_symbol}: "
+                        f"SL ${sl_price:.4f} >= current ${current_price:.4f}"
+                    )
+                    # Форсируем разумный SL
+                    sl_price = current_price * 0.95  # 5% ниже текущей цены
+                    logger.info(f"Forced SL to ${sl_price:.4f} (5% below current)")
+            else:
+                if sl_price <= current_price:
+                    logger.error(
+                        f"Invalid SL for SHORT {signal.pair_symbol}: "
+                        f"SL ${sl_price:.4f} <= current ${current_price:.4f}"
+                    )
+                    # Форсируем разумный SL
+                    sl_price = current_price * 1.05  # 5% выше текущей цены
+                    logger.info(f"Forced SL to ${sl_price:.4f} (5% above current)")
+
+            logger.info(
+                f"Setting SL for {signal.pair_symbol} {signal.recommended_action}: "
+                f"entry=${entry_price:.4f}, current=${current_price:.4f}, SL=${sl_price:.4f}"
+            )
 
             # Set Stop Loss with retries
             for attempt in range(3):
@@ -691,6 +1041,19 @@ class MainTrader:
                 if await exchange.set_stop_loss(signal.pair_symbol, sl_price):
                     self.stats['sl_set'] += 1
                     logger.info(f"✅ Stop Loss set at ${sl_price:.4f}")
+
+                    # Обновляем БД если есть position_id
+                    if position_id and self.db_pool:
+                        try:
+                            async with self.db_pool.acquire() as conn:
+                                await conn.execute("""
+                                    UPDATE monitoring.positions 
+                                    SET has_stop_loss = true, stop_loss_price = $1
+                                    WHERE id = $2
+                                """, sl_price, position_id)
+                        except Exception as e:
+                            logger.error(f"Failed to update DB: {e}")
+
                     return True
 
             self.stats['sl_failed'] += 1
@@ -709,6 +1072,8 @@ class MainTrader:
 
         try:
             await self.initialize()
+            # NEW: Запуск health check в фоне
+            health_task = asyncio.create_task(self.periodic_health_check())
         except Exception as e:
             logger.critical(f"FATAL: System initialization failed: {e}")
             return
