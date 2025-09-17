@@ -215,8 +215,11 @@ class BybitExchange(BaseExchange):
             if result and result.get('retCode') == 0 and result['result']['list']:
                 ticker = result['result']['list'][0]
                 return {
-                    'symbol': ticker.get('symbol'), 'price': safe_float(ticker.get('lastPrice')),
-                    'bid': safe_float(ticker.get('bid1Price')), 'ask': safe_float(ticker.get('ask1Price')),
+                    'symbol': ticker.get('symbol'), 
+                    'price': safe_float(ticker.get('lastPrice')),
+                    'last': safe_float(ticker.get('lastPrice')),  # Добавляем поле last для совместимости
+                    'bid': safe_float(ticker.get('bid1Price')), 
+                    'ask': safe_float(ticker.get('ask1Price')),
                 }
         except Exception as e:
             logger.error(f"Error getting ticker for {symbol}: {e}")
@@ -269,34 +272,49 @@ class BybitExchange(BaseExchange):
                 )
                 return None
 
-            # Для тестнета используем обычный Market ордер вместо IOC
-            if self.testnet:
-                result = await self._async_request(
-                    self.client.place_order,
-                    category="linear",
-                    symbol=symbol,
-                    side=side.capitalize(),
-                    orderType="Market",  # Обычный рыночный ордер
-                    qty=formatted_qty,
-                    positionIdx=0
-                )
+            # Всегда используем IOC лимитный ордер для избежания ошибки 30208
+            # Особенно важно для токенов с префиксом "1000" (1000TURBOUSDT, 1000PEPEUSDT и др.)
+            
+            # Проверяем ликвидность и корректность спреда
+            ask_price = float(ticker.get('ask', 0))
+            bid_price = float(ticker.get('bid', 0))
+            last_price = float(ticker.get('last', 0))
+            
+            # Если спред слишком большой (больше 10%), используем last price с запасом
+            if ask_price > 0 and bid_price > 0:
+                spread_pct = ((ask_price - bid_price) / bid_price) * 100
+                if spread_pct > 10:
+                    logger.warning(f"Large spread detected for {symbol}: {spread_pct:.2f}%. Using last price.")
+                    # Используем last price с большим запасом
+                    if side.upper() == "BUY":
+                        limit_price = last_price * 1.05  # 5% выше последней цены для покупки
+                    else:
+                        limit_price = last_price * 0.95  # 5% ниже последней цены для продажи
+                else:
+                    # Нормальный спред - используем bid/ask с небольшим запасом
+                    price_multiplier = 1.01 if side.upper() == "BUY" else 0.99
+                    limit_price = ask_price * price_multiplier if side.upper() == "BUY" else bid_price * price_multiplier
             else:
-                # Для продакшена оставляем IOC логику
-                price_multiplier = 1.01 if side.upper() == "BUY" else 0.99
-                limit_price = float(ticker['ask' if side.upper() == "BUY" else 'bid']) * price_multiplier
-                formatted_price = self.format_price(symbol, limit_price)
+                # Нет данных о bid/ask - используем last price
+                logger.warning(f"No bid/ask data for {symbol}. Using last price.")
+                if side.upper() == "BUY":
+                    limit_price = last_price * 1.05
+                else:
+                    limit_price = last_price * 0.95
+            
+            formatted_price = self.format_price(symbol, limit_price)
 
-                result = await self._async_request(
-                    self.client.place_order,
-                    category="linear",
-                    symbol=symbol,
-                    side=side.capitalize(),
-                    orderType="Limit",
-                    qty=formatted_qty,
-                    price=formatted_price,
-                    timeInForce="IOC",
-                    positionIdx=0
-                )
+            result = await self._async_request(
+                self.client.place_order,
+                category="linear",
+                symbol=symbol,
+                side=side.capitalize(),
+                orderType="Limit",
+                qty=formatted_qty,
+                price=formatted_price,
+                timeInForce="IOC",
+                positionIdx=0
+            )
 
             if result and result.get('retCode') == 0:
                 order_id = result.get('result', {}).get('orderId')

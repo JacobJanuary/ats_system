@@ -341,13 +341,20 @@ class ProtectionMonitor:
 
         # Для Bybit - прямая установка TS (SL автоматически заменяется)
         if isinstance(exchange, BybitExchange):
+            # ВАЖНО: Используем актуальную рыночную цену, а не mark_price!
+            ticker = await exchange.get_ticker(symbol)
+            last_price = float(ticker.get('price', pos_info.current_price))
+            
             # Минимальный буфер для Bybit
             buffer_percent = 0.1
             if pos_info.side in ['LONG', 'BUY']:
-                activation_price = pos_info.current_price * (1 + buffer_percent / 100)
+                # Для LONG: activePrice должен быть > last_price
+                activation_price = last_price * (1 + buffer_percent / 100)
             else:
-                activation_price = pos_info.current_price * (1 - buffer_percent / 100)
+                # Для SHORT: activePrice должен быть < last_price
+                activation_price = last_price * (1 - buffer_percent / 100)
 
+            logger.info(f"  Bybit: Using last_price=${last_price:.8f} (not mark_price=${pos_info.current_price:.8f})")
             logger.info(f"  Bybit: Setting TS with activation=${activation_price:.8f} (buffer={buffer_percent}%)")
 
             if await exchange.set_trailing_stop(symbol, activation_price, self.trailing_callback):
