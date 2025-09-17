@@ -130,6 +130,19 @@ class MainTrader:
         self.min_score_month = float(os.getenv('MIN_SCORE_MONTH', '80'))
         self.position_size_usd = float(os.getenv('POSITION_SIZE_USD', '10'))
         self.min_position_size_usd = float(os.getenv('MIN_POSITION_SIZE_USD', '10.0'))
+        
+        # Working hours configuration
+        working_hours_str = os.getenv('WORKING_HOURS', '')
+        if working_hours_str:
+            try:
+                self.working_hours = set(int(h.strip()) for h in working_hours_str.split(',') if h.strip())
+                logger.info(f"Working hours configured: {sorted(self.working_hours)}")
+            except ValueError as e:
+                logger.error(f"Invalid WORKING_HOURS format: {e}. Using 24/7 mode.")
+                self.working_hours = set(range(24))
+        else:
+            self.working_hours = set(range(24))
+            logger.info("No WORKING_HOURS configured. Running 24/7.")
 
         # Ensure minimum position size
         if self.position_size_usd < self.min_position_size_usd:
@@ -141,6 +154,7 @@ class MainTrader:
         self.leverage = int(os.getenv('LEVERAGE', '10'))
         self.check_interval = int(os.getenv('CHECK_INTERVAL', '30'))
         self.signal_time_window = int(os.getenv('SIGNAL_TIME_WINDOW', '5'))
+        self.max_trades_per_15m = int(os.getenv('MAX_TRADES_PER_15M', '10'))
 
         # Retry configuration
         self.order_retry_max = int(os.getenv('ORDER_RETRY_MAX', '3'))
@@ -214,7 +228,20 @@ class MainTrader:
         logger.info(f"Max Spread: {self.spread_limit}%")
         logger.info(f"Trade Delay: {self.delay_between_trades}s")
         logger.info(f"Signal Window: {self.signal_time_window} minutes")
+        logger.info(f"Max Trades per 15min: {self.max_trades_per_15m}")
+        if len(self.working_hours) == 24:
+            logger.info("Working Hours: 24/7")
+        else:
+            logger.info(f"Working Hours: {sorted(self.working_hours)}")
         logger.info("=" * 80)
+    
+    def is_in_working_hours(self, signal_time: datetime) -> bool:
+        """Check if signal time is within configured working hours"""
+        if len(self.working_hours) == 24:
+            return True
+        
+        hour = signal_time.hour
+        return hour in self.working_hours
 
     async def _init_db(self):
         """Initialize database connection pool with retry logic"""
@@ -698,44 +725,57 @@ class MainTrader:
                                           symbol: str, side: str = None,
                                           entry_price: float = None, position_id: Optional[int] = None):
         """
-        HIGH PRIORITY FIX v2: Умная проверка и восстановление защиты позиции
-        - Не пытается установить SL если он уже есть и корректен
-        - Правильно определяет направление позиции
-        - Валидирует SL перед установкой
+        HIGH PRIORITY FIX v3: Правильная проверка и восстановление защиты позиции
+        - Для Bybit проверяет SL в параметрах позиции, не в ордерах
+        - Для Binance проверяет SL среди открытых ордеров
+        - Не пытается установить SL если он уже есть
         """
         try:
             await asyncio.sleep(2)  # Даем время на обработку ордеров
 
-            # Получаем текущие ордера
-            orders = await exchange.get_open_orders(symbol)
+            # CRITICAL FIX: Разная логика для Bybit и Binance
+            sl_exists = False
+            sl_price = 0
+            
+            if exchange.__class__.__name__ == 'BybitExchange':
+                # Для Bybit: проверяем SL в позиции
+                positions = await exchange.get_open_positions(symbol)
+                if positions:
+                    position = positions[0]
+                    sl_value = position.get('stopLoss')
+                    if sl_value and float(sl_value) > 0:
+                        sl_exists = True
+                        sl_price = float(sl_value)
+                        logger.info(f"✅ Stop Loss verified in Bybit position for {symbol} at ${sl_price:.4f}")
+                
+            else:  # BinanceExchange
+                # Для Binance: проверяем SL среди ордеров
+                orders = await exchange.get_open_orders(symbol)
+                sl_orders = [
+                    order for order in orders
+                    if order.get('type', '').lower() in ['stop_market', 'stop', 'stop_loss']
+                ]
+                
+                if sl_orders:
+                    sl_order = sl_orders[0]
+                    sl_price = float(sl_order.get('stopPrice', 0) or sl_order.get('price', 0))
+                    if sl_price > 0:
+                        sl_exists = True
+                        logger.info(f"✅ Stop Loss verified in Binance orders for {symbol} at ${sl_price:.4f}")
 
-            # Проверяем наличие SL ордеров
-            sl_orders = [
-                order for order in orders
-                if order.get('type', '').lower() in ['stop_market', 'stop', 'stop_loss']
-            ]
-
-            # Если SL уже есть - проверяем его корректность
-            if sl_orders:
-                sl_order = sl_orders[0]
-                sl_price = float(sl_order.get('stopPrice', 0) or sl_order.get('price', 0))
-
-                if sl_price > 0:
-                    logger.info(f"✅ Stop Loss verified for {symbol} at ${sl_price:.4f}")
-
-                    # Обновляем БД
-                    if position_id and self.db_pool:
-                        try:
-                            async with self.db_pool.acquire() as conn:
-                                await conn.execute("""
-                                    UPDATE monitoring.positions 
-                                    SET has_stop_loss = true, stop_loss_price = $1
-                                    WHERE id = $2
-                                """, sl_price, position_id)
-                        except:
-                            pass
-
-                    return True
+            # Если SL найден - обновляем БД и выходим
+            if sl_exists:
+                if position_id and self.db_pool:
+                    try:
+                        async with self.db_pool.acquire() as conn:
+                            await conn.execute("""
+                                UPDATE monitoring.positions 
+                                SET has_stop_loss = true, stop_loss_price = $1
+                                WHERE id = $2
+                            """, sl_price, position_id)
+                    except:
+                        pass
+                return True
 
             # SL отсутствует - пытаемся восстановить
             logger.error(f"⚠️ No Stop Loss detected for {symbol}, attempting recovery...")
@@ -880,14 +920,23 @@ class MainTrader:
                 logger.error(f"Health check error: {e}")
 
     async def get_unprocessed_signals(self) -> List[Signal]:
-        """Fetch unprocessed signals from fas.scoring_history"""
+        """Fetch unprocessed signals from fas.scoring_history - top N by score_week"""
         if not self.db_pool:
             logger.error("Database not available")
             return []
 
         time_threshold = datetime.now(timezone.utc) - timedelta(minutes=self.signal_time_window)
 
-        query = """
+        # Build WHERE conditions for working hours
+        if len(self.working_hours) == 24:
+            # All hours - no time filtering needed
+            hour_condition = ""
+        else:
+            # Create SQL condition for specific hours
+            hours_list = ','.join(str(h) for h in sorted(self.working_hours))
+            hour_condition = f"AND EXTRACT(HOUR FROM sh.created_at) IN ({hours_list})"
+
+        query = f"""
             SELECT 
                 sh.id,
                 sh.trading_pair_id,
@@ -908,8 +957,9 @@ class MainTrader:
                 AND sh.score_week >= $2
                 AND sh.score_month >= $3
                 AND sh.recommended_action IN ('BUY', 'SELL')
-            ORDER BY sh.created_at DESC
-            LIMIT 50
+                {hour_condition}
+            ORDER BY sh.score_week DESC, sh.score_month DESC
+            LIMIT $4
         """
 
         try:
@@ -918,11 +968,17 @@ class MainTrader:
                     query,
                     time_threshold,
                     self.min_score_week,
-                    self.min_score_month
+                    self.min_score_month,
+                    self.max_trades_per_15m
                 )
 
                 signals = []
                 for row in rows:
+                    # Double-check with Python (in case of timezone differences)
+                    if not self.is_in_working_hours(row['created_at']):
+                        logger.debug(f"Signal {row['id']} skipped - outside working hours")
+                        continue
+                        
                     if row['id'] not in self.processing_signals and row['id'] not in self.failed_signals:
                         signal = Signal(
                             id=row['id'],
@@ -938,6 +994,14 @@ class MainTrader:
                             combinations_details=row['combinations_details']
                         )
                         signals.append(signal)
+                
+                if signals:
+                    logger.info(
+                        f"Found {len(signals)} signals (top {self.max_trades_per_15m} by score_week). "
+                        f"Highest score: {signals[0].score_week:.1f}%"
+                    )
+                elif len(self.working_hours) != 24:
+                    logger.debug("No signals found within working hours")
 
                 return signals
 

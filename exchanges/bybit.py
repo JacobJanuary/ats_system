@@ -9,7 +9,7 @@ Bybit Exchange Implementation - PRODUCTION READY v2.4 (FIXED)
 import asyncio
 import logging
 from typing import Dict, Optional, List, Any
-from decimal import Decimal, ROUND_DOWN
+from decimal import Decimal, ROUND_DOWN, ROUND_UP, ROUND_HALF_UP
 
 # Official Bybit Python SDK
 from pybit.unified_trading import HTTP
@@ -44,6 +44,7 @@ class BybitExchange(BaseExchange):
         # Кэш для trailing stop параметров, чтобы избежать повторных установок
         # Формат: {symbol: {'distance': value, 'activePrice': value}}
         self.trailing_stop_cache = {}
+        logger.info(f"Bybit {'testnet' if self.testnet else 'mainnet'} client created")
 
     async def initialize(self):
         """Initialize Bybit connection and load market info"""
@@ -93,17 +94,97 @@ class BybitExchange(BaseExchange):
         }
 
     def format_quantity(self, symbol: str, quantity: float) -> str:
-        if symbol not in self.symbol_info: return str(round(quantity, 4))
+        """
+        Форматирует количество согласно требованиям Bybit (TICK_SIZE mode)
+        Основано на логике CCXT для правильной обработки qtyStep
+        """
+        if symbol not in self.symbol_info: 
+            logger.warning(f"No symbol info for {symbol}, using default rounding")
+            return str(round(quantity, 4))
+        
         try:
             info = self.symbol_info[symbol]
             step_size = Decimal(str(info['qtyStep']))
+            min_order_qty = Decimal(str(info['minOrderQty']))
             qty_decimal = Decimal(str(quantity))
-            rounded_qty = (qty_decimal / step_size).quantize(Decimal('1'), rounding=ROUND_DOWN) * step_size
-
-            step_str = str(step_size).rstrip('0')
-            decimals = len(step_str.split('.')[1]) if '.' in step_str else 0
-            return format(rounded_qty, f'.{decimals}f')
-        except Exception:
+            
+            # TICK_SIZE MODE: округляем количество до ближайшего кратного qtyStep
+            # Для reduce-only ордеров важно не округлять вверх больше позиции
+            remainder = qty_decimal % step_size
+            
+            if remainder == 0:
+                # Количество уже кратно step_size - не меняем
+                rounded_qty = qty_decimal
+            else:
+                # Округляем к ближайшему кратному
+                # ВАЖНО: используем ROUND_DOWN для reduce-only чтобы не превысить позицию
+                steps = (qty_decimal / step_size).quantize(Decimal('0'), rounding=ROUND_DOWN)
+                rounded_qty = steps * step_size
+                
+                # Если округлили до 0, пробуем минимальное количество
+                if rounded_qty == 0:
+                    rounded_qty = step_size
+            
+            # Проверяем минимальное количество
+            if rounded_qty < min_order_qty:
+                # Если меньше минимума, используем минимум
+                rounded_qty = min_order_qty
+                logger.debug(
+                    f"{symbol}: Quantity {quantity} rounded to {rounded_qty} (using minOrderQty)"
+                )
+            
+            # КРИТИЧЕСКАЯ ПРОВЕРКА: Для целочисленных qtyStep (>=1) 
+            # убеждаемся что результат тоже целое число
+            if step_size >= 1:
+                # Форматируем как целое число без десятичной точки
+                formatted = str(int(rounded_qty))
+            else:
+                # Определяем количество знаков после запятой из qtyStep
+                step_str = str(step_size)
+                if '.' in step_str:
+                    # Считаем значащие цифры после точки
+                    after_dot = step_str.split('.')[1].rstrip('0')
+                    decimals = len(after_dot)
+                else:
+                    decimals = 0
+                
+                # Форматируем с нужным количеством знаков
+                # ВАЖНО: НЕ удаляем trailing zeros для Bybit
+                formatted = format(rounded_qty, f'.{decimals}f')
+            
+            # Финальная валидация
+            # Проверяем что не получился 0 после форматирования
+            if float(formatted) == 0:
+                logger.warning(f"Formatted quantity is 0 for {symbol}, using minimum: {min_order_qty}")
+                if min_order_qty >= 1:
+                    formatted = str(int(min_order_qty))
+                else:
+                    formatted = str(min_order_qty)
+            
+            # Дополнительная проверка для больших qtyStep
+            final_value = Decimal(formatted)
+            if final_value == 0:
+                logger.error(
+                    f"{symbol}: CRITICAL - Formatted quantity is 0! "
+                    f"Original: {quantity}, Step: {step_size}, Min: {min_order_qty}"
+                )
+                # Возвращаем минимальное количество
+                if step_size >= 1:
+                    formatted = str(int(min_order_qty))
+                else:
+                    formatted = str(min_order_qty)
+            
+            # Логирование для отладки
+            if float(formatted) != quantity:
+                logger.debug(
+                    f"{symbol}: Quantity formatted from {quantity} to {formatted} "
+                    f"(qtyStep={step_size}, minOrderQty={min_order_qty})"
+                )
+            
+            return formatted
+            
+        except Exception as e:
+            logger.error(f"Error formatting quantity for {symbol}: {e}", exc_info=True)
             return str(round(quantity, 4))
 
     def format_price(self, symbol: str, price: float) -> str:
@@ -290,30 +371,38 @@ class BybitExchange(BaseExchange):
 
     async def set_stop_loss(self, symbol: str, stop_price: float) -> bool:
         try:
+            # Форматируем цену перед отправкой
+            formatted_price = self.format_price(symbol, stop_price)
+            
             result = await self._async_request(
                 self.client.set_trading_stop, category="linear", symbol=symbol,
-                stopLoss=self.format_price(symbol, stop_price), positionIdx=0
+                stopLoss=formatted_price, positionIdx=0
             )
+            
+            error_code = result.get('retCode') if result else None
+            error_msg = result.get('retMsg', '') if result else ''
+            
             if result and result.get('retCode') == 0:
                 logger.info(f"✅ Stop loss set for {symbol} at ${stop_price:.4f}")
                 return True
-
-                # NEW: Обработка специфических ошибок Bybit
-            error_code = result.get('retCode') if result else None
-            error_msg = result.get('retMsg', '') if result else ''
-
-            if error_code == 34040:  # "not modified" - SL уже установлен
-                logger.info(f"Stop loss already set at this price for {symbol}")
+            elif error_code == 34040:  # "not modified" - SL уже установлен с таким же значением
+                logger.info(f"Stop loss already set at ${stop_price:.4f} for {symbol} (no modification needed)")
                 return True
             elif error_code == 110008:  # "cannot replace_so" - ордер уже triggered
                 logger.warning(f"Cannot modify SL for {symbol}: order already triggered")
                 return False
-            elif error_code == 10001 and "should lower than" in error_msg:
-                logger.error(f"Invalid SL price for {symbol}: {error_msg}")
+            elif error_code == 10001:
+                if "should lower than" in error_msg:
+                    logger.error(f"Invalid SL price for LONG {symbol}: SL ${stop_price:.4f} must be lower than current price")
+                elif "should higher than" in error_msg:
+                    logger.error(f"Invalid SL price for SHORT {symbol}: SL ${stop_price:.4f} must be higher than current price")
+                else:
+                    logger.error(f"Invalid parameters for {symbol}: {error_msg}")
                 return False
-
-            logger.error(f"Failed to set stop loss: {result}")
-            return False
+            else:
+                logger.error(f"Failed to set stop loss for {symbol}: {error_msg} (code: {error_code})")
+                return False
+                
         except Exception as e:
             logger.error(f"Error setting stop loss: {e}")
             return False
@@ -466,8 +555,41 @@ class BybitExchange(BaseExchange):
     async def create_limit_order(self, symbol: str, side: str, quantity: float, price: float,
                                  reduce_only: bool = False) -> Optional[Dict]:
         try:
+            # Для reduce-only ордеров сначала получаем актуальную позицию
+            if reduce_only:
+                positions = await self.get_open_positions(symbol=symbol)
+                actual_position = None
+                for pos in positions:
+                    if pos.get('symbol') == symbol:
+                        actual_position = pos
+                        break
+                
+                if actual_position:
+                    # Используем точное количество из позиции
+                    actual_qty = actual_position.get('quantity', 0)
+                    if actual_qty > 0:
+                        logger.debug(f"Using actual position size for reduce-only: {actual_qty} (requested: {quantity})")
+                        quantity = actual_qty
+                    else:
+                        logger.warning(f"No position to reduce for {symbol}")
+                        return None
+                else:
+                    logger.warning(f"No position found for {symbol} to reduce")
+                    return None
+                
+                # WORKAROUND: Многие символы на testnet имеют проблемы с reduce-only limit orders
+                # Основано на тестировании: ALEOUSDT, COREUSDT работают с reduce-only
+                # Остальные требуют обходного решения
+                working_symbols = ['ALEOUSDT', 'COREUSDT']
+                
+                if self.testnet and symbol not in working_symbols:
+                    logger.warning(
+                        f"Testnet workaround for {symbol}: reduce-only limit orders fail with 110017. "
+                        f"Will use regular limit order without reduce-only flag."
+                    )
+                    reduce_only = False
+            
             # Проверка минимального размера ордера перед отправкой на биржу
-            # Это предотвращает ошибку "orderQty will be truncated to zero"
             if symbol in self.symbol_info:
                 min_order_qty = self.symbol_info[symbol].get('minOrderQty', 0.001)
                 if quantity < min_order_qty:
@@ -480,14 +602,28 @@ class BybitExchange(BaseExchange):
             # Форматирование количества с учетом step size
             formatted_qty = self.format_quantity(symbol, quantity)
             
+            # Логирование для отладки
+            logger.debug(f"Quantity formatting for {symbol}: original={quantity}, formatted={formatted_qty}, type={type(formatted_qty)}")
+            
             # Дополнительная проверка после форматирования
             # Убеждаемся, что отформатированное количество не стало 0
             if float(formatted_qty) == 0:
-                logger.warning(
-                    f"Formatted quantity became 0 for {symbol} (original: {quantity}). "
-                    f"Order creation skipped."
+                logger.error(
+                    f"CRITICAL: Formatted quantity became 0 for {symbol} "
+                    f"(original: {quantity}, formatted: {formatted_qty}). "
+                    f"Order creation skipped to avoid error 110017."
                 )
                 return None
+            
+            # НОВАЯ ПРОВЕРКА: Для reduce-only ордеров проверяем соответствие позиции
+            if reduce_only and symbol in self.symbol_info:
+                step_size = self.symbol_info[symbol].get('qtyStep', 1)
+                if step_size >= 1000 and float(formatted_qty) < step_size:
+                    logger.error(
+                        f"Reduce-only order for {symbol}: formatted qty {formatted_qty} < step {step_size}. "
+                        f"This will cause error 110017. Adjusting to minimum step."
+                    )
+                    formatted_qty = str(int(step_size))
             
             params = {
                 "category": "linear", "symbol": symbol, "side": side.capitalize(),
@@ -496,11 +632,32 @@ class BybitExchange(BaseExchange):
                 "positionIdx": 0
             }
             if reduce_only: params["reduceOnly"] = True
+            
+            # DEBUG: Логирование параметров ордера перед отправкой
+            logger.debug(
+                f"Creating limit order for {symbol}: qty={formatted_qty} (original={quantity}), "
+                f"price={self.format_price(symbol, price)}, side={side}, reduce_only={reduce_only}"
+            )
 
             result = await self._async_request(self.client.place_order, **params)
             if result and result.get('retCode') == 0:
                 return {'orderId': result['result'].get('orderId')}
-            logger.error(f"Failed to create limit order: {result}")
+            
+            # Детальное логирование ошибки для диагностики
+            error_code = result.get('retCode') if result else None
+            error_msg = result.get('retMsg', '') if result else 'No error message'
+            
+            if error_code == 110017:
+                # Специальная диагностика для ошибки 110017
+                logger.error(
+                    f"Error 110017 for {symbol}: {error_msg}. "
+                    f"Order params: qty={formatted_qty}, original_qty={quantity}, "
+                    f"qtyStep={self.symbol_info.get(symbol, {}).get('qtyStep', 'unknown')}, "
+                    f"minOrderQty={self.symbol_info.get(symbol, {}).get('minOrderQty', 'unknown')}"
+                )
+            else:
+                logger.error(f"Failed to create limit order: {result}")
+            
             return None
         except Exception as e:
             logger.error(f"Error creating limit order: {e}")
