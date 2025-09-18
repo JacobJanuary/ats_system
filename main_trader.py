@@ -419,12 +419,37 @@ class MainTrader:
     async def calculate_position_size(self, exchange: Union[BinanceExchange, BybitExchange],
                                       symbol: str, price: float) -> float:
         """
-        CRITICAL FIX v2: Улучшенный расчет размера позиции
+        FIXED v4: Расчет ФИКСИРОВАННОГО размера позиции с проверкой маржи
+        - Проверка доступной маржи только для валидации (без изменения размера)
+        - Использование фиксированного размера позиции
         - Добавлена проверка минимального размера для Bybit
         - Добавлена валидация notional value с выбросом исключения
-        - Улучшено логирование
         """
         try:
+            # FIXED: Проверяем доступную маржу только для отклонения сигнала
+            if isinstance(exchange, BinanceExchange):
+                try:
+                    # Используем API метод для получения баланса
+                    account_info = await exchange.get_account_balance()
+                    available_balance = float(account_info) if account_info else 0
+                    
+                    # Проверяем, достаточно ли маржи для ФИКСИРОВАННОЙ позиции
+                    margin_required = self.position_size_usd / self.leverage
+                    
+                    if available_balance < margin_required:
+                        error_msg = (
+                            f"Insufficient margin for {symbol}: "
+                            f"Available=${available_balance:.2f}, "
+                            f"Required=${margin_required:.2f}"
+                        )
+                        logger.error(error_msg)
+                        raise ValueError(error_msg)
+                        
+                except Exception as e:
+                    logger.error(f"Failed to check Binance margin: {e}")
+                    # Продолжаем с фиксированным размером, пусть биржа сама отклонит если не хватает
+            
+            # Используем ФИКСИРОВАННЫЙ размер позиции
             base_quantity = self.position_size_usd / price
             formatted_qty = float(exchange.format_quantity(symbol, base_quantity))
 

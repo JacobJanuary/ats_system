@@ -59,6 +59,7 @@ class PositionInfo:
     has_trailing: bool = False
     has_tp: bool = False
     has_breakeven_order: bool = False
+    has_broken_ts: bool = False  # Flag for broken TS on Bybit
     sl_price: Optional[float] = None
     tp_price: Optional[float] = None
     trailing_activation_price: Optional[float] = None
@@ -79,6 +80,7 @@ class ProtectionMonitor:
         self.trailing_activation_buffer = float(os.getenv('TRAILING_ACTIVATION_BUFFER', '0.3'))  # Буфер 0.3%
         self.max_position_duration_hours = int(os.getenv('MAX_POSITION_DURATION_HOURS', '24'))
         self.min_profit_for_breakeven = float(os.getenv('MIN_PROFIT_FOR_BREAKEVEN', '0.3'))
+        self.min_profit_for_aged_close = float(os.getenv('MIN_PROFIT_FOR_AGED_CLOSE', '3.0'))  # Close aged only if > 3%
         self.check_interval = int(os.getenv('CHECK_INTERVAL', '30'))
         self.testnet = os.getenv('TESTNET', 'false').lower() == 'true'
         self.taker_fee_percent = float(os.getenv('TAKER_FEE_PERCENT', '0.06'))
@@ -94,7 +96,7 @@ class ProtectionMonitor:
 
     def _log_configuration(self):
         logger.info("=" * 80)
-        logger.info("PROTECTION MONITOR CONFIGURATION v7.0 (FINAL)")
+        logger.info("PROTECTION MONITOR CONFIGURATION v8.0 (PRIORITY FIX)")
         logger.info("=" * 80)
         logger.info(f"Environment: {'TESTNET' if self.testnet else 'MAINNET'}")
         logger.info(f"Stop Loss: {self.sl_percent}%")
@@ -103,6 +105,8 @@ class ProtectionMonitor:
         logger.info(f"Trailing Callback: {self.trailing_callback}%")
         logger.info(f"Trailing Buffer: {self.trailing_activation_buffer}%")
         logger.info(f"Max Position Duration: {self.max_position_duration_hours}h")
+        logger.info(f"Min Profit for Breakeven: {self.min_profit_for_breakeven}%")
+        logger.info(f"Min Profit for Aged Close: {self.min_profit_for_aged_close}%")
         logger.info(f"Check Interval: {self.check_interval}s")
         logger.info("=" * 80)
 
@@ -218,22 +222,6 @@ class ProtectionMonitor:
         logger.warning(f"Cannot determine age for {symbol} on {exchange_name}, assuming new position")
         return 0.0
 
-    def _calculate_position_age(self, position: Dict, exchange_name: str) -> float:
-        """
-        CRITICAL FIX v2: Синхронная обертка для обратной совместимости
-        """
-        # Если мы уже в async контексте, создаем задачу
-        try:
-            loop = asyncio.get_running_loop()
-            # Мы в async контексте, создаем корутину которая будет выполнена позже
-            future = asyncio.ensure_future(
-                self._calculate_position_age_async(position, exchange_name)
-            )
-            # Возвращаем 0 как временное значение, реальное значение будет получено асинхронно
-            return 0.0
-        except RuntimeError:
-            # Нет запущенного loop, запускаем синхронно
-            return asyncio.run(self._calculate_position_age_async(position, exchange_name))
 
     def _calculate_pnl_percent(self, entry_price: float, current_price: float, side: str) -> float:
         if entry_price <= 0: return 0.0
@@ -248,7 +236,8 @@ class ProtectionMonitor:
             symbol=symbol, exchange=exchange_name, side=position.get('side', '').upper(),
             quantity=float(position.get('quantity', 0)), entry_price=float(position.get('entry_price', 0)),
             current_price=float(position.get('mark_price', position.get('entry_price', 0))),
-            pnl=float(position.get('pnl', 0)), age_hours=self._calculate_position_age(position, exchange_name)
+            pnl=float(position.get('pnl', 0)), age_hours=0.0,  # Will be set properly in process_exchange_positions
+            has_broken_ts=False  # Initialize the new field
         )
         pos_info.pnl_percent = self._calculate_pnl_percent(pos_info.entry_price, pos_info.current_price, pos_info.side)
 
@@ -265,8 +254,11 @@ class ProtectionMonitor:
                 logger.warning(
                     f"Bybit: Found broken Trailing Stop for {symbol} with 0 activation price. Marking as inactive.")
                 pos_info.has_trailing = False
+                # CRITICAL: Mark that we need to fix this broken TS
+                pos_info.has_broken_ts = True
             else:
                 pos_info.has_trailing = has_ts_value
+                pos_info.has_broken_ts = False
 
         # ИСПРАВЛЕНИЕ для Binance: проверяем АКТИВНЫЕ trailing stop ордера
         active_trailing = False
@@ -294,7 +286,8 @@ class ProtectionMonitor:
                     pos_info.has_tp = True
                     pos_info.tp_price = float(order.get('stopPrice', 0))
 
-            if order_type == 'limit' and order.get('reduceOnly', False):
+            # Проверка на breakeven ордер - только если это limit ордер без stopOrderType
+            if order_type == 'limit' and order.get('reduceOnly', False) and not order.get('stopOrderType'):
                 pos_info.has_breakeven_order = True
 
         # Для Binance используем результат проверки активных ордеров
@@ -446,7 +439,7 @@ class ProtectionMonitor:
                     if symbol:
                         position_map[symbol] = {
                             'position': pos,
-                            'age_hours': self._calculate_position_age(pos, exchange_name)
+                            'age_hours': await self._calculate_position_age_async(pos, exchange_name)
                         }
 
             logger.info(f"🔍 Analyzing {len(all_orders)} orders for {len(position_map)} positions on {exchange_name}")
@@ -607,6 +600,34 @@ class ProtectionMonitor:
                 logger.error(f"CRITICAL: Failed to execute emergency close for {pos_info.symbol}: {e}", exc_info=True)
         return False
 
+    async def _apply_basic_sl(self, exchange: Union[BinanceExchange, BybitExchange], pos_info: PositionInfo):
+        """Force apply basic stop-loss protection regardless of position state"""
+        symbol = pos_info.symbol
+        logger.info(f"🚨 FORCE applying basic SL to {symbol} on {pos_info.exchange}")
+        
+        current_price = pos_info.current_price
+        entry_price = pos_info.entry_price
+        
+        if pos_info.side in ['LONG', 'BUY']:
+            sl_from_entry = entry_price * (1 - self.sl_percent / 100)
+            sl_from_current = current_price * (1 - self.sl_percent / 100)
+            sl_price = min(sl_from_entry, sl_from_current)
+            logger.info(f"  LONG SL: from_entry=${sl_from_entry:.4f}, from_current=${sl_from_current:.4f}, using=${sl_price:.4f}")
+        else:  # SHORT
+            sl_from_entry = entry_price * (1 + self.sl_percent / 100)
+            sl_from_current = current_price * (1 + self.sl_percent / 100)
+            sl_price = max(sl_from_entry, sl_from_current)
+            logger.info(f"  SHORT SL: from_entry=${sl_from_entry:.4f}, from_current=${sl_from_current:.4f}, using=${sl_price:.4f}")
+        
+        await asyncio.sleep(self.request_delay)
+        if await exchange.set_stop_loss(symbol, sl_price):
+            logger.info(f"✅ CRITICAL SL set for {symbol} at ${sl_price:.8f}")
+            pos_info.has_sl = True
+            return True
+        else:
+            logger.error(f"❌ FAILED to set critical SL for {symbol}")
+            return False
+
     async def _apply_protection(self, exchange: Union[BinanceExchange, BybitExchange], pos_info: PositionInfo):
         symbol = pos_info.symbol
         logger.info(f"🛡️ Applying protection to {symbol} on {pos_info.exchange}")
@@ -624,8 +645,37 @@ class ProtectionMonitor:
                 logger.info(f"  Position {symbol} already has Trailing Stop, no additional protection needed")
                 return
 
-            # Action 1: Если нет защиты вообще, устанавливаем SL
+            # NEW LOGIC: Сначала проверяем прибыльность
+            # Если позиция уже прибыльна >= 1.5%, сразу ставим TS
+            if pos_info.pnl_percent >= self.trailing_activation and not pos_info.has_trailing:
+                logger.info(
+                    f"📈 Position {symbol} is profitable ({pos_info.pnl_percent:.2f}%). Setting Trailing Stop directly.")
+                
+                # Если есть SL - апгрейдим, если нет - ставим сразу TS
+                if pos_info.has_sl:
+                    success = await self._safe_sl_to_ts_upgrade(exchange, pos_info)
+                else:
+                    # Прямая установка TS для прибыльной позиции без SL
+                    current_price = pos_info.current_price
+                    buffer_percent = 0.3  # Минимальный буфер для активации
+                    
+                    if pos_info.side in ['LONG', 'BUY']:
+                        activation_price = current_price * (1 + buffer_percent / 100)
+                    else:
+                        activation_price = current_price * (1 - buffer_percent / 100)
+                    
+                    logger.info(f"  Setting TS with activation=${activation_price:.8f} (buffer={buffer_percent}%)")
+                    success = await exchange.set_trailing_stop(symbol, activation_price, self.trailing_callback)
+                
+                if success:
+                    logger.info(f"✅ Trailing Stop set for {symbol}")
+                    pos_info.has_trailing = True
+                    pos_info.has_sl = False
+                return
+
+            # Если позиция НЕ прибыльна и нет защиты - ставим SL
             if not pos_info.has_sl and not pos_info.has_trailing:
+                logger.info(f"📉 Position {symbol} not profitable enough for TS ({pos_info.pnl_percent:.2f}% < {self.trailing_activation}%), setting SL")
                 # Расчет SL с учетом текущей цены
                 current_price = pos_info.current_price
                 entry_price = pos_info.entry_price
@@ -646,20 +696,7 @@ class ProtectionMonitor:
                 await asyncio.sleep(self.request_delay)
                 if await exchange.set_stop_loss(symbol, sl_price):
                     logger.info(f"✅ Stop Loss added for {symbol} at ${sl_price:.8f}")
-                    pos_info.has_sl = True  # Обновляем статус
-
-            # Action 2: Апгрейд SL → TS если позиция прибыльна
-            if pos_info.has_sl and not pos_info.has_trailing:
-                if pos_info.pnl_percent >= self.trailing_activation:
-                    logger.info(
-                        f"📈 Position {symbol} is profitable ({pos_info.pnl_percent:.2f}%). Upgrading SL to Trailing Stop.")
-                    success = await self._safe_sl_to_ts_upgrade(exchange, pos_info)
-                    if success:
-                        pos_info.has_trailing = True
-                        pos_info.has_sl = False  # На Binance SL заменяется на TS
-                else:
-                    logger.debug(
-                        f"  Position not ready for TS: PnL {pos_info.pnl_percent:.2f}% < target {self.trailing_activation}%")
+                    pos_info.has_sl = True
 
         except Exception as e:
             logger.error(f"Error applying protection to {symbol}: {e}", exc_info=True)
@@ -672,24 +709,136 @@ class ProtectionMonitor:
             logger.info(f"Breakeven limit order already exists for {symbol}. Monitoring.")
             return
 
+        # FIRST CHECK: Before acquiring lock
         try:
-            if pos_info.pnl_percent > self.min_profit_for_breakeven:
-                logger.info(f"📈 Aged position {symbol} is in profit ({pos_info.pnl_percent:.2f}%), closing at market.")
+            if exchange.__class__.__name__ == 'BybitExchange':
+                from pybit.unified_trading import HTTP
+                client = HTTP(
+                    testnet=exchange.testnet,
+                    api_key=exchange.api_key,
+                    api_secret=exchange.api_secret
+                )
+                
+                symbol_orders = client.get_open_orders(
+                    category="linear",
+                    symbol=symbol,
+                    settleCoin="USDT"
+                )
+                
+                limit_orders = [
+                    o for o in symbol_orders['result']['list']
+                    if o.get('orderType') == 'Limit' 
+                    and not o.get('stopOrderType')
+                ]
+                
+                if limit_orders:
+                    logger.info(f"Found {len(limit_orders)} existing limit orders for {symbol}. Skipping.")
+                    return
+            else:
+                orders = await exchange.get_open_orders(symbol)
+                existing_limit_orders = [
+                    o for o in orders 
+                    if o.get('type', '').lower() == 'limit' 
+                    and o.get('reduceOnly', False)
+                ]
+                
+                if existing_limit_orders:
+                    logger.info(f"Found {len(existing_limit_orders)} existing limit orders for {symbol}. Skipping.")
+                    return
+        except Exception as e:
+            logger.warning(f"Initial check for existing orders failed: {e}")
+
+        # ACQUIRE LOCK for aged position processing
+        lock_key = f"aged_{pos_info.exchange}_{symbol}"
+        lock_acquired = False
+        
+        try:
+            # Try to acquire special lock for aged position processing
+            if self.db_pool:
+                async with self.db_pool.acquire() as conn:
+                    lock_id = hash(lock_key) % 2147483647
+                    lock_acquired = await conn.fetchval(
+                        "SELECT pg_try_advisory_lock($1)", lock_id
+                    )
+                    
+                    if not lock_acquired:
+                        logger.debug(f"Could not acquire aged position lock for {symbol}")
+                        return
+                        
+            # SECOND CHECK: After acquiring lock (double-check pattern)
+            if exchange.__class__.__name__ == 'BybitExchange':
+                from pybit.unified_trading import HTTP
+                client = HTTP(
+                    testnet=exchange.testnet,
+                    api_key=exchange.api_key,
+                    api_secret=exchange.api_secret
+                )
+                
+                symbol_orders = client.get_open_orders(
+                    category="linear",
+                    symbol=symbol,
+                    settleCoin="USDT"
+                )
+                
+                limit_orders = [
+                    o for o in symbol_orders['result']['list']
+                    if o.get('orderType') == 'Limit' 
+                    and not o.get('stopOrderType')
+                ]
+                
+                if limit_orders:
+                    logger.info(f"[After lock] Found {len(limit_orders)} existing limit orders for {symbol}. Skipping.")
+                    return
+                
+            # Use different thresholds for closing vs breakeven
+            if pos_info.pnl_percent >= self.min_profit_for_aged_close:
+                logger.info(f"📈 Aged position {symbol} has high profit ({pos_info.pnl_percent:.2f}% >= {self.min_profit_for_aged_close}%), closing at market.")
                 await exchange.cancel_all_open_orders(symbol)
                 await asyncio.sleep(self.request_delay)
                 if await exchange.close_position(symbol):
-                    logger.info(f"✅ Position {symbol} closed at market due to age and profit.")
-            else:
+                    logger.info(f"✅ Position {symbol} closed at market due to age and high profit.")
+            elif pos_info.pnl_percent > self.min_profit_for_breakeven:
                 logger.info(
-                    f"📉 Aged position {symbol} not in profit ({pos_info.pnl_percent:.2f}%), setting breakeven limit order.")
+                    f"📊 Aged position {symbol} has moderate profit ({pos_info.pnl_percent:.2f}%), keeping position with breakeven order.")
+                # Don't close, just set breakeven order
                 fee_multiplier = 1 + (self.taker_fee_percent * 2 / 100)
                 side = 'SELL' if pos_info.side in ['LONG', 'BUY'] else 'BUY'
                 breakeven_price = pos_info.entry_price * fee_multiplier if side == 'SELL' else pos_info.entry_price / fee_multiplier
                 logger.info(f"Placing breakeven limit order for {symbol} at ${breakeven_price:.8f}.")
-                await exchange.create_limit_order(symbol=symbol, side=side, quantity=pos_info.quantity,
-                                                  price=breakeven_price, reduce_only=True)
+                
+                try:
+                    await exchange.create_limit_order(symbol=symbol, side=side, quantity=pos_info.quantity,
+                                                      price=breakeven_price, reduce_only=True)
+                    logger.info(f"✅ Successfully placed breakeven order for profitable aged {symbol}")
+                except Exception as order_error:
+                    logger.error(f"Failed to create breakeven order for {symbol}: {order_error}")
+            else:
+                logger.info(
+                    f"📉 Aged position {symbol} in loss ({pos_info.pnl_percent:.2f}%), setting breakeven limit order.")
+                fee_multiplier = 1 + (self.taker_fee_percent * 2 / 100)
+                side = 'SELL' if pos_info.side in ['LONG', 'BUY'] else 'BUY'
+                breakeven_price = pos_info.entry_price * fee_multiplier if side == 'SELL' else pos_info.entry_price / fee_multiplier
+                logger.info(f"Placing SINGLE breakeven limit order for {symbol} at ${breakeven_price:.8f}.")
+                
+                try:
+                    await exchange.create_limit_order(symbol=symbol, side=side, quantity=pos_info.quantity,
+                                                      price=breakeven_price, reduce_only=True)
+                    logger.info(f"✅ Successfully placed breakeven order for {symbol}")
+                except Exception as order_error:
+                    logger.error(f"Failed to create breakeven order for {symbol}: {order_error}")
+                    
         except Exception as e:
             logger.error(f"Error handling aged position {symbol}: {e}", exc_info=True)
+        finally:
+            # Release aged position lock if acquired
+            if lock_acquired and self.db_pool:
+                try:
+                    async with self.db_pool.acquire() as conn:
+                        lock_id = hash(lock_key) % 2147483647
+                        await conn.execute("SELECT pg_advisory_unlock($1)", lock_id)
+                        logger.debug(f"Released aged position lock for {symbol}")
+                except Exception as e:
+                    logger.error(f"Failed to release aged position lock: {e}")
 
     async def process_exchange_positions(self, exchange_name: str):
         exchange = self.binance if exchange_name == 'Binance' else self.bybit
@@ -732,20 +881,46 @@ class ProtectionMonitor:
                     if await self._handle_breached_sl(exchange, pos_info):
                         continue
 
-                    if pos_info.status == PositionStatus.TRAILING_ACTIVE and not (
-                            pos_info.age_hours > self.max_position_duration_hours > 0):
+                    # PRIORITY 0: FIX BROKEN TRAILING STOPS ON BYBIT IMMEDIATELY
+                    if pos_info.has_broken_ts and exchange_name == 'Bybit':
+                        logger.warning(f"🚨 CRITICAL: Position {symbol} has BROKEN TS (activation=0). Setting SL immediately!")
+                        # Force set SL for broken TS
+                        await self._apply_basic_sl(exchange, pos_info)
+                        continue
+
+                    # PRIORITY 1: Skip if already has active trailing stop
+                    if pos_info.status == PositionStatus.TRAILING_ACTIVE:
                         logger.debug(f"Position {symbol} has an active trailing stop. Monitoring.")
                         continue
 
+                    # PRIORITY 2: Skip if has pending close order
                     if pos_info.status == PositionStatus.PENDING_CLOSE:
                         logger.info(f"Position {symbol} has a pending breakeven limit order. Monitoring.")
                         continue
 
+                    # PRIORITY 3: Apply protection (SL/TS) for profitable positions FIRST
+                    # This ensures profitable positions get TS before being processed as aged
+                    if pos_info.pnl_percent >= self.trailing_activation and not pos_info.has_trailing:
+                        logger.info(f"📈 Profitable position {symbol} ({pos_info.pnl_percent:.2f}%) - applying TS before aged check")
+                        await self._apply_protection(exchange, pos_info)
+                        continue
+
+                    # PRIORITY 4: Handle aged positions (only after checking for TS eligibility)
                     if self.max_position_duration_hours > 0 and pos_info.age_hours > self.max_position_duration_hours:
+                        logger.info(f"⏰ Processing aged position {symbol} (age={pos_info.age_hours:.1f}h, profit={pos_info.pnl_percent:.2f}%)")
+                        # CRITICAL: Ensure aged positions also have SL as fallback
+                        if not pos_info.has_sl and not pos_info.has_trailing:
+                            logger.warning(f"Aged position {symbol} has NO protection! Setting SL before handling age")
+                            await self._apply_basic_sl(exchange, pos_info)
                         await self._handle_aged_position(exchange, pos_info)
                         continue
 
-                    if pos_info.status in [PositionStatus.UNPROTECTED, PositionStatus.PARTIALLY_PROTECTED]:
+                    # PRIORITY 5: Apply basic protection (SL) for ALL positions without protection
+                    # This includes aged positions that didn't get closed or breakeven
+                    if not pos_info.has_sl and not pos_info.has_trailing and not pos_info.has_breakeven_order:
+                        logger.info(f"⚠️ Position {symbol} has NO protection at all! Setting SL immediately")
+                        await self._apply_basic_sl(exchange, pos_info)
+                    elif pos_info.status in [PositionStatus.UNPROTECTED, PositionStatus.PARTIALLY_PROTECTED]:
                         await self._apply_protection(exchange, pos_info)
 
                 finally:

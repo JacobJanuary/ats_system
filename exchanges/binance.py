@@ -305,6 +305,17 @@ class BinanceExchange(BaseExchange):
             logger.error(f"Failed to cancel orders for {symbol}: {e}")
             return False
 
+    async def get_account_balance(self) -> float:
+        """Get available balance from futures account"""
+        try:
+            account_info = await self._make_request("GET", "/fapi/v2/account", signed=True)
+            if account_info:
+                return float(account_info.get('availableBalance', 0))
+            return 0.0
+        except Exception as e:
+            logger.error(f"Failed to get account balance: {e}")
+            return 0.0
+
     async def cancel_order(self, symbol: str, order_id: str) -> bool:
         """Cancels a specific order by its ID."""
         try:
@@ -344,6 +355,16 @@ class BinanceExchange(BaseExchange):
             if not pos:
                 logger.warning(f"No position found for {symbol} to set SL.")
                 return False
+            
+            # CRITICAL FIX: Cancel existing SL orders before creating new one
+            open_orders = await self.get_open_orders(symbol)
+            for order in open_orders:
+                if order.get('type') == 'STOP_MARKET' and order.get('status') in ['NEW', 'PARTIALLY_FILLED']:
+                    order_id = order.get('orderId')
+                    logger.info(f"Cancelling existing SL order {order_id} for {symbol}")
+                    await self.cancel_order(symbol, order_id)
+                    await asyncio.sleep(0.1)  # Small delay to ensure cancellation
+            
             side = 'SELL' if pos['side'] == 'LONG' else 'BUY'
             params = {
                 'symbol': symbol, 'side': side, 'type': 'STOP_MARKET',
